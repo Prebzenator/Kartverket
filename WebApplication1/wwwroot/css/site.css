@@ -1,0 +1,73 @@
+/* Typography scale */
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+/* Theme-aware base so dark mode works */
+body {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+/* Accessible, theme-aware focus ring */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem var(--bs-body-bg), 0 0 0 0.25rem var(--bs-focus-ring-color, rgba(13,110,253,.25));
+    outline: 0;
+}
+
+/* Floating labels: placeholder alignment (Bootstrap pattern) */
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
+    color: var(--bs-secondary-color);
+    text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
+    text-align: start;
+}
+
+/* Cards/alerts polish */
+.card.rounded-4, .alert.rounded-4 {
+    border-radius: 1rem;
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+:root[data-bs-theme='dark'] .shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.2);
+}
+
+/* Floating label icon helpers */
+.form-floating .field-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    opacity: .65;
+    font-size: 1.1rem;
+}
+
+.form-floating > .form-control.ps-with-icon,
+.form-floating > textarea.form-control.ps-with-icon {
+    padding-left: 2.2rem; /* room for the icon */
+}
