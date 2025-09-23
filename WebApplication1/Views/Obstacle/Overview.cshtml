@@ -2,6 +2,8 @@
 @model WebApplication1.Models.ObstacleData
 @{
     ViewData["Title"] = "Overview";
+    var lat = Model.Latitude?.ToString("0.######", CultureInfo.InvariantCulture);
+    var lng = Model.Longitude?.ToString("0.######", CultureInfo.InvariantCulture);
 }
 
 <div class="container py-4">
@@ -12,7 +14,7 @@
                 <p class="mb-0">Your submission has been saved.</p>
             </div>
 
-            <div class="card shadow-sm rounded-4">
+            <div class="card shadow-sm rounded-4 mb-3">
                 <div class="card-body p-4">
                     <h3 class="h5 mb-3">Details</h3>
                     <dl class="row mb-0">
@@ -24,21 +26,45 @@
 
                         <dt class="col-5 col-md-4">Description</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleDescription</dd>
+
+                        <dt class="col-5 col-md-4">Coordinates</dt>
+                        <dd class="col-7 col-md-8">
+                            @Model.Latitude?.ToString("0.######", CultureInfo.CurrentCulture),
+                            @Model.Longitude?.ToString("0.######", CultureInfo.CurrentCulture)
+                        </dd>
                     </dl>
                 </div>
             </div>
 
-            <div class="d-grid gap-2 mt-3">
-                <!-- Be explicit about the new controller -->
-                <a asp-controller="Obstacle" asp-action="DataForm" class="btn btn-primary">
-                    Register another
-                </a>
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <div class="card shadow-sm rounded-4">
+                    <div class="card-body p-0">
+                        <div id="map-overview" style="height: 320px; border-radius: 0.75rem;"></div>
+                    </div>
+                </div>
+            }
 
-                <!-- Keep Home if you want to return to the landing page -->
-                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
-                    Back to Home
-                </a>
+            <div class="d-grid gap-2 mt-3">
+                <a asp-controller="Obstacle" asp-action="DataForm" class="btn btn-primary">Register another</a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    {
+        <script>
+            const lat = parseFloat("@lat");
+            const lng = parseFloat("@lng");
+            const map2 = L.map('map-overview').setView([lat, lng], 14);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map2);
+            L.marker([lat, lng]).addTo(map2);
+        </script>
+    }
+}

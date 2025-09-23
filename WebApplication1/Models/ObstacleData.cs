@@ -9,7 +9,7 @@ namespace WebApplication1.Models
         [DisplayName("Obstacle name")]
         public string ObstacleName { get; set; } = string.Empty;
 
-        // Use decimal for inputs measured in meters; better for user-entered numeric values than double.
+        // Use decimal for inputs measured in meters
         [Required]
         [Range(0, 1000, ErrorMessage = "Height must be between 0 and 1000 meters.")]
         [DisplayName("Height (m)")]
@@ -20,5 +20,12 @@ namespace WebApplication1.Models
         [DisplayName("Description")]
         [DataType(DataType.MultilineText)]
         public string? ObstacleDescription { get; set; }
+
+        [DisplayName("Latitude")]
+        public decimal? Latitude { get; set; }
+
+        [DisplayName("Longitude")]
+        public decimal? Longitude { get; set; }
+
     }
 }

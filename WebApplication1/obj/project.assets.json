@@ -292,11 +292,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\emil1\\Documents\\GitHub\\Kartverket\\WebApplication1\\WebApplication1.csproj",
+      "projectUniqueName": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
       "projectName": "WebApplication1",
-      "projectPath": "C:\\Users\\emil1\\Documents\\GitHub\\Kartverket\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
       "packagesPath": "C:\\Users\\emil1\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\emil1\\Documents\\GitHub\\Kartverket\\WebApplication1\\obj\\",
+      "outputPath": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
