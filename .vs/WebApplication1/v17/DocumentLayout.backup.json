@@ -3,12 +3,36 @@
   "WorkspaceRootPath": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\webapplication1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\webapplication1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\views\\obstacle\\dataform.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -59,18 +83,6 @@
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\emil1\\desktop\\netcore app test\\webapplication1\\webapplication1\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
@@ -90,97 +102,63 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
+              "Title": "jquery.min.map",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+              "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+              "RelativeToolTip": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAB+DgAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-09-22T13:56:14.256Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "jquery.min.js",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+              "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+              "RelativeToolTip": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAEAAADQNwEAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T13:56:11.774Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "jquery.js",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+              "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+              "RelativeToolTip": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js",
+              "ViewState": "AgIAAFQmAAAAAAAAAAAswGgmAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-09-22T13:55:58.734Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "ObstacleController.cs",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Controllers\\ObstacleController.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Controllers\\ObstacleController.cs",
               "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Controllers\\ObstacleController.cs",
               "RelativeToolTip": "WebApplication1\\Controllers\\ObstacleController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-21T23:40:24.497Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Overview.cshtml",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T19:12:40.416Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "site.css",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\css\\site.css",
-              "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\css\\site.css",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\css\\site.css",
-              "RelativeToolTip": "WebApplication1\\wwwroot\\css\\site.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-09-21T20:03:18.579Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "HomeController.cs",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Controllers\\HomeController.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\HomeController.cs",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Controllers\\HomeController.cs",
-              "RelativeToolTip": "WebApplication1\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAYwCAAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-25T16:09:32.932Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "DataForm.cshtml",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T20:46:21.082Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAYwC4AAAA/AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T23:15:28.633Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "Index.cshtml",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Home\\Index.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Home\\Index.cshtml",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Home\\Index.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Home\\Index.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T18:51:33.866Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "WebApplication1.csproj",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\WebApplication1.csproj",
               "RelativeDocumentMoniker": "WebApplication1\\WebApplication1.csproj",
@@ -193,7 +171,118 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
+              "Title": "docker-compose.yml",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\docker-compose.yml",
+              "RelativeDocumentMoniker": "docker-compose.yml",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\docker-compose.yml",
+              "RelativeToolTip": "docker-compose.yml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
+              "WhenOpened": "2025-08-25T15:58:47.046Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\launchSettings.json",
+              "RelativeDocumentMoniker": "launchSettings.json",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\launchSettings.json",
+              "RelativeToolTip": "launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-21T21:38:04.655Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\appsettings.json",
+              "RelativeDocumentMoniker": "WebApplication1\\appsettings.json",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\appsettings.json",
+              "RelativeToolTip": "WebApplication1\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-25T15:55:21.974Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T18:51:33.866Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAYwC4AAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T23:15:28.633Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "DataForm.cshtml",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T20:46:21.082Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAYwCAAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-25T16:09:32.932Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "site.css",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\css\\site.css",
+              "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\css\\site.css",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\wwwroot\\css\\site.css",
+              "RelativeToolTip": "WebApplication1\\wwwroot\\css\\site.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-09-21T20:03:18.579Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "Overview.cshtml",
+              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T19:12:40.416Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "_ValidationScriptsPartial.cshtml",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
@@ -205,7 +294,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 10,
               "Title": "ObstacleData.cs",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Models\\ObstacleData.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Models\\ObstacleData.cs",
@@ -217,7 +306,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 15,
               "Title": "Privacy.cshtml",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\Home\\Privacy.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Views\\Home\\Privacy.cshtml",
@@ -229,7 +318,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 16,
               "Title": "_ViewImports.cshtml",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Views\\_ViewImports.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Views\\_ViewImports.cshtml",
@@ -241,19 +330,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\launchSettings.json",
-              "RelativeDocumentMoniker": "launchSettings.json",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\launchSettings.json",
-              "RelativeToolTip": "launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-21T21:38:04.655Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 18,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "WebApplication1\\Properties\\launchSettings.json",
@@ -265,31 +342,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "docker-compose.yml",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\docker-compose.yml",
-              "RelativeDocumentMoniker": "docker-compose.yml",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\docker-compose.yml",
-              "RelativeToolTip": "docker-compose.yml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAASAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
-              "WhenOpened": "2025-08-25T15:58:47.046Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\appsettings.json",
-              "RelativeDocumentMoniker": "WebApplication1\\appsettings.json",
-              "ToolTip": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\appsettings.json",
-              "RelativeToolTip": "WebApplication1\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-25T15:55:21.974Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 19,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Program.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Program.cs",
@@ -301,7 +354,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 20,
               "Title": "Dockerfile",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\Dockerfile",
               "RelativeDocumentMoniker": "WebApplication1\\Dockerfile",
@@ -313,7 +366,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 21,
               "Title": "docker-compose.override.yml",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\docker-compose.override.yml",
               "RelativeDocumentMoniker": "docker-compose.override.yml",
@@ -325,7 +378,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 22,
               "Title": "appsettings.Development.json",
               "DocumentMoniker": "C:\\Users\\emil1\\Desktop\\NETCORE APP TEST\\WebApplication1\\WebApplication1\\appsettings.Development.json",
               "RelativeDocumentMoniker": "WebApplication1\\appsettings.Development.json",
