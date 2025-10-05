@@ -86,3 +86,12 @@ Shows a working interactive map. Markers appear, and Latitude/Longitude fields f
 A page confirming that an obstacle has succesfully been registerted. 
 
 
+**Drift / Usage**
+
+To use this application you can do the following:
+
+* Check the prerequisites
+* Clone this repository
+* Make sure your 3306:3306 port is available
+If your 3306:3306 port can't be made available, you have to change the code and manually choose a port yourself.
+* After this you are ready to press Docker Compose, or run: docker compose up --build

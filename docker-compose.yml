@@ -1,17 +1,33 @@
+version: '3.8'
+
 services:
+  db:
+    image: mariadb:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: securepass
+      MYSQL_DATABASE: kartverket
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: securepass
+    ports:
+      - "3306:3306"
+    networks:
+      - appnet
+
   webapplication1:
-    image: ${DOCKER_REGISTRY-}webapplication1
     build:
       context: .
       dockerfile: WebApplication1/Dockerfile
     ports:
-    - "5000:8080"
+      - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=server=mariadbcontainer;port=3306;database=mysql;user=root;password=
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "server=db;port=3306;database=kartverket;user=appuser;password=securepass;"
+    depends_on:
+      - db
     networks:
-    - appnet
+      - appnet
+
 networks:
-   appnet:
+  appnet:
     external: true
-    name: appnet

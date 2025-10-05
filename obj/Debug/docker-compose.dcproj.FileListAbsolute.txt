@@ -12,3 +12,16 @@ C:\Users\emil1\Desktop\NETCORE APP TEST\WebApplication1\bin\Debug\WebApplication
 C:\Users\emil1\Desktop\NETCORE APP TEST\WebApplication1\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
 C:\Users\emil1\Desktop\NETCORE APP TEST\WebApplication1\obj\Debug\docker-c.35A3FFBA.Up2Date
 C:\Users\emil1\Documents\GitHub\Kartverket\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\appsettings.Development.json
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\appsettings.json
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.deps.json
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.runtimeconfig.json
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.staticwebassets.runtime.json
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.staticwebassets.endpoints.json
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.exe
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.dll
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\MySqlConnector.dll
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\bin\Debug\WebApplication1.pdb
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\obj\Debug\docker-compose.dcproj.AssemblyReference.cache
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\obj\Debug\docker-c.35A3FFBA.Up2Date
