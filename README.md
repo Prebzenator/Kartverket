@@ -94,4 +94,5 @@ To use this application you can do the following:
 * Clone this repository
 * Make sure your 3306:3306 port is available
 If your 3306:3306 port can't be made available, you have to change the code and manually choose a port yourself.
+* Open the WebApplication1.sln
 * After this you are ready to press Docker Compose, or run: docker compose up --build
