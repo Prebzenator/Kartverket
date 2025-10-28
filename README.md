@@ -95,3 +95,12 @@ To use this application you can do the following:
 * Make sure your 3306:3306 port is available
 If your 3306:3306 port can't be made available, you have to change the code and manually choose a port yourself.
 * After this you are ready to press Docker Compose, or run: docker compose up --build
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Database Migration**
+
+To apply the latest database migrations (including the `DateData` column), run the following command **after** starting the database with Docker Compose:
+
+```bash
+docker run --rm -v "${PWD}:/app" -w /app --network appnet mcr.microsoft.com/dotnet/sdk:9.0 sh -c "dotnet tool install --global dotnet-ef && /root/.dotnet/tools/dotnet-ef database update --project WebApplication1.csproj"
