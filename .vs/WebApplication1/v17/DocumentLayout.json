@@ -114,11 +114,15 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
             },
             {
               "$type": "Bookmark",
@@ -134,8 +138,7 @@
               "RelativeToolTip": "WebApplication1\\appsettings.Development.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-21T20:00:00.211Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-21T20:00:00.211Z"
             },
             {
               "$type": "Document",
@@ -147,8 +150,7 @@
               "RelativeToolTip": "WebApplication1\\Program.cs",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-25T16:06:28.74Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-25T16:06:28.74Z"
             },
             {
               "$type": "Document",
@@ -160,8 +162,7 @@
               "RelativeToolTip": "WebApplication1\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-25T15:55:21.974Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-08-25T15:55:21.974Z"
             },
             {
               "$type": "Document",
@@ -186,8 +187,7 @@
               "RelativeToolTip": "WebApplication1\\Dockerfile",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAA8AAAA8AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-09-21T20:00:01.308Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-21T20:00:01.308Z"
             },
             {
               "$type": "Document",
@@ -440,16 +440,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
               "WhenOpened": "2025-09-21T20:07:26.84Z"
-            }
-          ]
-        },
-        {
-          "DockedWidth": 200,
-          "SelectedChildIndex": -1,
-          "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             }
           ]
         }
