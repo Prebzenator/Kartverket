@@ -1,0 +1,50 @@
+﻿version: "3.8"
+
+services:
+  db:
+    image: mariadb:11
+    container_name: kartverket-db-1
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: kartverket
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: securepass
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    image: webapplication1:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kartverket-webapplication1-1
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "server=db;port=3306;database=kartverket;user=appuser;password=securepass;"
+    ports:
+      - "5000:80"
+    volumes:
+      - web_dataprotection:/root/.aspnet/DataProtection-Keys
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  db_data:
+    name: kartverket_db_data
+  web_dataprotection:
+    name: kartverket_web_dataprotection

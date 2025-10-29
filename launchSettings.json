@@ -1,11 +1,14 @@
 {
   "profiles": {
-    "Docker Compose": {
-      "commandName": "DockerCompose",
-      "commandVersion": "1.0",
-      "serviceActions": {
-        "webapplication1": "StartDebugging"
-      }
+    "http": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5068"
     }
-  }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
 }

@@ -7,28 +7,72 @@
       "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:docker-compose.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\data\\migrations\\applicationdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\data\\migrations\\applicationdbcontextmodelsnapshot.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\dockerfile||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\webapplication1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\webapplication1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\docker-compose.dcproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:docker-compose.dcproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\.dockerignore||{3B902123-F8A7-4915-9F01-361F908088D0}",
+      "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:.dockerignore||{3B902123-F8A7-4915-9F01-361F908088D0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\data\\designtimedbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\data\\designtimedbcontextfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\obstaclecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\models\\obstacledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\models\\obstacledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\obstacle\\dataform.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -37,10 +81,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\obstacle\\overview.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\obstacle\\overview.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -55,14 +95,6 @@
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\models\\errorviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\models\\obstacledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\models\\obstacledata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
@@ -71,16 +103,8 @@
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\views\\shared\\error.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\views\\shared\\error.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\webapplication1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\webapplication1.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
@@ -99,22 +123,18 @@
       "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\wwwroot\\css\\site.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\webapplication1\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{FB2EB2A3-F50D-4819-8C66-5530C4734022}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|c:\\users\\truls\\onedrive\\dokumenter\\kartverket\\docker-compose.override.yml||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{81DDED9D-158B-E303-5F62-77A2896D2A5A}|docker-compose.dcproj|solutionrelative:docker-compose.override.yml||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
     {
-      "Orientation": 0,
+      "Orientation": 1,
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 5,
+          "DockedHeight": 200,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -126,41 +146,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "appsettings.Development.json",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.Development.json",
-              "RelativeDocumentMoniker": "WebApplication1\\appsettings.Development.json",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.Development.json",
-              "RelativeToolTip": "WebApplication1\\appsettings.Development.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-21T20:00:00.211Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Program.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Program.cs",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Program.cs",
-              "RelativeToolTip": "WebApplication1\\Program.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Title": "ApplicationDbContextModelSnapshot.cs",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Data\\Migrations\\ApplicationDbContextModelSnapshot.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Data\\Migrations\\ApplicationDbContextModelSnapshot.cs",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Data\\Migrations\\ApplicationDbContextModelSnapshot.cs",
+              "RelativeToolTip": "WebApplication1\\Data\\Migrations\\ApplicationDbContextModelSnapshot.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAwA4AAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-25T16:06:28.74Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.json",
-              "RelativeDocumentMoniker": "WebApplication1\\appsettings.json",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.json",
-              "RelativeToolTip": "WebApplication1\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-08-25T15:55:21.974Z",
+              "WhenOpened": "2025-10-29T00:30:56.893Z",
               "EditorCaption": ""
             },
             {
@@ -171,7 +165,7 @@
               "RelativeDocumentMoniker": "docker-compose.yml",
               "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\docker-compose.yml",
               "RelativeToolTip": "docker-compose.yml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABsAAAAEAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003775|",
               "WhenOpened": "2025-08-25T15:58:47.046Z",
               "EditorCaption": ""
@@ -179,127 +173,198 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.json",
+              "RelativeDocumentMoniker": "WebApplication1\\appsettings.json",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.json",
+              "RelativeToolTip": "WebApplication1\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-08-25T15:55:21.974Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "appsettings.Development.json",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.Development.json",
+              "RelativeDocumentMoniker": "WebApplication1\\appsettings.Development.json",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\appsettings.Development.json",
+              "RelativeToolTip": "WebApplication1\\appsettings.Development.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-21T20:00:00.211Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Program.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Program.cs",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Program.cs",
+              "RelativeToolTip": "WebApplication1\\Program.cs",
+              "ViewState": "AgIAAHUAAAAAAAAAAAAowJMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-25T16:06:28.74Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "Dockerfile",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Dockerfile",
               "RelativeDocumentMoniker": "WebApplication1\\Dockerfile",
               "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Dockerfile",
               "RelativeToolTip": "WebApplication1\\Dockerfile",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA8AAAA8AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-09-21T20:00:01.308Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "HomeController.cs",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\HomeController.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\HomeController.cs",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\HomeController.cs",
-              "RelativeToolTip": "WebApplication1\\Controllers\\HomeController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-08-25T16:09:32.932Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "_ViewImports.cshtml",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewImports.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\_ViewImports.cshtml",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewImports.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\_ViewImports.cshtml",
+              "DocumentIndex": 4,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\_ViewStart.cshtml",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\_ViewStart.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-22T00:18:42.605Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "Overview.cshtml",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEMAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T19:12:40.416Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "_Layout.cshtml",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
-              "ViewState": "AgIAAFUAAAAAAAAAAAAAAA0AAABIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T23:15:28.633Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "ObstacleController.cs",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\ObstacleController.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\ObstacleController.cs",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\ObstacleController.cs",
-              "RelativeToolTip": "WebApplication1\\Controllers\\ObstacleController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAmAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-21T23:40:24.497Z"
+              "WhenOpened": "2025-09-23T12:35:46.38Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "DataForm.cshtml",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-21T20:46:21.082Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\launchSettings.json",
               "RelativeDocumentMoniker": "launchSettings.json",
               "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\launchSettings.json",
               "RelativeToolTip": "launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-21T21:38:04.655Z"
+              "WhenOpened": "2025-09-21T21:38:04.655Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "WebApplication1\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-28T18:06:57.245Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "WebApplication1.csproj",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\WebApplication1.csproj",
+              "RelativeDocumentMoniker": "WebApplication1\\WebApplication1.csproj",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\WebApplication1.csproj",
+              "RelativeToolTip": "WebApplication1\\WebApplication1.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-21T20:10:21.665Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 10,
-              "Title": "_ValidationScriptsPartial.cshtml",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "Title": "docker-compose",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\docker-compose.dcproj",
+              "RelativeDocumentMoniker": "docker-compose.dcproj",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\docker-compose.dcproj",
+              "RelativeToolTip": "docker-compose.dcproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-22T00:46:14.356Z"
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-10-28T19:57:26.707Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": ".dockerignore",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\.dockerignore",
+              "RelativeDocumentMoniker": ".dockerignore",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\.dockerignore",
+              "RelativeToolTip": ".dockerignore",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-10-28T19:57:04.224Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "WebApplication1\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Properties\\launchSettings.json",
+              "RelativeToolTip": "WebApplication1\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-09-21T20:32:57.248Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "DesignTimeDbContextFactory.cs",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Data\\DesignTimeDbContextFactory.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Data\\DesignTimeDbContextFactory.cs",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Data\\DesignTimeDbContextFactory.cs",
+              "RelativeToolTip": "WebApplication1\\Data\\DesignTimeDbContextFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-28T19:16:00.508Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 14,
+              "Title": "ObstacleController.cs",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\ObstacleController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\ObstacleController.cs",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\ObstacleController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\ObstacleController.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAA1wBQAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-21T23:40:24.497Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAgwCAAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-08-25T16:09:32.932Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
               "Title": "ObstacleData.cs",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Models\\ObstacleData.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Models\\ObstacleData.cs",
               "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Models\\ObstacleData.cs",
               "RelativeToolTip": "WebApplication1\\Models\\ObstacleData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAA0AAAAAAAAAA==",
+              "ViewState": "AgIAAB8AAAAAAAAAAAA5wDcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-09-21T18:48:58.977Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 17,
               "Title": "ErrorViewModel.cs",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Models\\ErrorViewModel.cs",
               "RelativeDocumentMoniker": "WebApplication1\\Models\\ErrorViewModel.cs",
@@ -311,19 +376,67 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "_ViewStart.cshtml",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewStart.cshtml",
-              "RelativeDocumentMoniker": "WebApplication1\\Views\\_ViewStart.cshtml",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewStart.cshtml",
-              "RelativeToolTip": "WebApplication1\\Views\\_ViewStart.cshtml",
+              "DocumentIndex": 22,
+              "Title": "_ViewImports.cshtml",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewImports.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\_ViewImports.cshtml",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\_ViewImports.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\_ViewImports.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-09-23T12:35:46.38Z"
+              "WhenOpened": "2025-09-22T00:18:42.605Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Overview.cshtml",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\Overview.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEMAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T19:12:40.416Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAAFIAAAAAAAAAAIBJwA0AAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T23:15:28.633Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 18,
+              "Title": "DataForm.cshtml",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Obstacle\\DataForm.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-21T20:46:21.082Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "_ValidationScriptsPartial.cshtml",
+              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeToolTip": "WebApplication1\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-09-22T00:46:14.356Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
               "Title": "Error.cshtml",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Shared\\Error.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Views\\Shared\\Error.cshtml",
@@ -335,7 +448,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 24,
               "Title": "Privacy.cshtml",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Home\\Privacy.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Views\\Home\\Privacy.cshtml",
@@ -347,7 +460,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 23,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Views\\Home\\Index.cshtml",
               "RelativeDocumentMoniker": "WebApplication1\\Views\\Home\\Index.cshtml",
@@ -359,19 +472,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "WebApplication1.csproj",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\WebApplication1.csproj",
-              "RelativeDocumentMoniker": "WebApplication1\\WebApplication1.csproj",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\WebApplication1.csproj",
-              "RelativeToolTip": "WebApplication1\\WebApplication1.csproj",
-              "ViewState": "AgIAABEAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-09-21T20:10:21.665Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 28,
               "Title": "jquery.js",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js",
               "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.js",
@@ -383,19 +484,19 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 27,
               "Title": "jquery.min.js",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
               "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
               "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
               "RelativeToolTip": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.js",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAEAAADQNwEAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAxwAEAAADQNwEAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2025-09-22T13:56:11.774Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 26,
               "Title": "jquery.min.map",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
               "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
@@ -407,7 +508,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 29,
               "Title": "site.css",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\wwwroot\\css\\site.css",
               "RelativeDocumentMoniker": "WebApplication1\\wwwroot\\css\\site.css",
@@ -419,19 +520,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "WebApplication1\\Properties\\launchSettings.json",
-              "ToolTip": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\WebApplication1\\Properties\\launchSettings.json",
-              "RelativeToolTip": "WebApplication1\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAfAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-09-21T20:32:57.248Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 30,
               "Title": "docker-compose.override.yml",
               "DocumentMoniker": "C:\\Users\\truls\\OneDrive\\Dokumenter\\Kartverket\\docker-compose.override.yml",
               "RelativeDocumentMoniker": "docker-compose.override.yml",
@@ -444,12 +533,12 @@
           ]
         },
         {
-          "DockedWidth": 200,
+          "DockedHeight": 200,
           "SelectedChildIndex": -1,
           "Children": [
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+              "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"
             }
           ]
         }

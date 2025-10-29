@@ -1,0 +1,15 @@
+.vs/
+bin/
+obj/
+*.db
+*.cache
+*.log
+*.user
+*.dll
+*.exe
+*.pdb
+*.vsidx
+*.json.cache
+*.xml
+*.gz
+
