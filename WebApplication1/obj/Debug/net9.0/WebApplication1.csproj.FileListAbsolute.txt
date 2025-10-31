@@ -223,3 +223,4 @@ C:\Users\truls\OneDrive\Dokumenter\Kartverket\WebApplication1\obj\Debug\net9.0\W
 C:\Users\truls\OneDrive\Dokumenter\Kartverket\WebApplication1\obj\Debug\net9.0\WebApplication1.pdb
 C:\Users\truls\OneDrive\Dokumenter\Kartverket\WebApplication1\obj\Debug\net9.0\WebApplication1.genruntimeconfig.cache
 C:\Users\truls\OneDrive\Dokumenter\Kartverket\WebApplication1\obj\Debug\net9.0\ref\WebApplication1.dll
+C:\Users\truls\OneDrive\Dokumenter\Kartverket\WebApplication1\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

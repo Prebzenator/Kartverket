@@ -1,8 +1,8 @@
 {
   "ContentRoots": [
-    "/src/WebApplication1/wwwroot/",
-    "/src/WebApplication1/obj/Debug/net9.0/compressed/",
-    "/src/WebApplication1/obj/Debug/net9.0/scopedcss/bundle/"
+    "/src/wwwroot/",
+    "/src/obj/Debug/net9.0/compressed/",
+    "/src/obj/Debug/net9.0/scopedcss/bundle/"
   ],
   "Root": {
     "Children": {

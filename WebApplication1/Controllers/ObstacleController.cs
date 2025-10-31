@@ -1,42 +1,65 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
-
-/// Handles routes for obstacle data input and overview display (Obstacle registration)
-/// - GET /Obstacle/DataForm: Displays the form for entering obstacle data
-/// - POST /Obstacle/DataForm: Handles form submission and shows overview if valid
-/// - GET /Obstacle/Overview: Displays the overview of submitted obstacle data
+using WebApplication1.Data;
 
 namespace WebApplication1.Controllers
 {
+    /// <summary>
+    /// Handles routes for obstacle data input and overview display (Obstacle registration).
+    /// 
+    /// Routes:
+    /// - GET /Obstacle/DataForm: Displays the form for entering obstacle data.
+    /// - POST /Obstacle/DataForm: Handles form submission, validates input, saves to database, and shows overview.
+    /// - GET /Obstacle/Overview: Displays the overview of submitted obstacle data.
+    /// 
+    /// Notes:
+    /// - Uses Entity Framework Core via ApplicationDbContext to persist obstacle reports.
+    /// - Model validation is enforced via data annotations in ObstacleData.cs.
+    /// - LoggedAt timestamp is automatically set at object creation.
+    /// </summary>
     public class ObstacleController : Controller
     {
-        //public IActionResult Index()
-        //{
-        //return View();
-        //}
+        private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Initializes the controller with the application's database context.
+        /// </summary>
+        /// <param name="context">Injected EF Core database context.</param>
+        public ObstacleController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-        // This action displays the form for entering obstacle data (GET)
+        /// <summary>
+        /// Displays the form for entering obstacle data (GET).
+        /// </summary>
+        /// <returns>View with empty ObstacleData model.</returns>
         [HttpGet]
         public ActionResult DataForm()
         {
             return View();
         }
 
-
-
-        // This action handles the form submission for the obstacle data (POST)
-        // If the model is valid, it shows the overview page with the submitted data
+        /// <summary>
+        /// Handles the form submission for obstacle data (POST).
+        /// - Validates the model.
+        /// - Saves the report to the database if valid.
+        /// - Displays the overview page with submitted data.
+        /// </summary>
+        /// <param name="obstacledata">User-submitted obstacle data.</param>
+        /// <returns>Overview view if valid; otherwise redisplays form with validation errors.</returns>
         [HttpPost]
-        public ActionResult DataForm(ObstacleData obstacledata)
+        public async Task<IActionResult> DataForm(ObstacleData obstacledata)
         {
             if (!ModelState.IsValid)
             {
                 return View(obstacledata);
             }
+
+            _context.Obstacles.Add(obstacledata);
+            await _context.SaveChangesAsync();
+
             return View("Overview", obstacledata);
         }
-
-
     }
 }

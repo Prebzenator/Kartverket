@@ -1,32 +1,38 @@
+# docker-compose.yml
 services:
   db:
-    image: mariadb:11
+    image: mariadb:11.8
     container_name: kartverket-db-1
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE: kartverket
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: securepass
+      MYSQL_ROOT_PASSWORD: "rootpass"
+      MYSQL_DATABASE: "kartverket"
+      MYSQL_USER: "appuser"
+      MYSQL_PASSWORD: "securepass"
     volumes:
       - db_data:/var/lib/mysql
     ports:
       - "3306:3306"
-    restart: unless-stopped
     healthcheck:
-        disable: true
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/tcp/127.0.0.1/3306 > /dev/null 2>&1'"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
-
-  web:
+  webapplication1:
     build:
       context: ./WebApplication1
       dockerfile: Dockerfile
     container_name: kartverket-webapplication1-1
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "server=db;port=3306;database=kartverket;user=appuser;password=securepass;"
+      ASPNETCORE_URLS: "http://+:8080"
     ports:
       - "5000:8080"
     volumes:
@@ -40,6 +46,4 @@ services:
 
 volumes:
   db_data:
-    name: kartverket_db_data
   web_dataprotection:
-    name: kartverket_web_dataprotection
