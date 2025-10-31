@@ -3,6 +3,7 @@ using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using WebApplication1.Data;
 using System.Globalization;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 /// <summary>
 /// Entry point for the web application.
@@ -34,7 +35,7 @@ var configuration = builder.Configuration;
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     // Read connection string directly to support environment variable injection
-    var conn = configuration["ConnectionStrings:DefaultConnection"];
+    var conn = builder.Configuration.GetConnectionString("DefaultConnection");
     Console.WriteLine("Connection string: " + (string.IsNullOrWhiteSpace(conn) ? "<empty>" : conn));
 
     if (string.IsNullOrWhiteSpace(conn))
@@ -56,12 +57,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             // Enable retry on failure to handle transient DB startup/connectivity issues
             mySqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 6,
-                maxRetryDelay: TimeSpan.FromSeconds(10),
+                maxRetryCount: 10,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
                 errorNumbersToAdd: null);
 
             // Increase command timeout to allow longer-running DDL during migrations
-            mySqlOptions.CommandTimeout(60);
+            mySqlOptions.CommandTimeout(120);
         });
     }
 });
@@ -77,46 +78,49 @@ var app = builder.Build();
 /// Apply pending EF Core migrations in Development environment.
 /// This block:
 /// - Creates a scope and resolves ApplicationDbContext.
-/// - Retries migration application a configurable number of times with delays.
-/// - Logs progress to the console for easier debugging inside containers.
+/// - Retries migration application with exponential backoff.
+/// - Logs progress via the configured ILogger for easier debugging inside containers.
 /// </summary>
 try
 {
     using var scope = app.Services.CreateScope();
-    var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    var env = services.GetRequiredService<IHostEnvironment>();
+    var db = services.GetRequiredService<ApplicationDbContext>();
 
-    Console.WriteLine("Environment: " + env.EnvironmentName);
+    logger.LogInformation("Environment: {EnvironmentName}", env.EnvironmentName);
 
     if (env.IsDevelopment())
     {
-        Console.WriteLine("Applying migrations...");
+        logger.LogInformation("Applying migrations...");
 
-        var attempts = 0;
-        const int maxAttempts = 6;
-        const int delaySeconds = 5;
+        int attempts = 0;
+        const int maxAttempts = 12;
+        int delaySeconds = 2;
 
         while (true)
         {
             try
             {
                 db.Database.Migrate();
-                Console.WriteLine("Migrations applied successfully.");
+                logger.LogInformation("Migrations applied successfully.");
                 break;
             }
             catch (Exception ex)
             {
                 attempts++;
-                Console.WriteLine($"Migration attempt {attempts} failed: {ex.GetType().Name} - {ex.Message}");
+                logger.LogWarning(ex, "Migration attempt {Attempt} failed.", attempts);
 
                 if (attempts >= maxAttempts)
                 {
-                    Console.WriteLine("Exceeded maximum migration attempts. Throwing exception to surface startup error.");
+                    logger.LogError(ex, "Max migration attempts reached, rethrowing to fail startup.");
                     throw;
                 }
 
-                Console.WriteLine($"Waiting {delaySeconds} seconds before retrying...");
+                logger.LogInformation("Waiting {Delay}s before retrying migration (attempt {Attempt}/{MaxAttempts})", delaySeconds, attempts, maxAttempts);
                 Thread.Sleep(TimeSpan.FromSeconds(delaySeconds));
+                delaySeconds = Math.Min(delaySeconds * 2, 30);
             }
         }
     }
@@ -124,6 +128,7 @@ try
 catch (Exception ex)
 {
     Console.WriteLine("Startup error: " + ex.GetType().Name + " - " + ex.Message);
+    throw;
 }
 
 /// <summary>
