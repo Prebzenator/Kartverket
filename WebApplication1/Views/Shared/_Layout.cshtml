@@ -1,4 +1,9 @@
 ﻿@* Views/Shared/_Layout.cshtml *@
+@using WebApplication1.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
@@ -56,15 +61,22 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
+
+                        <!-- Theme toggle (same as before) -->
                         <button id="theme-toggle" class="btn btn-outline-secondary" type="button" aria-label="Toggle theme">
                             <i id="theme-icon" class="bi bi-moon"></i>
                         </button>
 
+                        <!-- Primary action: register obstacle -->
                         <a class="btn btn-primary d-flex align-items-center gap-1"
                            asp-area="" asp-controller="Obstacle" asp-action="DataForm">
                             <i class="bi bi-plus-circle"></i><span>Register obstacle</span>
                         </a>
+
+                        <!-- Login/Logout partial -->
+                        <partial name="_LoginPartial" />
                     </div>
+
                 </div>
             </div>
         </nav>

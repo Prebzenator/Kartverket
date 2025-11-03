@@ -1,23 +1,11 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using WebApplication1.Data;
+using WebApplication1.Models;
 using System.Globalization;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-
-/// <summary>
-/// Entry point for the web application.
-/// Configures services, middleware, database resilience options and launches the web server.
-/// </summary>
-///
-/// Notes:
-/// - Connection resilience is enabled for MySQL via EnableRetryOnFailure to tolerate
-///   transient database startup/connectivity errors.
-/// - The migration application is wrapped in a retry loop so the app will wait
-///   for the database to become available during container startup.
-/// - Default culture is set to en-US to keep date/number formatting consistent across environments.
-/// - Connection string is read directly from configuration to support Docker environment variables.
-/// </summary>
 
 // Set default culture to en-US for consistent formatting
 var defaultCulture = new CultureInfo("en-US");
@@ -68,6 +56,21 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 /// <summary>
+/// Identity configuration (ApplicationUser + Roles)
+/// </summary>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.User.RequireUniqueEmail = true;
+})
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+/// <summary>
 /// Adds support for MVC controllers and views.
 /// </summary>
 builder.Services.AddControllersWithViews();
@@ -80,6 +83,7 @@ var app = builder.Build();
 /// - Creates a scope and resolves ApplicationDbContext.
 /// - Retries migration application with exponential backoff.
 /// - Logs progress via the configured ILogger for easier debugging inside containers.
+/// - Seeds roles and an initial admin user (development convenience).
 /// </summary>
 try
 {
@@ -105,6 +109,20 @@ try
             {
                 db.Database.Migrate();
                 logger.LogInformation("Migrations applied successfully.");
+
+                // Seed roles & admin user (development only)
+                try
+                {
+                    // RoleSeeder.SeedAsync expects an IServiceProvider
+                    // Call synchronously to keep top-level statements simple
+                    RoleSeeder.SeedAsync(services).GetAwaiter().GetResult();
+                    logger.LogInformation("Role seeding completed.");
+                }
+                catch (Exception seedEx)
+                {
+                    logger.LogError(seedEx, "Role seeding failed.");
+                }
+
                 break;
             }
             catch (Exception ex)
@@ -132,7 +150,7 @@ catch (Exception ex)
 }
 
 /// <summary>
-/// Configures middleware for error handling, static files, routing, and authorization.
+/// Configures middleware for error handling, static files, routing, authentication and authorization.
 /// </summary>
 if (!app.Environment.IsDevelopment())
 {
@@ -142,6 +160,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
+
+// Add authentication before authorization
+app.UseAuthentication();
 app.UseAuthorization();
 
 /// <summary>

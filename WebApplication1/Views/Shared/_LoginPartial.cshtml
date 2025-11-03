@@ -1,0 +1,32 @@
+﻿@using WebApplication1.Models
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="d-flex align-items-center gap-2">
+        <span class="small text-muted me-2">@User.Identity?.Name</span>
+        <form asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+        </form>
+    </div>
+}
+else
+{
+    var allowSelf = Configuration.GetValue<bool>("Authentication:AllowSelfRegistration");
+    <div class="d-flex gap-1 align-items-center">
+        <a class="btn btn-outline-secondary btn-sm" asp-controller="Account" asp-action="Login">Login</a>
+
+        @if (allowSelf)
+        {
+            <a class="btn btn-link btn-sm" asp-controller="Account" asp-action="Register">Register</a>
+        }
+        else
+        {
+            <a class="btn btn-link btn-sm" asp-controller="Home" asp-action="RequestAccount">Request account</a>
+        }
+    </div>
+}
