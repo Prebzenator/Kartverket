@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models;
 using WebApplication1.Data;
 
@@ -16,18 +18,23 @@ namespace WebApplication1.Controllers
     /// - Uses Entity Framework Core via ApplicationDbContext to persist obstacle reports.
     /// - Model validation is enforced via data annotations in ObstacleData.cs.
     /// - LoggedAt timestamp is automatically set at object creation.
+    /// - User info is automatically captured from the logged-in user.
     /// </summary>
+    [Authorize] // Require login to submit obstacles
     public class ObstacleController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         /// <summary>
-        /// Initializes the controller with the application's database context.
+        /// Initializes the controller with the application's database context and user manager.
         /// </summary>
         /// <param name="context">Injected EF Core database context.</param>
-        public ObstacleController(ApplicationDbContext context)
+        /// <param name="userManager">Injected Identity UserManager for accessing user data.</param>
+        public ObstacleController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -43,6 +50,7 @@ namespace WebApplication1.Controllers
         /// <summary>
         /// Handles the form submission for obstacle data (POST).
         /// - Validates the model.
+        /// - Captures the logged-in user's information.
         /// - Saves the report to the database if valid.
         /// - Displays the overview page with submitted data.
         /// </summary>
@@ -55,6 +63,20 @@ namespace WebApplication1.Controllers
             {
                 return View(obstacledata);
             }
+
+            // Get the currently logged-in user
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+                // Store who submitted this obstacle
+                obstacledata.ReportedByUserId = user.Id;
+                obstacledata.ReporterName = user.FullName;
+                obstacledata.ReporterOrganization = user.Organization;
+            }
+
+            // Set default status for new reports
+            obstacledata.Status = "Pending";
 
             _context.Obstacles.Add(obstacledata);
             await _context.SaveChangesAsync();

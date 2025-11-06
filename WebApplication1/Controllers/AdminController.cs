@@ -41,6 +41,8 @@ namespace WebApplication1.Controllers
             {
                 UserName = vm.Email,
                 Email = vm.Email,
+                FullName = vm.FullName,
+                Organization = vm.Organization,
                 EmailConfirmed = true // for demo, skip email confirmation
             };
 
@@ -65,6 +67,8 @@ namespace WebApplication1.Controllers
             // In production you would send a secure email/invite link instead.
             var successVm = new CreateUserSuccessViewModel
             {
+                FullName = vm.FullName,
+                Organization = vm.Organization,
                 Email = vm.Email,
                 Role = vm.Role,
                 TempPassword = tempPassword

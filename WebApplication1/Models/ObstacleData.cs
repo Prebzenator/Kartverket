@@ -51,5 +51,27 @@ namespace WebApplication1.Models
         [Required]
         [DisplayName("Logged at")]
         public DateTime DateData { get; set; } = DateTime.UtcNow;
+
+        // ===== USER TRACKING FIELDS =====
+
+        /// The UserId from AspNetUsers table (foreign key to ApplicationUser)
+        [StringLength(450)] // Identity UserId max length
+        [DisplayName("Reported by (User ID)")]
+        public string? ReportedByUserId { get; set; }
+
+        /// Cached full name of the reporter (denormalized for performance)
+        [StringLength(100)]
+        [DisplayName("Reporter name")]
+        public string? ReporterName { get; set; }
+
+        /// Cached organization of the reporter (denormalized for performance)
+        [StringLength(100)]
+        [DisplayName("Reporter organization")]
+        public string? ReporterOrganization { get; set; }
+
+        /// Status of the obstacle report (Pending, Approved, Rejected)
+        [StringLength(50)]
+        [DisplayName("Status")]
+        public string Status { get; set; } = "Pending";
     }
 }

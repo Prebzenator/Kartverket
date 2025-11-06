@@ -7,6 +7,15 @@ namespace WebApplication1.ViewModels
     public class RegisterViewModel
     {
         [Required]
+        [StringLength(100)]
+        [Display(Name = "Full name")]
+        public string FullName { get; set; }
+
+        [Required]
+        [Display(Name = "Organization")]
+        public string Organization { get; set; }
+
+        [Required]
         [EmailAddress]
         [Display(Name = "Email address")]
         public string Email { get; set; }

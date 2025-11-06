@@ -13,6 +13,24 @@
                         @Html.AntiForgeryToken()
 
                         <div class="form-floating mb-3">
+                            <input asp-for="FullName" class="form-control" placeholder="John Doe" />
+                            <label asp-for="FullName">Full name</label>
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Organization" class="form-label">Organization</label>
+                            <select asp-for="Organization" class="form-select">
+                                <option value="">-- Select organization --</option>
+                                <option value="Norsk Luftambulanse (NLA)">Norsk Luftambulanse (NLA)</option>
+                                <option value="Luftforsvaret">Luftforsvaret</option>
+                                <option value="Politiets helikoptertjeneste">Politiets helikoptertjeneste</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Organization" class="text-danger small"></span>
+                        </div>
+
+                        <div class="form-floating mb-3">
                             <input asp-for="Email" class="form-control" placeholder="user@example.com" />
                             <label asp-for="Email">Email</label>
                             <span asp-validation-for="Email" class="text-danger small"></span>

@@ -12,18 +12,18 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-8 col-lg-6">
             <div class="alert alert-success rounded-4 shadow-sm" role="alert">
-                <p class="mb-0">Your submission has been saved.</p>
+                <p class="mb-0">Your submission has been saved and is pending review.</p>
             </div>
 
             <div class="card shadow-sm rounded-4 mb-3">
                 <div class="card-body p-4">
-                    <h3 class="h5 mb-3">Details</h3>
+                    <h3 class="h5 mb-3">Obstacle Details</h3>
                     <dl class="row mb-0">
                         <dt class="col-5 col-md-4">Name</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleName</dd>
 
                         <dt class="col-5 col-md-4">Height</dt>
-                        <dd class="col-7 col-md-8">@Model.ObstacleHeight?.ToString("0.##", CultureInfo.CurrentCulture)</dd>
+                        <dd class="col-7 col-md-8">@Model.ObstacleHeight?.ToString("0.##", CultureInfo.CurrentCulture) m</dd>
 
                         <dt class="col-5 col-md-4">Description</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleDescription</dd>
@@ -33,9 +33,34 @@
                             @Model.Latitude?.ToString("0.######", CultureInfo.CurrentCulture),
                             @Model.Longitude?.ToString("0.######", CultureInfo.CurrentCulture)
                         </dd>
+
+                        <dt class="col-5 col-md-4">Status</dt>
+                        <dd class="col-7 col-md-8">
+                            <span class="badge bg-warning text-dark">@Model.Status</span>
+                        </dd>
                     </dl>
                 </div>
             </div>
+
+            @* Show reporter information *@
+            @if (!string.IsNullOrEmpty(Model.ReporterName))
+            {
+                <div class="card shadow-sm rounded-4 mb-3">
+                    <div class="card-body p-4">
+                        <h3 class="h6 mb-3">Reported By</h3>
+                        <dl class="row mb-0">
+                            <dt class="col-5 col-md-4">Name</dt>
+                            <dd class="col-7 col-md-8">@Model.ReporterName</dd>
+
+                            <dt class="col-5 col-md-4">Organization</dt>
+                            <dd class="col-7 col-md-8">@Model.ReporterOrganization</dd>
+
+                            <dt class="col-5 col-md-4">Submitted</dt>
+                            <dd class="col-7 col-md-8">@Model.DateData.ToString("g", CultureInfo.CurrentCulture)</dd>
+                        </dl>
+                    </div>
+                </div>
+            }
 
             @* Overview shows the submitted values. If Latitude/Longitude are set, render a read-only map. *@
             @if (Model.Latitude.HasValue && Model.Longitude.HasValue)

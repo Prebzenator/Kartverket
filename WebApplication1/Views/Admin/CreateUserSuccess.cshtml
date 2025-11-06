@@ -8,7 +8,11 @@
         <div class="col-12 col-md-6">
             <div class="alert alert-success rounded-4">
                 <h4 class="h6 mb-1">User created</h4>
-                <p class="mb-0">User <strong>@Model.Email</strong> with role <strong>@Model.Role</strong> has been created.</p>
+                <p class="mb-0">
+                    User <strong>@Model.FullName</strong> (@Model.Email)
+                    from <strong>@Model.Organization</strong>
+                    with role <strong>@Model.Role</strong> has been created.
+                </p>
             </div>
 
             <div class="card p-3 shadow-sm">
