@@ -57,6 +57,8 @@ namespace WebApplication1.Controllers
             {
                 UserName = vm.Email,
                 Email = vm.Email,
+                FullName = vm.FullName,
+                Organization = vm.Organization,
                 EmailConfirmed = true // For demo: skip confirmation to simplify testing
             };
 

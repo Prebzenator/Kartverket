@@ -26,6 +26,8 @@ namespace WebApplication1.Data
             // Create initial admin if env variables are provided (or fallback to safe defaults)
             var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? "admin@example.com";
             var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "Admin123!";
+            var adminName = Environment.GetEnvironmentVariable("ADMIN_NAME") ?? "System Administrator";
+            var adminOrg = Environment.GetEnvironmentVariable("ADMIN_ORG") ?? "Kartverket";
 
             var admin = await userManager.FindByEmailAsync(adminEmail);
             if (admin == null)
@@ -34,6 +36,8 @@ namespace WebApplication1.Data
                 {
                     UserName = adminEmail,
                     Email = adminEmail,
+                    FullName = adminName,
+                    Organization = adminOrg,
                     EmailConfirmed = true
                 };
                 var result = await userManager.CreateAsync(admin, adminPassword);
@@ -44,6 +48,24 @@ namespace WebApplication1.Data
             }
             else
             {
+                // Update existing admin user with name and org if they're missing
+                bool needsUpdate = false;
+                if (string.IsNullOrEmpty(admin.FullName))
+                {
+                    admin.FullName = adminName;
+                    needsUpdate = true;
+                }
+                if (string.IsNullOrEmpty(admin.Organization))
+                {
+                    admin.Organization = adminOrg;
+                    needsUpdate = true;
+                }
+
+                if (needsUpdate)
+                {
+                    await userManager.UpdateAsync(admin);
+                }
+
                 if (!await userManager.IsInRoleAsync(admin, "Registry Administrator"))
                     await userManager.AddToRoleAsync(admin, "Registry Administrator");
             }
