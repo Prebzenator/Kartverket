@@ -27,6 +27,22 @@
 
                         <dt class="col-5 col-md-4">Description</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleDescription</dd>
+                        @* STATUS *@
+                        <dt class="col-5 col-md-4">Status</dt>
+                        <dd class="col-7 col-md-8">
+                            @if (Model.Status == WebApplication1.Models.ReportStatus.Pending)
+                            {
+                                <span class="badge text-bg-secondary">Pending</span>
+                            }
+                            else if (Model.Status == WebApplication1.Models.ReportStatus.Approved)
+                            {
+                                <span class="badge text-bg-success">Approved</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-danger">Rejected</span>
+                            }
+                        </dd>
 
                         <dt class="col-5 col-md-4">Coordinates</dt>
                         <dd class="col-7 col-md-8">
@@ -46,6 +62,24 @@
                     </div>
                 </div>
             }
+            @* Status for the submitted report (read-only on this page) *@
+            <div class="mt-3">
+                @switch (Model.Status)
+                {
+                    case ReportStatus.Pending:
+                        @:<span class="badge text-bg-secondary">Pending review</span>
+                        break;
+                    case ReportStatus.Approved:
+                        @:<span class="badge text-bg-success">Approved</span>
+                        break;
+                    case ReportStatus.Rejected:
+                        @:<span class="badge text-bg-danger">Rejected</span>
+                        break;
+                }
+            </div>
+
+            
+            </div>
 
             <div class="d-grid gap-2 mt-3">
                 <a asp-controller="Obstacle" asp-action="DataForm" class="btn btn-primary">Register another</a>

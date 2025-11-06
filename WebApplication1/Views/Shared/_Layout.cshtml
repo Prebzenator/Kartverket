@@ -53,6 +53,14 @@
                                 <i class="bi bi-shield-lock"></i><span>Privacy</span>
                             </a>
                         </li>
+                        @* Admin review page link (shows the list to approve/reject) *@
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-1"
+                               asp-controller="Obstacle" asp-action="Review">
+                                <i class="bi bi-clipboard-check"></i><span>Review Reports</span>
+                            </a>
+                        </li>
+
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
