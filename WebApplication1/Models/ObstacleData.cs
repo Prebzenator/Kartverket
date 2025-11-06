@@ -52,6 +52,7 @@ namespace WebApplication1.Models
         [DisplayName("Logged at")]
         public DateTime DateData { get; set; } = DateTime.UtcNow;
 
+<<<<<<< HEAD
         // ===== USER TRACKING FIELDS =====
 
         /// The UserId from AspNetUsers table (foreign key to ApplicationUser)
@@ -73,5 +74,36 @@ namespace WebApplication1.Models
         [StringLength(50)]
         [DisplayName("Status")]
         public string Status { get; set; } = "Pending";
+=======
+        /// Optional trace of who submitted the report (username shown if available).
+        [DisplayName("Submitted by (username)")]
+        public string? SubmittedByUserName { get; set; }
+
+        /// Optional trace of submitter email (used if username is not available).
+        [EmailAddress]
+        [DisplayName("Submitted by (email)")]
+        public string? SubmittedByEmail { get; set; }
+
+
+        // Approval status for the obstacle report.
+        // Default value is Pending until an admin reviews the report.
+        [Required]
+        [DisplayName("Approval Status")]
+        public ReportStatus Status { get; set; } = ReportStatus.Pending;
+    }
+        
+
+    // Enum defining the possible states of a submitted report.
+    public enum ReportStatus
+    {
+        // Report is awaiting review.
+        Pending = 0,
+
+        // Report has been reviewed and approved by an admin.
+        Approved = 1,
+
+        // Report has been reviewed but rejected (invalid, duplicate, or incorrect).
+        Rejected = 2
+>>>>>>> backup-log
     }
 }

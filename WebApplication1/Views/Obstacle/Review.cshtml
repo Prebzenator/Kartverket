@@ -1,0 +1,94 @@
+﻿@model IEnumerable<WebApplication1.Models.ObstacleData>
+@using WebApplication1.Models
+@using System.Globalization
+
+@*
+   Admin overview page for reviewing obstacle reports.
+   Displays all reports with status and action buttons for Approve/Reject.
+   This page is intended for admin users.
+*@
+<h2 class="mb-3">Reports – Review</h2>
+
+<div class="mb-3">
+    <a asp-action="ReviewPending" class="btn btn-sm btn-outline-secondary">Show only Pending</a>
+    <a asp-action="Review" class="btn btn-sm btn-outline-secondary">Show all</a>
+</div>
+
+<table class="table table-striped align-middle">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Height (m)</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <!-- Id -->
+                <td>@item.Id</td>
+
+                <!-- Name -->
+                <td>@item.ObstacleName</td>
+
+                <!-- Height (m) -->
+                <td>
+                    @((item.ObstacleHeight.HasValue
+                                    ? item.ObstacleHeight.Value.ToString("0.##", CultureInfo.CurrentCulture)
+                                    : "-") + " m")
+            </td>
+
+                <!-- Description -->
+                <td class="text-truncate" style="max-width: 300px;">
+                    @item.ObstacleDescription
+                </td>
+
+                <!-- Status -->
+                <td>
+                @switch (item.Status)
+                    {
+                        case ReportStatus.Pending:
+                            @:<span class="badge text-bg-secondary">Pending</span>
+                            break;
+                        case ReportStatus.Approved:
+                            @:<span class="badge text-bg-success">Approved</span>
+                            break;
+                        case ReportStatus.Rejected:
+                            @:<span class="badge text-bg-danger">Rejected</span>
+                            break;
+                    }
+                </td>
+
+                <!-- Actions -->
+                <td class="text-end">
+                    <!-- Approve -->
+                    <form asp-action="UpdateStatus" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="status" value="@ReportStatus.Approved" />
+                        <button class="btn btn-sm btn-success"
+                                @(item.Status == ReportStatus.Approved ? "disabled" : null)>
+                            Approve
+                        </button>
+                    </form>
+
+                    <!-- Reject -->
+                    <form asp-action="UpdateStatus" method="post" class="d-inline ms-1">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@item.Id" />
+                        <input type="hidden" name="status" value="@ReportStatus.Rejected" />
+                        <button class="btn btn-sm btn-outline-danger"
+                                @(item.Status == ReportStatus.Rejected ? "disabled" : null)>
+                            Reject
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

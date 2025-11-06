@@ -259,6 +259,7 @@ namespace WebApplication1.Data.Migrations
                     b.Property<DateTime>("ReportedAt")
                         .HasColumnType("datetime(6)");
 
+<<<<<<< HEAD
                     b.Property<string>("ReportedByUserId")
                         .HasMaxLength(450)
                         .HasColumnType("varchar(450)");
@@ -275,6 +276,10 @@ namespace WebApplication1.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
+=======
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+>>>>>>> backup-log
 
                     b.HasKey("Id");
 
