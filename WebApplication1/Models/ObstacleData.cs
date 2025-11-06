@@ -4,74 +4,116 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebApplication1.Models
 {
-    /// ViewModel and EF entity for obstacle data registration
+    /// <summary>
+    /// ViewModel and EF entity for obstacle data registration.
     /// Used to both display the form and store submitted reports in the database.
+    /// </summary>
     public class ObstacleData
     {
-        /// Primary key for the database table
+        /// <summary>
+        /// Primary key for the database table.
+        /// </summary>
         public int Id { get; set; }
 
-        /// Use string for names and descriptions (e.g., "Windmill")
+        /// <summary>
+        /// Name of the obstacle (e.g., "Windmill").
+        /// </summary>
         [Required, StringLength(100)]
         [DisplayName("Obstacle name")]
         public string ObstacleName { get; set; } = string.Empty;
 
-        /// Height of obstacle. Use decimal for inputs measured in meters.
-        /// Decimal? and [Required] allows for validation. Error if null or out of range.
-        /// Currently capped at 1000 meters for practicality. Can be adjusted as needed.
+        /// <summary>
+        /// Height of the obstacle in meters.
+        /// Must be between 0 and 1000.
+        /// </summary>
         [Required]
         [Range(0, 1000, ErrorMessage = "Height must be between 0 and 1000 meters.")]
         [DisplayName("Height (m)")]
         public decimal? ObstacleHeight { get; set; }
 
-        /// Description of the obstacle. 500 characters max. Shown on overview page.
+        /// <summary>
+        /// Description of the obstacle. Max 500 characters.
+        /// </summary>
         [Required(ErrorMessage = "Description is required.")]
         [StringLength(500)]
         [DisplayName("Description")]
         [DataType(DataType.MultilineText)]
         public string? ObstacleDescription { get; set; }
 
-        /// Latitude picked from leaflet map. Decimal for precision.
+        /// <summary>
+        /// Latitude picked from map. Optional.
+        /// </summary>
         [DisplayName("Latitude")]
         public decimal? Latitude { get; set; }
 
-        /// Longitude picked from leaflet map. Decimal for precision.
+        /// <summary>
+        /// Longitude picked from map. Optional.
+        /// </summary>
         [DisplayName("Longitude")]
         public decimal? Longitude { get; set; }
 
+        /// <summary>
         /// UTC timestamp when the report was submitted by the user.
-        /// This reflects when the obstacle was observed or occurred, as chosen by the user.
+        /// </summary>
         [Required]
         [DisplayName("Reported at")]
         public DateTime ReportedAt { get; set; }
 
+        /// <summary>
         /// UTC timestamp for when the obstacle was registered in the system.
-        /// This is automatically set at object creation and used for logging and auditing.
-        /// Required to ensure all obstacles have a system timestamp.
+        /// Automatically set at object creation.
+        /// </summary>
         [Required]
         [DisplayName("Logged at")]
         public DateTime DateData { get; set; } = DateTime.UtcNow;
 
-        // ===== USER TRACKING FIELDS =====
-
-        /// The UserId from AspNetUsers table (foreign key to ApplicationUser)
-        [StringLength(450)] // Identity UserId max length
+        /// <summary>
+        /// Identity UserId of the reporter (foreign key to AspNetUsers).
+        /// </summary>
+        [StringLength(450)]
         [DisplayName("Reported by (User ID)")]
         public string? ReportedByUserId { get; set; }
 
-        /// Cached full name of the reporter (denormalized for performance)
+        /// <summary>
+        /// Full name of the reporter (cached for performance).
+        /// </summary>
         [StringLength(100)]
         [DisplayName("Reporter name")]
         public string? ReporterName { get; set; }
 
-        /// Cached organization of the reporter (denormalized for performance)
+        /// <summary>
+        /// Organization of the reporter (cached for performance).
+        /// </summary>
         [StringLength(100)]
         [DisplayName("Reporter organization")]
         public string? ReporterOrganization { get; set; }
 
-        /// Status of the obstacle report (Pending, Approved, Rejected)
-        [StringLength(50)]
+        /// <summary>
+        /// Approval status of the report.
+        /// </summary>
+        [Required]
         [DisplayName("Status")]
-        public string Status { get; set; } = "Pending";
+        public ReportStatus Status { get; set; } = ReportStatus.Pending;
+    }
+
+    /// <summary>
+    /// Enum defining the possible states of a submitted report.
+    /// </summary>
+    public enum ReportStatus
+    {
+        /// <summary>
+        /// Report is awaiting review.
+        /// </summary>
+        Pending = 0,
+
+        /// <summary>
+        /// Report has been reviewed and approved.
+        /// </summary>
+        Approved = 1,
+
+        /// <summary>
+        /// Report has been reviewed but not approved.
+        /// </summary>
+        NotApproved = 2
     }
 }

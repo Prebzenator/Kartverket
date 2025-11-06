@@ -5,34 +5,49 @@
 
 <section class="bg-body-tertiary border-bottom">
     <div class="container py-5">
-        <div class="row align-items-center justify-content-center text-center">
+        <div class="row justify-content-center text-center">
             <div class="col-12 col-lg-8">
-                <h1 class="display-5 mb-3">Welcome</h1>
 
-                @* Show an admin-only button that links to Admin/CreateUser.
-   Uses User.IsInRole which returns false for anonymous users, so no extra injections needed. *@
+                <!-- Logo og tittel -->
+                <div class="mb-4">
+                    <img src="~/images/Kartverket-logoutentekst.png" alt="Kartverket logo" class="img-fluid" style="max-height: 100px;" />
+                    <h2 class="mt-2 fw-semibold">Kartverket</h2>
+                </div>
 
+                <!-- Overskrift og beskrivelse -->
+                <h1 class="display-5 mb-3 fw-semibold">Register aviation obstacles</h1>
+                <p class="lead text-muted mb-4">
+                    Ensure safe navigation by reporting new or missing obstacles.
+                </p>
+
+                <!-- Admin-knapp (kun for innloggede administratorer) -->
                 @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
                 {
-                    <div class="my-3">
+                    <div class="mb-4">
                         <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-outline-primary">
                             <i class="bi bi-person-plus"></i> Admin: Create user
                         </a>
                     </div>
                 }
 
+                <!-- Handlingsknapper -->
+                <div class="d-grid gap-3 d-sm-flex justify-content-center">
+                    <a asp-action="DataForm" asp-controller="Obstacle"
+                       class="btn btn-primary btn-lg d-flex align-items-center gap-2">
+                        <i class="bi bi-plus-circle"></i> <span>Report new obstacle</span>
+                    </a>
 
-                <p class="lead text-muted mb-4">
-                    Register obstacles quickly with a clean, mobile-friendly form.
-                </p>
-                @* Landing Page. Navigates to the obstacle registration form.*@
-                <a asp-action="DataForm" asp-controller="Obstacle"
-                class="btn btn-primary btn-lg">Register Obstacle</a>
+                    <a asp-action="Overview" asp-controller="Obstacle"
+                       class="btn btn-outline-primary btn-lg d-flex align-items-center gap-2">
+                        <i class="bi bi-search"></i> <span>Report missing obstacle</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
+<!-- Info og lenke nederst -->
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8 text-center">
@@ -40,7 +55,6 @@
                 Learn more about building Web apps with ASP.NET Core at
                 <a href="https://learn.microsoft.com/aspnet/core" target="_blank" rel="noopener">Microsoft Learn</a>.
             </p>
-            @* If you still pass a string model, it will render here *@
             @if (!string.IsNullOrWhiteSpace(Model))
             {
                 <p class="small text-muted">@Model</p>
