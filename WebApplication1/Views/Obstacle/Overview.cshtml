@@ -1,8 +1,8 @@
 ﻿@using System.Globalization
-@model WebApplication1.Models.ObstacleData
-@* This page shows what we saved. If we have coordinates, we show a map marker too. *@
+@using WebApplication1.Models
+@model ObstacleData
+
 @{
-    // Turn decimal into JS-friendly numbers (always dot decimal here)
     ViewData["Title"] = "Overview";
     var lat = Model.Latitude?.ToString("0.######", CultureInfo.InvariantCulture);
     var lng = Model.Longitude?.ToString("0.######", CultureInfo.InvariantCulture);
@@ -36,13 +36,23 @@
 
                         <dt class="col-5 col-md-4">Status</dt>
                         <dd class="col-7 col-md-8">
-                            <span class="badge bg-warning text-dark">@Model.Status</span>
+                            @switch (Model.Status)
+                            {
+                                case ReportStatus.Pending:
+                                    <span class="badge text-bg-warning text-dark">Pending</span>
+                                    break;
+                                case ReportStatus.Approved:
+                                    <span class="badge text-bg-success">Approved</span>
+                                    break;
+                                case ReportStatus.NotApproved:
+                                    <span class="badge text-bg-danger">Not Approved</span>
+                                    break;
+                            }
                         </dd>
                     </dl>
                 </div>
             </div>
 
-            @* Show reporter information *@
             @if (!string.IsNullOrEmpty(Model.ReporterName))
             {
                 <div class="card shadow-sm rounded-4 mb-3">
@@ -62,7 +72,6 @@
                 </div>
             }
 
-            @* Overview shows the submitted values. If Latitude/Longitude are set, render a read-only map. *@
             @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
             {
                 <div class="card shadow-sm rounded-4">
@@ -83,14 +92,13 @@
 @section Scripts {
     @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
     {
-        // Map script, only if coordinates are available
         <script>
             const lat = parseFloat("@lat");
             const lng = parseFloat("@lng");
             const map2 = L.map('map-overview').setView([lat, lng], 14);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-              maxZoom: 19,
-              attribution: '&copy; OpenStreetMap contributors'
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map2);
             L.marker([lat, lng]).addTo(map2);
         </script>

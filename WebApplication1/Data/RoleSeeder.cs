@@ -15,7 +15,7 @@ namespace WebApplication1.Data
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            string[] roles = new[] { "Pilot", "Registry Administrator" };
+            string[] roles = new[] { "Pilot", "Registry Administrator", "Admin" };
 
             foreach (var role in roles)
             {
@@ -44,6 +44,7 @@ namespace WebApplication1.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(admin, "Registry Administrator");
+                    await userManager.AddToRoleAsync(admin, "Admin");
                 }
             }
             else
