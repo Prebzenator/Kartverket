@@ -51,15 +51,23 @@ namespace WebApplication1.Controllers
         /// Handles form submission, validates input, saves to database, and shows overview.
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> DataForm(ObstacleData obstacledata)
+        public async Task<IActionResult> DataForm(IFormCollection form)
         {
-            if (!ModelState.IsValid)
+            var isDraft = form["IsDraft"].ToString().ToLower() == "true";
+            Console.WriteLine("IsDraft received: " + isDraft);
+
+            var obstacledata = new ObstacleData
             {
-                return View(obstacledata);
-            }
+                ObstacleName = form["ObstacleName"],
+                ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : null,
+                ObstacleDescription = form["ObstacleDescription"],
+                Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : null,
+                Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : null,
+                ReportedAt = DateTime.UtcNow,
+                Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending
+            };
 
             var user = await _userManager.GetUserAsync(User);
-
             if (user != null)
             {
                 obstacledata.ReportedByUserId = user.Id;
@@ -67,8 +75,10 @@ namespace WebApplication1.Controllers
                 obstacledata.ReporterOrganization = user.Organization;
             }
 
-            obstacledata.Status = ReportStatus.Pending;
-            obstacledata.ReportedAt = DateTime.UtcNow;
+            if (!isDraft && !TryValidateModel(obstacledata))
+            {
+                return View(obstacledata);
+            }
 
             _context.Obstacles.Add(obstacledata);
             await _context.SaveChangesAsync();

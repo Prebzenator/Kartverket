@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication1.Models
 {
@@ -39,6 +40,12 @@ namespace WebApplication1.Models
         [DisplayName("Description")]
         [DataType(DataType.MultilineText)]
         public string? ObstacleDescription { get; set; }
+
+        /// <summary>
+        /// Form submission mode: true if saving as draft, false if final submission.
+        /// </summary>
+        [NotMapped]
+        public bool IsDraft { get; set; }
 
         /// <summary>
         /// Latitude picked from map. Optional.
