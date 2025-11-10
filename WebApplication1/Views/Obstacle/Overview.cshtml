@@ -23,7 +23,11 @@
                         <dd class="col-7 col-md-8">@Model.ObstacleName</dd>
 
                         <dt class="col-5 col-md-4">Height</dt>
-                        <dd class="col-7 col-md-8">@Model.ObstacleHeight?.ToString("0.##", CultureInfo.CurrentCulture) m</dd>
+                        <dd class="col-7 col-md-8">
+                            @(Model.ObstacleHeight != null
+                                ? Model.ObstacleHeight?.ToString("0.##", CultureInfo.CurrentCulture) + " m"
+                                : "")
+                        </dd>
 
                         <dt class="col-5 col-md-4">Description</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleDescription</dd>

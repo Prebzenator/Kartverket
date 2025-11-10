@@ -59,10 +59,10 @@ namespace WebApplication1.Controllers
             var obstacledata = new ObstacleData
             {
                 ObstacleName = form["ObstacleName"],
-                ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : null,
+                ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : default,
                 ObstacleDescription = form["ObstacleDescription"],
-                Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : null,
-                Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : null,
+                Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : (decimal?)null,
+                Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : (decimal?)null,
                 ReportedAt = DateTime.UtcNow,
                 Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending
             };
