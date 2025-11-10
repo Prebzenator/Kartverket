@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication1.Models
 {
@@ -21,7 +22,19 @@ namespace WebApplication1.Models
         [Required, StringLength(100)]
         [DisplayName("Obstacle name")]
         public string ObstacleName { get; set; } = string.Empty;
+       
+        /// <summary>
+        /// Foreign key to obstacle category.
+        /// </summary>
+        [Required]
+        [DisplayName("Category")]
+        public int CategoryId { get; set; }
 
+        /// <summary>
+        /// Navigation property to category.
+        /// </summary>
+         [ForeignKey("CategoryId")]
+        public ObstacleCategory? Category { get; set; }
         /// <summary>
         /// Height of the obstacle in meters.
         /// Must be between 0 and 1000.

@@ -34,7 +34,7 @@ services:
       ConnectionStrings__DefaultConnection: "server=db;port=3306;database=kartverket;user=appuser;password=securepass;"
       ASPNETCORE_URLS: "http://+:8080"
     ports:
-      - "5000:8080"
+      - "5001:8080"
     volumes:
       - web_dataprotection:/root/.aspnet/DataProtection-Keys
     restart: unless-stopped

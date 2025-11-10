@@ -14,6 +14,7 @@
         <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Category</th> <!-- ✅ Flyttet hit -->
             <th>Height (m)</th>
             <th>Description</th>
             <th>Status</th>
@@ -26,6 +27,7 @@
             <tr>
                 <td>@item.Id</td>
                 <td>@item.ObstacleName</td>
+                <td>@item.Category?.Name</td> <!-- ✅ Viser kategori rett etter navn -->
                 <td>@string.Format(CultureInfo.CurrentCulture, "{0:0.##}", item.ObstacleHeight)</td>
                 <td class="text-truncate" style="max-width: 300px;">@item.ObstacleDescription</td>
                 <td>

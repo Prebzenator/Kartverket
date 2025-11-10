@@ -6,26 +6,10 @@ using WebApplication1.Models;
 using WebApplication1.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace WebApplication1.Controllers
 {
-    /// <summary>
-    /// Handles routes for obstacle data input and admin review.
-    ///
-    /// Routes:
-    /// - GET /Obstacle/DataForm: Displays the form for entering obstacle data.
-    /// - POST /Obstacle/DataForm: Handles form submission, validates input, saves to database, and shows overview.
-    /// - GET /Obstacle/Review: Displays all submitted reports for admin review.
-    /// - GET /Obstacle/ReviewPending: Displays only pending reports.
-    /// - POST /Obstacle/UpdateStatus: Updates the status of a report (Approve/Reject).
-    ///
-    /// Notes:
-    /// - Uses Entity Framework Core via ApplicationDbContext to persist obstacle reports.
-    /// - Model validation is enforced via data annotations in ObstacleData.cs.
-    /// - LoggedAt timestamp is automatically set at object creation.
-    /// - User info is automatically captured from the logged-in user.
-    /// - Admin-only routes are protected via role-based authorization.
-    /// </summary>
     [Authorize]
     public class ObstacleController : Controller
     {
@@ -44,6 +28,14 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public IActionResult DataForm()
         {
+            ViewBag.CategoryOptions = _context.ObstacleCategories
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
+                .ToList();
+
             return View();
         }
 
@@ -53,6 +45,14 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> DataForm(ObstacleData obstacledata)
         {
+            ViewBag.CategoryOptions = _context.ObstacleCategories
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
+                .ToList();
+
             if (!ModelState.IsValid)
             {
                 return View(obstacledata);
@@ -73,41 +73,37 @@ namespace WebApplication1.Controllers
             _context.Obstacles.Add(obstacledata);
             await _context.SaveChangesAsync();
 
+            // ✅ Laster inn Category-navigasjonsobjektet før visning
+            await _context.Entry(obstacledata).Reference(o => o.Category).LoadAsync();
+
             return View("Overview", obstacledata);
         }
 
-        /// <summary>
-        /// Admin: displays all obstacle reports regardless of status.
-        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Review()
         {
             var allObstacles = _context.Obstacles
+                .Include(o => o.Category)
                 .OrderByDescending(o => o.ReportedAt)
                 .ToList();
 
             return View(allObstacles);
         }
 
-        /// <summary>
-        /// Admin: displays only pending obstacle reports.
-        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult ReviewPending()
         {
             var pendingObstacles = _context.Obstacles
                 .Where(o => o.Status == ReportStatus.Pending)
+                .Include(o => o.Category)
                 .OrderByDescending(o => o.ReportedAt)
                 .ToList();
 
             return View("Review", pendingObstacles);
         }
 
-        /// <summary>
-        /// Admin: updates the status of a report (Approve or Reject).
-        /// </summary>
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
