@@ -22,7 +22,7 @@ namespace WebApplication1.Models
         [Required, StringLength(100)]
         [DisplayName("Obstacle name")]
         public string ObstacleName { get; set; } = string.Empty;
-       
+
         /// <summary>
         /// Foreign key to obstacle category.
         /// </summary>
@@ -33,7 +33,7 @@ namespace WebApplication1.Models
         /// <summary>
         /// Navigation property to category.
         /// </summary>
-         [ForeignKey("CategoryId")]
+        [ForeignKey("CategoryId")]
         public ObstacleCategory? Category { get; set; }
         /// <summary>
         /// Height of the obstacle in meters.
@@ -52,6 +52,12 @@ namespace WebApplication1.Models
         [DisplayName("Description")]
         [DataType(DataType.MultilineText)]
         public string? ObstacleDescription { get; set; }
+
+        /// <summary>
+        /// Form submission mode: true if saving as draft, false if final submission.
+        /// </summary>
+        [NotMapped]
+        public bool IsDraft { get; set; }
 
         /// <summary>
         /// Latitude picked from map. Optional.
@@ -80,6 +86,8 @@ namespace WebApplication1.Models
         [DisplayName("Logged at")]
         public DateTime DateData { get; set; } = DateTime.UtcNow;
 
+        // ===== USER TRACKING FIELDS =====
+
         /// <summary>
         /// Identity UserId of the reporter (foreign key to AspNetUsers).
         /// </summary>
@@ -101,12 +109,55 @@ namespace WebApplication1.Models
         [DisplayName("Reporter organization")]
         public string? ReporterOrganization { get; set; }
 
+        // ===== ADMIN WORKFLOW FIELDS =====
+
         /// <summary>
         /// Approval status of the report.
         /// </summary>
         [Required]
         [DisplayName("Status")]
         public ReportStatus Status { get; set; } = ReportStatus.Pending;
+
+        /// <summary>
+        /// UserId of the admin who is assigned to review this report.
+        /// </summary>
+        [StringLength(450)]
+        [DisplayName("Assigned to (User ID)")]
+        public string? AssignedToUserId { get; set; }
+
+        /// <summary>
+        /// Name of the admin assigned to this report (cached).
+        /// </summary>
+        [StringLength(100)]
+        [DisplayName("Assigned to")]
+        public string? AssignedToName { get; set; }
+
+        /// <summary>
+        /// Admin comments/feedback (required when rejecting).
+        /// </summary>
+        [StringLength(1000)]
+        [DisplayName("Admin comments")]
+        [DataType(DataType.MultilineText)]
+        public string? AdminComments { get; set; }
+
+        /// <summary>
+        /// UserId of the admin who last reviewed/updated this report.
+        /// </summary>
+        [StringLength(450)]
+        public string? ReviewedByUserId { get; set; }
+
+        /// <summary>
+        /// Name of the admin who last reviewed this report (cached).
+        /// </summary>
+        [StringLength(100)]
+        [DisplayName("Reviewed by")]
+        public string? ReviewedByName { get; set; }
+
+        /// <summary>
+        /// Timestamp of last status change by admin.
+        /// </summary>
+        [DisplayName("Last reviewed at")]
+        public DateTime? LastReviewedAt { get; set; }
     }
 
     /// <summary>

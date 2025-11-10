@@ -6,6 +6,9 @@ using WebApplication1.Models;
 using System.Globalization;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.Extensions;
+using System.IO;
 
 // Set default culture to en-US for consistent formatting
 var defaultCulture = new CultureInfo("en-US");
@@ -74,6 +77,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 /// Adds support for MVC controllers and views.
 /// </summary>
 builder.Services.AddControllersWithViews();
+
+/// <summary>
+/// Data Protection configuration
+/// </summary>
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/root/.aspnet/DataProtection-Keys"))
+    .SetApplicationName("kartverket");
+
 
 var app = builder.Build();
 

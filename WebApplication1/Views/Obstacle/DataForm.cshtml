@@ -11,7 +11,7 @@
                     <h1 class="h3 mb-2">Obstacle Registration</h1>
                     <p class="text-muted mb-4">Click the map to choose a location.</p>
 
-                    <form asp-controller="Obstacle" asp-action="DataForm" method="post" novalidate>
+                    <form asp-controller="Obstacle" asp-action="DataForm" method="post">
                         @Html.AntiForgeryToken()
 
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
@@ -42,7 +42,6 @@
                             <span asp-validation-for="ObstacleDescription" class="text-danger"></span>
                         </div>
 
-                        <!-- Map -->
                         <div class="mb-3">
                             <div id="map" style="height: 320px; border-radius: 0.75rem;"></div>
                             <small class="text-muted d-block mt-1">
@@ -50,7 +49,6 @@
                             </small>
                         </div>
 
-                        <!-- Coordinates -->
                         <div class="row g-3 mb-4">
                             <div class="col">
                                 <label asp-for="Latitude" class="form-label"></label>
@@ -65,7 +63,9 @@
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                            <button type="submit" name="IsDraft" value="false" class="btn btn-primary btn-lg">Submit</button>
+                            <button type="submit" name="IsDraft" value="true" formnovalidate class="btn btn-outline-warning">Submit as Draft</button>
+
                             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
                         </div>
                     </form>
@@ -90,23 +90,17 @@
         }).addTo(map);
 
         let marker;
+        const fmt = new Intl.NumberFormat(navigator.language || 'nb-NO', { maximumFractionDigits: 6 });
         const latInput = document.getElementById('Latitude');
         const lngInput = document.getElementById('Longitude');
 
-        function formatForSubmit(num) {
-            return Number(num).toFixed(6);
-        }
-
         (function initFromInputs() {
-            const rawLat = latInput?.value;
-            const rawLng = lngInput?.value;
-            if (!rawLat || !rawLng) return;
-
-            const lat = parseFloat(rawLat.replace(',', '.'));
-            const lng = parseFloat(rawLng.replace(',', '.'));
-            if (!isNaN(lat) && !isNaN(lng)) {
-                marker = L.marker([lat, lng]).addTo(map);
-                map.setView([lat, lng], 14);
+            const lat = latInput?.value?.replace(',', '.');
+            const lng = lngInput?.value?.replace(',', '.');
+            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+                const p = [parseFloat(lat), parseFloat(lng)];
+                marker = L.marker(p).addTo(map);
+                map.setView(p, 14);
             }
         })();
 
@@ -116,11 +110,12 @@
             } else {
                 marker = L.marker(latlng).addTo(map);
             }
-
-            if (latInput) latInput.value = formatForSubmit(latlng.lat);
-            if (lngInput) lngInput.value = formatForSubmit(latlng.lng);
+            latInput.value = fmt.format(latlng.lat);
+            lngInput.value = fmt.format(latlng.lng);
         }
 
         map.on('click', (e) => setPoint(e.latlng));
+
+
     </script>
 }
