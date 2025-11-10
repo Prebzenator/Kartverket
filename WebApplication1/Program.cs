@@ -118,7 +118,7 @@ try
         {
             try
             {
-                db.Database.Migrate();
+               db.Database.Migrate();
                 logger.LogInformation("Migrations applied successfully.");
 
                 // Seed roles & admin user (development only)
