@@ -41,17 +41,19 @@ namespace WebApplication1.Controllers
 
         /// <summary>
         /// Handles form submission, validates input, saves to database, and shows overview.
+        /// Supports both create and update.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DataForm(IFormCollection form, string? IsDraft, int? id)
         {
-            var isDraft = string.Equals(IsDraft, "true", System.StringComparison.OrdinalIgnoreCase);
+            var isDraft = string.Equals(IsDraft, "true", StringComparison.OrdinalIgnoreCase);
             var user = await _userManager.GetUserAsync(User);
 
             ObstacleData obstacledata;
             if (id.HasValue && id.Value > 0)
             {
+                // Update existing obstacle
                 obstacledata = await _context.Obstacles.FindAsync(id.Value);
                 if (obstacledata == null) return NotFound();
 
@@ -66,9 +68,16 @@ namespace WebApplication1.Controllers
                 obstacledata.Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : obstacledata.Latitude;
                 obstacledata.Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : obstacledata.Longitude;
                 obstacledata.ReportedAt = DateTime.UtcNow;
+
+                // ✅ Update category if provided
+                if (int.TryParse(form["CategoryId"], out var categoryId))
+                {
+                    obstacledata.CategoryId = categoryId;
+                }
             }
             else
             {
+                // Create new obstacle
                 obstacledata = new ObstacleData
                 {
                     ObstacleName = form["ObstacleName"],
@@ -87,12 +96,18 @@ namespace WebApplication1.Controllers
                     obstacledata.ReporterOrganization = user.Organization;
                 }
 
+                // ✅ Set category when creating
+                if (int.TryParse(form["CategoryId"], out var categoryId))
+                {
+                    obstacledata.CategoryId = categoryId;
+                }
+
                 _context.Obstacles.Add(obstacledata);
             }
 
             obstacledata.Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending;
 
-            // When not a draft, validate the model
+            // Validate if not draft
             if (!isDraft && !TryValidateModel(obstacledata))
             {
                 ViewBag.CategoryOptions = _context.ObstacleCategories
@@ -108,14 +123,12 @@ namespace WebApplication1.Controllers
 
             await _context.SaveChangesAsync();
 
-            // ✅ Laster inn Category-navigasjonsobjektet før visning
+            // ✅ Load Category navigation property before showing overview
             await _context.Entry(obstacledata).Reference(o => o.Category).LoadAsync();
 
             return View("Overview", obstacledata);
         }
-
-
-
+        
 
         /// <summary>
         /// Admin: displays all obstacle reports regardless of status.
@@ -125,7 +138,7 @@ namespace WebApplication1.Controllers
         public IActionResult Review()
         {
             var allObstacles = _context.Obstacles
-                .Include(o => o.Category) // ✅ Inkluderer kategori
+                .Include(o => o.Category)
                 .OrderByDescending(o => o.ReportedAt)
                 .ToList();
 
@@ -138,7 +151,7 @@ namespace WebApplication1.Controllers
         {
             var pendingObstacles = _context.Obstacles
                 .Where(o => o.Status == ReportStatus.Pending)
-                .Include(o => o.Category) // ✅ Inkluderer kategori
+                .Include(o => o.Category)
                 .OrderByDescending(o => o.ReportedAt)
                 .ToList();
 
@@ -163,3 +176,4 @@ namespace WebApplication1.Controllers
         }
     }
 }
+ 

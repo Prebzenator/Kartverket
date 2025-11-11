@@ -28,7 +28,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     // Read connection string directly to support environment variable injection
     var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 
-    // Hvis EF kjøres lokalt, bruk localhost i stedet for 'db'
+    // Hvis EF kjï¿½res lokalt, bruk localhost i stedet for 'db'
     if (AppContext.BaseDirectory.Contains("dotnet-ef"))
     {
         conn = conn.Replace("server=db", "server=localhost");

@@ -53,6 +53,15 @@ namespace WebApplication1.Controllers
                 return Forbid();
             }
 
+            // ✅ Legg til kategori-valgene for dropdown
+            ViewBag.CategoryOptions = _context.ObstacleCategories
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
+                .ToList();
+
             // Reuse existing DataForm view for editing
             return View("~/Views/Obstacle/DataForm.cshtml", report);
         }
