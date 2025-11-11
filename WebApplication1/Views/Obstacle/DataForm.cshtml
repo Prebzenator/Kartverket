@@ -18,18 +18,23 @@
                             <input type="hidden" name="id" value="@Model.Id" />
                         }
 
-
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
                         <div class="mb-3">
                             <label asp-for="ObstacleName" class="form-label"></label>
-                            <input asp-for="ObstacleName" class="form-control" placeholder="e.g., Fallen tree" />
+                            <input asp-for="ObstacleName" class="form-control" id="ObstacleNameInput" placeholder="e.g., Fallen tree" />
                             <span asp-validation-for="ObstacleName" class="text-danger"></span>
+                            @if (ViewBag.Missing == true)
+                            {
+                                <div class="form-text text-warning">
+                                    You are reporting a missing obstacle. The name must begin with "MISSING - ".
+                                </div>
+                            }
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="ObstacleHeight" class="form-label"></label>
-                            <input asp-for="ObstacleHeight" class="form-control" type="number" step="0.01" min="0" placeholder="e.g., 1,25" />
+                            <input asp-for="ObstacleHeight" class="form-control" type="number" step="0.01" min="0" placeholder="e.g., 1.25" />
                             <span asp-validation-for="ObstacleHeight" class="text-danger"></span>
                         </div>
 
@@ -111,7 +116,38 @@
         }
 
         map.on('click', (e) => setPoint(e.latlng));
-
-
     </script>
+
+    @if (ViewBag.Missing == true)
+    {
+        <script>
+            const input = document.getElementById("ObstacleNameInput");
+            const prefix = "MISSING - ";
+
+            // Prevent deletion of the prefix via backspace or delete
+            input.addEventListener("keydown", (e) => {
+                const cursorPos = input.selectionStart;
+                if ((e.key === "Backspace" && cursorPos <= prefix.length) ||
+                    (e.key === "Delete" && cursorPos < prefix.length)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Restore prefix if removed
+            input.addEventListener("input", () => {
+                if (!input.value.startsWith(prefix)) {
+                    const suffix = input.value.replace(prefix, "");
+                    input.value = prefix + suffix;
+                    input.setSelectionRange(prefix.length, prefix.length);
+                }
+            });
+
+            // Ensure cursor starts after prefix
+            input.addEventListener("focus", () => {
+                if (input.selectionStart < prefix.length) {
+                    input.setSelectionRange(prefix.length, prefix.length);
+                }
+            });
+        </script>
+    }
 }

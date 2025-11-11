@@ -40,12 +40,22 @@ namespace WebApplication1.Controllers
 
         /// <summary>
         /// Displays the form for entering obstacle data.
+        /// If 'missing' is true, prefill ObstacleName with "MISSING - ".
         /// </summary>
         [HttpGet]
-        public IActionResult DataForm()
+        public IActionResult DataForm(bool missing = false)
         {
-            return View();
+            var model = new ObstacleData();
+
+            if (missing)
+            {
+                model.ObstacleName = "MISSING - ";
+                ViewBag.Missing = true;
+            }
+
+            return View(model);
         }
+
 
         /// <summary>
         /// Handles form submission, validates input, saves to database, and shows overview.
@@ -110,9 +120,6 @@ namespace WebApplication1.Controllers
 
             return View("Overview", obstacledata);
         }
-
-
-
 
         /// <summary>
         /// Admin: displays all obstacle reports regardless of status.
