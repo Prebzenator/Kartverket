@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.Models;
 
@@ -69,6 +70,23 @@ namespace WebApplication1.Data
 
                 if (!await userManager.IsInRoleAsync(admin, "Registry Administrator"))
                     await userManager.AddToRoleAsync(admin, "Registry Administrator");
+            }
+
+            // Assign Pilot role to all users that are NOT Registry Administrator
+            // (Do not remove roles from anyone; only add Pilot where missing.)
+            var allUsers = userManager.Users.ToList();
+            foreach (var user in allUsers)
+            {
+                // skip the admin user(s) who already are Registry Administrator
+                if (await userManager.IsInRoleAsync(user, "Registry Administrator"))
+                    continue;
+
+                // if user is already Pilot, nothing to do
+                if (await userManager.IsInRoleAsync(user, "Pilot"))
+                    continue;
+
+                // Add Pilot role
+                await userManager.AddToRoleAsync(user, "Pilot");
             }
         }
     }

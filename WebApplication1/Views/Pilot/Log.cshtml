@@ -1,0 +1,48 @@
+﻿@model IEnumerable<WebApplication1.Models.ObstacleData>
+
+@{
+    ViewData["Title"] = "Reports Log";
+}
+
+<div class="container py-4">
+    <h2 class="mb-3">My Reports</h2>
+
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Obstacle</th>
+                <th>Reported At</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.ObstacleName</td>
+                    <td>@item.ReportedAt.ToString("g")</td>
+                    <td>
+                        @switch (item.Status)
+                        {
+                            case WebApplication1.Models.ReportStatus.Pending:
+                                <span class="badge text-bg-warning text-dark">Pending</span>
+                                break;
+                            case WebApplication1.Models.ReportStatus.Approved:
+                                <span class="badge text-bg-success">Approved</span>
+                                break;
+                            case WebApplication1.Models.ReportStatus.NotApproved:
+                                <span class="badge text-bg-danger">Not Approved</span>
+                                break;
+                        }
+                    </td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-primary" href="@Url.Action("EditReport", "Pilot", new { id = item.Id })">Edit report</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

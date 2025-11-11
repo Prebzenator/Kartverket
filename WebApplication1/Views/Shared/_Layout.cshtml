@@ -67,6 +67,17 @@
                                 </a>
                             </li>
                         }
+
+                        @* Pilot log link (visible only to users in role Pilot) *@
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="Pilot" asp-action="Log">
+                                    <i class="bi bi-journal-text"></i><span>Reports</span>
+                                </a>
+                            </li>
+                        }
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
@@ -139,3 +150,4 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
