@@ -59,6 +59,12 @@ namespace WebApplication1.Controllers
                 Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending
             };
 
+            // ✅ Hent valgt kategori fra skjemaet
+            if (int.TryParse(form["CategoryId"], out var categoryId))
+            {
+                obstacledata.CategoryId = categoryId;
+            }
+
             var user = await _userManager.GetUserAsync(User);
             if (user != null)
             {
@@ -69,6 +75,14 @@ namespace WebApplication1.Controllers
 
             if (!isDraft && !TryValidateModel(obstacledata))
             {
+                ViewBag.CategoryOptions = _context.ObstacleCategories
+                    .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                    {
+                        Value = c.Id.ToString(),
+                        Text = c.Name
+                    })
+                    .ToList();
+
                 return View(obstacledata);
             }
 
@@ -86,7 +100,7 @@ namespace WebApplication1.Controllers
         public IActionResult Review()
         {
             var allObstacles = _context.Obstacles
-                .Include(o => o.Category)
+                .Include(o => o.Category) // ✅ Inkluderer kategori
                 .OrderByDescending(o => o.ReportedAt)
                 .ToList();
 
@@ -99,7 +113,7 @@ namespace WebApplication1.Controllers
         {
             var pendingObstacles = _context.Obstacles
                 .Where(o => o.Status == ReportStatus.Pending)
-                .Include(o => o.Category)
+                .Include(o => o.Category) // ✅ Inkluderer kategori
                 .OrderByDescending(o => o.ReportedAt)
                 .ToList();
 
