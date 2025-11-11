@@ -16,14 +16,17 @@ namespace WebApplication1.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _configuration;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountController(UserManager<ApplicationUser> userManager,
                                  SignInManager<ApplicationUser> signInManager,
-                                 IConfiguration configuration)
+                                 IConfiguration configuration,
+                                 RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _configuration = configuration;
+            _roleManager = roleManager;
         }
 
         // GET: /Account/Register
@@ -68,6 +71,12 @@ namespace WebApplication1.Controllers
                 foreach (var e in createResult.Errors)
                     ModelState.AddModelError(string.Empty, e.Description);
                 return View(vm);
+            }
+
+            // Ensure Pilot role exists (harmless if it already does)
+            if (!await _roleManager.RoleExistsAsync("Pilot"))
+            {
+                await _roleManager.CreateAsync(new IdentityRole("Pilot"));
             }
 
             // For the mockup/demo: automatically put self-registered users into "Pilot".

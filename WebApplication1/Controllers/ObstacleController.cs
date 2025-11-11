@@ -51,40 +51,68 @@ namespace WebApplication1.Controllers
         /// Handles form submission, validates input, saves to database, and shows overview.
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> DataForm(IFormCollection form)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DataForm(IFormCollection form, string? IsDraft, int? id)
         {
-            var isDraft = form["IsDraft"].ToString().ToLower() == "true";
-            Console.WriteLine("IsDraft received: " + isDraft);
-
-            var obstacledata = new ObstacleData
-            {
-                ObstacleName = form["ObstacleName"],
-                ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : default,
-                ObstacleDescription = form["ObstacleDescription"],
-                Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : (decimal?)null,
-                Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : (decimal?)null,
-                ReportedAt = DateTime.UtcNow,
-                Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending
-            };
-
+            var isDraft = string.Equals(IsDraft, "true", System.StringComparison.OrdinalIgnoreCase);
             var user = await _userManager.GetUserAsync(User);
-            if (user != null)
+
+            ObstacleData obstacledata;
+            if (id.HasValue && id.Value > 0)
             {
-                obstacledata.ReportedByUserId = user.Id;
-                obstacledata.ReporterName = user.FullName;
-                obstacledata.ReporterOrganization = user.Organization;
+                obstacledata = await _context.Obstacles.FindAsync(id.Value);
+                if (obstacledata == null) return NotFound();
+
+                if (user != null && obstacledata.ReporterOrganization != user.Organization)
+                {
+                    return Forbid();
+                }
+
+                obstacledata.ObstacleName = form["ObstacleName"];
+                obstacledata.ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var h) ? h : obstacledata.ObstacleHeight;
+                obstacledata.ObstacleDescription = form["ObstacleDescription"];
+                obstacledata.Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : obstacledata.Latitude;
+                obstacledata.Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : obstacledata.Longitude;
+                obstacledata.ReportedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                obstacledata = new ObstacleData
+                {
+                    ObstacleName = form["ObstacleName"],
+                    ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : default,
+                    ObstacleDescription = form["ObstacleDescription"],
+                    Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : (decimal?)null,
+                    Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : (decimal?)null,
+                    ReportedAt = DateTime.UtcNow,
+                    DateData = DateTime.UtcNow
+                };
+
+                if (user != null)
+                {
+                    obstacledata.ReportedByUserId = user.Id;
+                    obstacledata.ReporterName = user.FullName;
+                    obstacledata.ReporterOrganization = user.Organization;
+                }
+
+                _context.Obstacles.Add(obstacledata);
             }
 
+            obstacledata.Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending;
+
+            // When not a draft, validate the model
             if (!isDraft && !TryValidateModel(obstacledata))
             {
                 return View(obstacledata);
             }
 
-            _context.Obstacles.Add(obstacledata);
             await _context.SaveChangesAsync();
 
             return View("Overview", obstacledata);
         }
+
+
+
 
         /// <summary>
         /// Admin: displays all obstacle reports regardless of status.

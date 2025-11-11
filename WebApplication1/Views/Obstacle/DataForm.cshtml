@@ -13,6 +13,11 @@
 
                     <form asp-controller="Obstacle" asp-action="DataForm" method="post">
                         @Html.AntiForgeryToken()
+                        @if (Model != null && Model.Id > 0)
+                        {
+                            <input type="hidden" name="id" value="@Model.Id" />
+                        }
+
 
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
