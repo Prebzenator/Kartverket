@@ -9,22 +9,23 @@ namespace WebApplication1.Data
 {
     public static class RoleSeeder
     {
-        // Call this once at startup (dev only) to create roles + initial admin
         public static async Task SeedAsync(IServiceProvider serviceProvider)
         {
             using var scope = serviceProvider.CreateScope();
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            string[] roles = new[] { "Pilot", "Registry Administrator", "Admin" };
+            // Define three distinct roles
+            string[] roles = new[] { "Pilot", "Registry Administrator", "System Administrator" };
 
+            // Create roles if they don't exist
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // Create initial admin if env variables are provided (or fallback to safe defaults)
+            // Create/update initial System Administrator
             var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL") ?? "admin@example.com";
             var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD") ?? "Admin123!";
             var adminName = Environment.GetEnvironmentVariable("ADMIN_NAME") ?? "System Administrator";
@@ -33,6 +34,7 @@ namespace WebApplication1.Data
             var admin = await userManager.FindByEmailAsync(adminEmail);
             if (admin == null)
             {
+                // Create new admin
                 admin = new ApplicationUser
                 {
                     UserName = adminEmail,
@@ -44,13 +46,26 @@ namespace WebApplication1.Data
                 var result = await userManager.CreateAsync(admin, adminPassword);
                 if (result.Succeeded)
                 {
+                    await userManager.AddToRoleAsync(admin, "System Administrator");
                     await userManager.AddToRoleAsync(admin, "Registry Administrator");
-                    await userManager.AddToRoleAsync(admin, "Admin");
                 }
             }
             else
             {
-                // Update existing admin user with name and org if they're missing
+                // Admin exists - ensure it has both required roles
+                var currentRoles = await userManager.GetRolesAsync(admin);
+
+                if (!currentRoles.Contains("System Administrator"))
+                {
+                    await userManager.AddToRoleAsync(admin, "System Administrator");
+                }
+
+                if (!currentRoles.Contains("Registry Administrator"))
+                {
+                    await userManager.AddToRoleAsync(admin, "Registry Administrator");
+                }
+
+                // Update profile if needed
                 bool needsUpdate = false;
                 if (string.IsNullOrEmpty(admin.FullName))
                 {
@@ -67,26 +82,33 @@ namespace WebApplication1.Data
                 {
                     await userManager.UpdateAsync(admin);
                 }
-
-                if (!await userManager.IsInRoleAsync(admin, "Registry Administrator"))
-                    await userManager.AddToRoleAsync(admin, "Registry Administrator");
             }
 
-            // Assign Pilot role to all users that are NOT Registry Administrator
-            // (Do not remove roles from anyone; only add Pilot where missing.)
+            // Migration: Remove old "Admin" role
+            var oldAdminRole = await roleManager.FindByNameAsync("Admin");
+            if (oldAdminRole != null)
+            {
+                var usersInOldRole = await userManager.GetUsersInRoleAsync("Admin");
+                foreach (var user in usersInOldRole)
+                {
+                    if (!await userManager.IsInRoleAsync(user, "Registry Administrator"))
+                    {
+                        await userManager.AddToRoleAsync(user, "Registry Administrator");
+                    }
+                    await userManager.RemoveFromRoleAsync(user, "Admin");
+                }
+                await roleManager.DeleteAsync(oldAdminRole);
+            }
+
+            // Ensure all users without roles get Pilot role
             var allUsers = userManager.Users.ToList();
             foreach (var user in allUsers)
             {
-                // skip the admin user(s) who already are Registry Administrator
-                if (await userManager.IsInRoleAsync(user, "Registry Administrator"))
-                    continue;
-
-                // if user is already Pilot, nothing to do
-                if (await userManager.IsInRoleAsync(user, "Pilot"))
-                    continue;
-
-                // Add Pilot role
-                await userManager.AddToRoleAsync(user, "Pilot");
+                var userRoles = await userManager.GetRolesAsync(user);
+                if (userRoles.Count == 0)
+                {
+                    await userManager.AddToRoleAsync(user, "Pilot");
+                }
             }
         }
     }

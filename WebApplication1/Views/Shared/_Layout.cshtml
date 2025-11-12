@@ -1,4 +1,4 @@
-﻿@* Views/Shared/_Layout.cshtml *@
+﻿@* Views/Shared/_Layout.cshtml - Updated Navigation *@
 @using WebApplication1.Models
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
@@ -44,40 +44,54 @@
 
                 <div id="mainNav" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto">
+                        <!-- Home (everyone) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-1"
                                asp-area="" asp-controller="Home" asp-action="Index">
                                 <i class="bi bi-house-door"></i><span>Home</span>
                             </a>
                         </li>
+
+                        <!-- My Reports (Pilots only) -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="Pilot" asp-action="Log">
+                                    <i class="bi bi-journal-text"></i><span>My Reports</span>
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Review Reports (Registry Administrators only) -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="AdminObstacle" asp-action="Dashboard">
+                                    <i class="bi bi-clipboard-check"></i><span>Review Reports</span>
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Manage Users (System Administrators only) -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("System Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="Admin" asp-action="CreateUser">
+                                    <i class="bi bi-person-plus"></i><span>Manage Users</span>
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Privacy (everyone) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-1"
                                asp-area="" asp-controller="Home" asp-action="Privacy">
                                 <i class="bi bi-shield-lock"></i><span>Privacy</span>
                             </a>
                         </li>
-
-                        @* Admin review page link (visible only to Registry Administrators) *@
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-controller="Obstacle" asp-action="Review">
-                                    <i class="bi bi-clipboard-check"></i><span>Review Reports</span>
-                                </a>
-                            </li>
-                        }
-
-                        @* Pilot log link (visible only to users in role Pilot) *@
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-controller="Pilot" asp-action="Log">
-                                    <i class="bi bi-journal-text"></i><span>Reports</span>
-                                </a>
-                            </li>
-                        }
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
@@ -86,11 +100,14 @@
                             <i id="theme-icon" class="bi bi-moon"></i>
                         </button>
 
-                        <!-- Register obstacle -->
-                        <a class="btn btn-primary d-flex align-items-center gap-1"
-                           asp-area="" asp-controller="Obstacle" asp-action="DataForm">
-                            <i class="bi bi-plus-circle"></i><span>Register obstacle</span>
-                        </a>
+                        <!-- Register obstacle (authenticated users only) -->
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="btn btn-primary d-flex align-items-center gap-1"
+                               asp-area="" asp-controller="Obstacle" asp-action="DataForm">
+                                <i class="bi bi-plus-circle"></i><span>Register obstacle</span>
+                            </a>
+                        }
 
                         <!-- Login/Logout -->
                         <partial name="_LoginPartial" />
@@ -109,6 +126,25 @@
     <footer class="border-top py-3 text-center text-muted small">
         <div class="container">
             &copy; @DateTime.Now.Year — Obstacle App
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span class="mx-2">•</span>
+                <span>
+                    Logged in as
+                    @if (User.IsInRole("System Administrator"))
+                    {
+                        <strong>System Administrator</strong>
+                    }
+                    else if (User.IsInRole("Registry Administrator"))
+                    {
+                        <strong>Registry Administrator</strong>
+                    }
+                    else if (User.IsInRole("Pilot"))
+                    {
+                        <strong>Pilot</strong>
+                    }
+                </span>
+            }
         </div>
     </footer>
 
@@ -150,4 +186,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

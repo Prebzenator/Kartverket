@@ -42,12 +42,6 @@ namespace WebApplication1.Models
         public string? ObstacleDescription { get; set; }
 
         /// <summary>
-        /// Form submission mode: true if saving as draft, false if final submission.
-        /// </summary>
-        [NotMapped]
-        public bool IsDraft { get; set; }
-
-        /// <summary>
         /// Latitude picked from map. Optional.
         /// </summary>
         [DisplayName("Latitude")]
@@ -97,24 +91,37 @@ namespace WebApplication1.Models
         [DisplayName("Reporter organization")]
         public string? ReporterOrganization { get; set; }
 
-        // ===== ADMIN WORKFLOW FIELDS =====
+        // ===== DRAFT & STATUS FIELDS =====
+
+        /// <summary>
+        /// Indicates if this report is saved as a draft (not submitted for review).
+        /// Drafts are only visible to the reporter and can be edited.
+        /// When false, the report is submitted and enters the review workflow.
+        /// </summary>
+        [DisplayName("Is Draft")]
+        public bool IsDraft { get; set; }
 
         /// <summary>
         /// Approval status of the report.
+        /// - Pending: Submitted for review (IsDraft = false)
+        /// - Approved: Approved by Registry Administrator
+        /// - NotApproved: Rejected by Registry Administrator with feedback
         /// </summary>
         [Required]
         [DisplayName("Status")]
         public ReportStatus Status { get; set; } = ReportStatus.Pending;
 
+        // ===== ADMIN WORKFLOW FIELDS =====
+
         /// <summary>
-        /// UserId of the admin who is assigned to review this report.
+        /// UserId of the Registry Administrator assigned to review this report.
         /// </summary>
         [StringLength(450)]
         [DisplayName("Assigned to (User ID)")]
         public string? AssignedToUserId { get; set; }
 
         /// <summary>
-        /// Name of the admin assigned to this report (cached).
+        /// Name of the Registry Administrator assigned to this report (cached).
         /// </summary>
         [StringLength(100)]
         [DisplayName("Assigned to")]
@@ -122,6 +129,7 @@ namespace WebApplication1.Models
 
         /// <summary>
         /// Admin comments/feedback (required when rejecting).
+        /// Visible to the reporter to explain rejection reason.
         /// </summary>
         [StringLength(1000)]
         [DisplayName("Admin comments")]
@@ -129,20 +137,20 @@ namespace WebApplication1.Models
         public string? AdminComments { get; set; }
 
         /// <summary>
-        /// UserId of the admin who last reviewed/updated this report.
+        /// UserId of the Registry Administrator who last reviewed/updated this report.
         /// </summary>
         [StringLength(450)]
         public string? ReviewedByUserId { get; set; }
 
         /// <summary>
-        /// Name of the admin who last reviewed this report (cached).
+        /// Name of the Registry Administrator who last reviewed this report (cached).
         /// </summary>
         [StringLength(100)]
         [DisplayName("Reviewed by")]
         public string? ReviewedByName { get; set; }
 
         /// <summary>
-        /// Timestamp of last status change by admin.
+        /// Timestamp of last status change by Registry Administrator.
         /// </summary>
         [DisplayName("Last reviewed at")]
         public DateTime? LastReviewedAt { get; set; }
@@ -150,21 +158,23 @@ namespace WebApplication1.Models
 
     /// <summary>
     /// Enum defining the possible states of a submitted report.
+    /// Note: Draft status is tracked separately via IsDraft boolean.
     /// </summary>
     public enum ReportStatus
     {
         /// <summary>
-        /// Report is awaiting review.
+        /// Report is awaiting review by Registry Administrator.
         /// </summary>
         Pending = 0,
 
         /// <summary>
-        /// Report has been reviewed and approved.
+        /// Report has been reviewed and approved by Registry Administrator.
         /// </summary>
         Approved = 1,
 
         /// <summary>
-        /// Report has been reviewed but not approved.
+        /// Report has been reviewed but rejected by Registry Administrator.
+        /// Admin comments are required and visible to the reporter.
         /// </summary>
         NotApproved = 2
     }

@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 namespace WebApplication1.Controllers
 {
     /// <summary>
-    /// Admin-only controller for reviewing and managing obstacle reports.
+    /// Registry Administrator controller for reviewing and managing obstacle reports.
     /// Only users in "Registry Administrator" role can access these actions.
+    /// Drafts are excluded from the review queue.
     /// </summary>
     [Authorize(Roles = "Registry Administrator")]
     public class AdminObstacleController : Controller
@@ -27,13 +28,14 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Main admin dashboard - shows all reports with filtering and sorting.
+        /// Main admin dashboard - shows all submitted reports (excludes drafts) with filtering and sorting.
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Dashboard(string sortBy = "date", string filterStatus = "all", string filterOrg = "all")
         {
-            // Get all reports
-            var query = _context.Obstacles.AsQueryable();
+            // Get all reports that are not drafts
+            var query = _context.Obstacles
+                .Where(o => !o.IsDraft); // CRITICAL: Exclude draft reports
 
             // Apply status filter
             if (filterStatus != "all" && Enum.TryParse<ReportStatus>(filterStatus, out var status))
@@ -62,12 +64,12 @@ namespace WebApplication1.Controllers
 
             var reports = await query.ToListAsync();
 
-            // Get all admins for assignment dropdown
+            // Get all Registry Administrators for assignment dropdown
             var admins = await _userManager.GetUsersInRoleAsync("Registry Administrator");
 
             // Get distinct organizations for filter
             var organizations = await _context.Obstacles
-                .Where(o => o.ReporterOrganization != null)
+                .Where(o => !o.IsDraft && o.ReporterOrganization != null)
                 .Select(o => o.ReporterOrganization)
                 .Distinct()
                 .ToListAsync();
@@ -87,6 +89,7 @@ namespace WebApplication1.Controllers
 
         /// <summary>
         /// View detailed information about a specific report.
+        /// Only shows submitted reports (not drafts).
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> ViewReport(int id)
@@ -95,7 +98,14 @@ namespace WebApplication1.Controllers
             if (report == null)
                 return NotFound();
 
-            // Get all admins for assignment
+            // Don't allow viewing draft reports in admin interface
+            if (report.IsDraft)
+            {
+                TempData["ErrorMessage"] = "Cannot review draft reports. The reporter must submit it first.";
+                return RedirectToAction(nameof(Dashboard));
+            }
+
+            // Get all Registry Administrators for assignment
             var admins = await _userManager.GetUsersInRoleAsync("Registry Administrator");
 
             ViewBag.Administrators = admins;
@@ -103,7 +113,7 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Edit report details (admin can update obstacle information).
+        /// Edit report details (Registry Administrator can update obstacle information).
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -127,7 +137,7 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Assign a report to another administrator.
+        /// Assign a report to another Registry Administrator.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
