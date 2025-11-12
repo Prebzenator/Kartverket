@@ -102,5 +102,39 @@ namespace WebApplication1.Controllers
 
             return View(report);
         }
+
+        /// <summary>
+        /// GET: /Pilot/OrganizationReports
+        /// Shows all reports from the user's organization (not just their own).
+        /// This allows organizations like NLA to see what their crew members have reported.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> OrganizationReports()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            // Get user's organization
+            var userOrg = user.Organization;
+
+            if (string.IsNullOrEmpty(userOrg))
+            {
+                TempData["ErrorMessage"] = "You don't have an organization assigned.";
+                return RedirectToAction(nameof(Log));
+            }
+
+            // Get all submitted reports (not drafts) from the same organization
+            var reports = await _context.Obstacles
+                .Where(o => !o.IsDraft && o.ReporterOrganization == userOrg)
+                .OrderByDescending(o => o.ReportedAt)
+                .ToListAsync();
+
+            // Pass organization name to view
+            ViewBag.OrganizationName = userOrg;
+            ViewBag.CurrentUserId = user.Id; // To highlight user's own reports
+
+            return View(reports);
+        }
     }
 }
+

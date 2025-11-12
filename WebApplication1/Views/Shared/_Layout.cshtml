@@ -55,11 +55,25 @@
                         <!-- My Reports (Pilots only) -->
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-controller="Pilot" asp-action="Log">
-                                    <i class="bi bi-journal-text"></i><span>My Reports</span>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-1"
+                                   href="#" role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="bi bi-journal-text"></i><span>Reports</span>
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Pilot" asp-action="Log">
+                                            <i class="bi bi-person"></i> My Reports
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Pilot" asp-action="OrganizationReports">
+                                            <i class="bi bi-building"></i> Organization Reports
+                                        </a>
+                                    </li>
+                                </ul>
                             </li>
                         }
 
