@@ -6,6 +6,19 @@
     ViewData["Title"] = "Admin Dashboard";
 }
 
+<style>
+    /* Små, kvadratiske ikonknapper for Actions-kolonnen */
+    .btn-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: .5rem;
+    }
+</style>
+
 <div class="container-fluid py-4">
     <!-- Header with Statistics -->
     <div class="row mb-4">
@@ -141,7 +154,6 @@
                                 </td>
                                 <td class="align-middle">
                                     <div>@report.ObstacleName</div>
-                                    <small class="text-muted">@(report.ObstacleDescription?.Length > 50 ? report.ObstacleDescription.Substring(0, 50) + "..." : report.ObstacleDescription)</small>
                                 </td>
                                 <td class="align-middle">@report.ObstacleHeight?.ToString("0.##") m</td>
                                 <td class="align-middle">
@@ -190,25 +202,52 @@
                                         <span class="text-muted">Unassigned</span>
                                     }
                                 </td>
+
+                                <!-- Actions -->
                                 <td class="align-middle text-end">
-                                    <div class="btn-group btn-group-sm">
-                                        <a asp-action="ViewReport" asp-route-id="@report.Id"
-                                           class="btn btn-outline-primary" title="View Details">
+                                    <div class="d-inline-flex gap-1">
+                                        <!-- View -->
+                                        <a asp-action="ViewReport"
+                                           asp-route-id="@report.Id"
+                                           class="btn btn-sm btn-outline-primary btn-icon"
+                                           title="View report">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
-                                        @if (report.Status == ReportStatus.Pending)
-                                        {
-                                            <form asp-action="ApproveReport" method="post" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@report.Id" />
-                                                <button type="submit" class="btn btn-outline-success" title="Quick Approve">
-                                                    <i class="bi bi-check"></i>
-                                                </button>
-                                            </form>
-                                        }
+                                        <!-- Approve -->
+                                        <form asp-controller="Obstacle"
+                                              asp-action="UpdateStatus"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@report.Id" />
+                                            <input type="hidden" name="status" value="@ReportStatus.Approved" />
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-success btn-icon"
+                                                    title="Approve"
+                                                    @(report.Status == ReportStatus.Approved ? "disabled" : null)>
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Not approve -->
+                                        <form asp-controller="Obstacle"
+                                              asp-action="UpdateStatus"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@report.Id" />
+                                            <input type="hidden" name="status" value="@ReportStatus.NotApproved" />
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger btn-icon"
+                                                    title="Not approve"
+                                                    @(report.Status == ReportStatus.NotApproved ? "disabled" : null)>
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
+                                <!-- /Actions -->
                             </tr>
                         }
                     </tbody>

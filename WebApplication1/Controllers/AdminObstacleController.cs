@@ -27,22 +27,31 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Main admin dashboard - shows all reports with filtering and sorting.
+        /// Main admin dashboard – shows reports with filtering and sorting.
+        /// Default: only Pending are shown on first load.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> Dashboard(string sortBy = "date", string filterStatus = "all", string filterOrg = "all")
+        public async Task<IActionResult> Dashboard(string sortBy = "date", string? filterStatus = null, string filterOrg = "all")
         {
-            // Get all reports
+            // If no status is explicitly provided by the user, default to Pending
+            // so approved / not approved reports do not clutter the main view.
+            if (string.IsNullOrWhiteSpace(filterStatus))
+                filterStatus = "Pending";
+
+            // Base query
             var query = _context.Obstacles.AsQueryable();
 
-            // Apply status filter
-            if (filterStatus != "all" && Enum.TryParse<ReportStatus>(filterStatus, out var status))
+            // Apply status filter (skip only when user chose "all")
+            if (!string.Equals(filterStatus, "all", System.StringComparison.OrdinalIgnoreCase))
             {
-                query = query.Where(o => o.Status == status);
+                if (System.Enum.TryParse<ReportStatus>(filterStatus, true, out var status))
+                {
+                    query = query.Where(o => o.Status == status);
+                }
             }
 
             // Apply organization filter
-            if (filterOrg != "all")
+            if (!string.Equals(filterOrg, "all", System.StringComparison.OrdinalIgnoreCase))
             {
                 query = query.Where(o => o.ReporterOrganization == filterOrg);
             }
@@ -175,7 +184,7 @@ namespace WebApplication1.Controllers
             report.Status = ReportStatus.Approved;
             report.ReviewedByUserId = currentUser?.Id;
             report.ReviewedByName = currentUser?.FullName ?? currentUser?.Email;
-            report.LastReviewedAt = DateTime.UtcNow;
+            report.LastReviewedAt = System.DateTime.UtcNow;
             report.AdminComments = null; // Clear comments on approval
 
             await _context.SaveChangesAsync();
@@ -207,7 +216,7 @@ namespace WebApplication1.Controllers
             report.AdminComments = adminComments;
             report.ReviewedByUserId = currentUser?.Id;
             report.ReviewedByName = currentUser?.FullName ?? currentUser?.Email;
-            report.LastReviewedAt = DateTime.UtcNow;
+            report.LastReviewedAt = System.DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
@@ -231,7 +240,7 @@ namespace WebApplication1.Controllers
             report.Status = ReportStatus.Pending;
             report.ReviewedByUserId = currentUser?.Id;
             report.ReviewedByName = currentUser?.FullName ?? currentUser?.Email;
-            report.LastReviewedAt = DateTime.UtcNow;
+            report.LastReviewedAt = System.DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 

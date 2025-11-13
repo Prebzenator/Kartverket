@@ -12,9 +12,9 @@ namespace WebApplication1.Data.Migrations
             migrationBuilder.Sql(@"
                 UPDATE Obstacles 
                 SET Status = CASE 
-                    WHEN Status = 'Pending' THEN 0
-                    WHEN Status = 'Approved' THEN 1
-                    WHEN Status = 'NotApproved' THEN 2
+                    WHEN CAST(Status AS CHAR(20)) = 'Pending' THEN 0
+                    WHEN CAST(Status AS CHAR(20)) = 'Approved' THEN 1
+                    WHEN CAST(Status AS CHAR(20)) = 'NotApproved' THEN 2
                     ELSE 0
                 END
             ");

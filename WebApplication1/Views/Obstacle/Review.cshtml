@@ -4,11 +4,13 @@
 
 <h2 class="mb-3">Obstacle Reports – Admin Review</h2>
 
+<!-- Filter buttons -->
 <div class="mb-3">
     <a asp-action="ReviewPending" class="btn btn-sm btn-outline-secondary">Show Pending Only</a>
     <a asp-action="Review" class="btn btn-sm btn-outline-secondary">Show All</a>
 </div>
 
+<!-- Table of reports -->
 <table class="table table-striped align-middle">
     <thead>
         <tr>
@@ -42,7 +44,10 @@
                             break;
                     }
                 </td>
+
+                <!-- Action buttons -->
                 <td class="text-end">
+                    <!-- Approve button -->
                     <form asp-action="UpdateStatus" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@item.Id" />
@@ -53,13 +58,14 @@
                         </button>
                     </form>
 
+                    <!-- Not Approve button -->
                     <form asp-action="UpdateStatus" method="post" class="d-inline ms-1">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="id" value="@item.Id" />
                         <input type="hidden" name="status" value="@ReportStatus.NotApproved" />
                         <button class="btn btn-sm btn-outline-danger"
                                 @(item.Status == ReportStatus.NotApproved ? "disabled" : null)>
-                            Reject
+                            Not Approve
                         </button>
                     </form>
                 </td>
