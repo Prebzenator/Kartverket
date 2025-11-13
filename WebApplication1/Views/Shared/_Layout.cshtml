@@ -17,11 +17,21 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
           crossorigin="anonymous" />
 
-    <!-- Leaflet -->
+    <!-- Leaflet + Draw (CSS) -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin="" />
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
+          crossorigin="anonymous">
+
+    <style>
+        /* Standard høyde for kartet */
+        #map, #app-map {
+            height: 70vh;
+            min-height: 420px;
+        }
+    </style>
 
     <!-- Site styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -112,14 +122,16 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
+    <!-- Core scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
 
+    <!-- Leaflet + Draw (JS må lastes FØR side-spesifikke scripts) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js" crossorigin="anonymous"></script>
+
+    <!-- Theme script -->
     <script>
         (function () {
             const STORAGE_KEY = 'theme';
@@ -150,4 +162,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
