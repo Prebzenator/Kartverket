@@ -26,9 +26,10 @@ var configuration = builder.Configuration;
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     // Read connection string directly to support environment variable injection
-    var conn = builder.Configuration.GetConnectionString("DefaultConnection");
+    var conn = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Missing connection string 'DefaultConnection'.");
 
-    // Hvis EF kj�res lokalt, bruk localhost i stedet for 'db'
+    // Hvis EF kjøres lokalt, bruk localhost i stedet for 'db'
     if (AppContext.BaseDirectory.Contains("dotnet-ef"))
     {
         conn = conn.Replace("server=db", "server=localhost");
@@ -92,16 +93,10 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/root/.aspnet/DataProtection-Keys"))
     .SetApplicationName("kartverket");
 
-
 var app = builder.Build();
 
 /// <summary>
 /// Apply pending EF Core migrations in Development environment.
-/// This block:
-/// - Creates a scope and resolves ApplicationDbContext.
-/// - Retries migration application with exponential backoff.
-/// - Logs progress via the configured ILogger for easier debugging inside containers.
-/// - Seeds roles and an initial admin user (development convenience).
 /// </summary>
 try
 {
@@ -125,14 +120,12 @@ try
         {
             try
             {
-               db.Database.Migrate();
+                db.Database.Migrate();
                 logger.LogInformation("Migrations applied successfully.");
 
                 // Seed roles & admin user (development only)
                 try
                 {
-                    // RoleSeeder.SeedAsync expects an IServiceProvider
-                    // Call synchronously to keep top-level statements simple
                     RoleSeeder.SeedAsync(services).GetAwaiter().GetResult();
                     logger.LogInformation("Role seeding completed.");
                 }

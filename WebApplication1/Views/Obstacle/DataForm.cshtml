@@ -1,4 +1,6 @@
 ﻿@model WebApplication1.Models.ObstacleData
+@using WebApplication1.Helpers
+
 @{
     ViewData["Title"] = "Register Obstacle";
 }
@@ -24,7 +26,7 @@
                             <label asp-for="ObstacleName" class="form-label"></label>
                             <input asp-for="ObstacleName" class="form-control" id="ObstacleNameInput" placeholder="e.g., Fallen tree" />
                             <span asp-validation-for="ObstacleName" class="text-danger"></span>
-                            @if (ViewBag.Missing == true)
+                            @if ((ViewBag.Missing as bool?) ?? false)
                             {
                                 <div class="form-text text-warning">
                                     You are reporting a missing obstacle. The name must begin with "MISSING - ".
@@ -40,9 +42,25 @@
                             <span asp-validation-for="CategoryId" class="text-danger"></span>
                         </div>
 
+                        <!-- HEIGHT INPUT: show feet for Pilot, meters for others -->
                         <div class="mb-3">
-                            <label asp-for="ObstacleHeight" class="form-label"></label>
-                            <input asp-for="ObstacleHeight" class="form-control" type="number" step="0.01" min="0" placeholder="e.g., 1.25" />
+                            <label class="form-label">Height (@(User.IsInRole("Pilot") ? "ft" : "m"))</label>
+
+                            <input name="HeightInputRaw" class="form-control"
+                                   value="@(User.IsInRole("Pilot")
+                                             ? (Model?.ObstacleHeight.HasValue == true
+                                                    ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
+                                                    : string.Empty)
+                                             : (Model?.ObstacleHeight.HasValue == true
+                                                    ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
+                                                    : string.Empty))"
+                                   placeholder="e.g., @(User.IsInRole("Pilot") ? "100" : "1.25")" />
+
+                            <div class="form-text">
+                                @(User.IsInRole("Pilot")
+                                    ? "Enter height in feet; it will be stored as meters."
+                                    : "Enter height in meters.")
+                            </div>
                             <span asp-validation-for="ObstacleHeight" class="text-danger"></span>
                         </div>
 
@@ -132,7 +150,7 @@
         map.on('click', (e) => setPoint(e.latlng));
     </script>
 
-    @if (ViewBag.Missing == true)
+    @if ((ViewBag.Missing as bool?) ?? false)
     {
         <script>
             const input = document.getElementById("ObstacleNameInput");

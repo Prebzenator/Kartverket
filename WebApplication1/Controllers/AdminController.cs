@@ -43,7 +43,8 @@ namespace WebApplication1.Controllers
                 Email = vm.Email,
                 FullName = vm.FullName,
                 Organization = vm.Organization,
-                EmailConfirmed = true // for demo, skip email confirmation
+                EmailConfirmed = true, // for demo, skip email confirmation
+                MustChangePassword = true // 👈 viktig: tving passordendring ved første login
             };
 
             // Generate a simple temporary password that meets policy.

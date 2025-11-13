@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<WebApplication1.Models.ObstacleData>
+@using WebApplication1.Helpers
 
 @{
     ViewData["Title"] = "Reports Log";
@@ -12,6 +13,7 @@
             <tr>
                 <th>Id</th>
                 <th>Obstacle</th>
+                <th>Height (@(User.IsInRole("Pilot") ? "ft" : "m"))</th>
                 <th>Reported At</th>
                 <th>Status</th>
                 <th class="text-end">Actions</th>
@@ -23,6 +25,36 @@
                 <tr>
                     <td>@item.Id</td>
                     <td>@item.ObstacleName</td>
+                    <td>
+                        @{
+                            // ObstacleHeight is decimal?; UnitConverter uses decimal arithmetic.
+                            if (User.IsInRole("Pilot"))
+                            {
+                                var feet = UnitConverter.ToFeet(item.ObstacleHeight);
+                                if (feet.HasValue)
+                                {
+                                    // Round to nearest whole foot for pilot display
+                                    <text>@Math.Round(feet.Value, 0).ToString("F0")</text>
+                                }
+                                else
+                                {
+                                    <text>—</text>
+                                }
+                            }
+                            else
+                            {
+                                if (item.ObstacleHeight.HasValue)
+                                {
+                                    // Show meters with one decimal for admin/others
+                                    <text>@item.ObstacleHeight.Value.ToString("F1")</text>
+                                }
+                                else
+                                {
+                                    <text>—</text>
+                                }
+                            }
+                        }
+                    </td>
                     <td>@item.ReportedAt.ToString("g")</td>
                     <td>
                         @switch (item.Status)

@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 using WebApplication1.Data;
+using WebApplication1.Helpers;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using System.Globalization;
 
 namespace WebApplication1.Controllers
 {
@@ -37,20 +39,65 @@ namespace WebApplication1.Controllers
                 ViewBag.Missing = true;
             }
 
+            // Populate category options for dropdown
+            ViewBag.CategoryOptions = _context.ObstacleCategories
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
+                .ToList();
+
             return View(model);
         }
-
 
         /// <summary>
         /// Handles form submission, validates input, saves to database, and shows overview.
         /// Supports both create and update.
+        ///
+        /// Behavior around height:
+        /// - The form field used by the view is "HeightInputRaw".
+        /// - Pilots enter heights in feet; controller converts to meters before saving.
+        /// - Non-pilots enter heights in meters directly.
+        /// - Database (ObstacleHeight) remains canonical in meters.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DataForm(IFormCollection form, string? IsDraft, int? id)
+        public async Task<IActionResult> DataForm(Microsoft.AspNetCore.Http.IFormCollection form, string? IsDraft, int? id)
         {
             var isDraft = string.Equals(IsDraft, "true", StringComparison.OrdinalIgnoreCase);
             var user = await _userManager.GetUserAsync(User);
+
+            // Helper: parse a raw input string into decimal? (robust against cultures)
+            decimal? ParseDecimalRaw(string? raw)
+            {
+                if (string.IsNullOrWhiteSpace(raw)) return null;
+
+                raw = raw.Trim();
+                if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out var inv)) return inv;
+                if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.CurrentCulture, out var cur)) return cur;
+                return null;
+            }
+
+            // Read the raw height input from the form (we use HeightInputRaw in the view)
+            var heightRaw = form["HeightInputRaw"].FirstOrDefault();
+            var parsedHeightInput = ParseDecimalRaw(heightRaw);
+
+            // Convert parsed input to canonical meters depending on role
+            decimal? heightMetersFromInput = null;
+            if (parsedHeightInput.HasValue)
+            {
+                if (User.IsInRole("Pilot"))
+                {
+                    // input is in feet -> convert to meters
+                    heightMetersFromInput = UnitConverter.ToMeters(parsedHeightInput);
+                }
+                else
+                {
+                    // input is in meters
+                    heightMetersFromInput = parsedHeightInput;
+                }
+            }
 
             ObstacleData obstacledata;
             if (id.HasValue && id.Value > 0)
@@ -65,13 +112,16 @@ namespace WebApplication1.Controllers
                 }
 
                 obstacledata.ObstacleName = form["ObstacleName"];
-                obstacledata.ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var h) ? h : obstacledata.ObstacleHeight;
+
+                // If user provided a height input we use the parsed/converted value, otherwise keep existing
+                obstacledata.ObstacleHeight = heightMetersFromInput ?? obstacledata.ObstacleHeight;
+
                 obstacledata.ObstacleDescription = form["ObstacleDescription"];
-                obstacledata.Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : obstacledata.Latitude;
-                obstacledata.Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : obstacledata.Longitude;
+                obstacledata.Latitude = ParseDecimalRaw(form["Latitude"]) ?? obstacledata.Latitude;
+                obstacledata.Longitude = ParseDecimalRaw(form["Longitude"]) ?? obstacledata.Longitude;
                 obstacledata.ReportedAt = DateTime.UtcNow;
 
-                // ✅ Update category if provided
+                // Update category if provided
                 if (int.TryParse(form["CategoryId"], out var categoryId))
                 {
                     obstacledata.CategoryId = categoryId;
@@ -83,10 +133,11 @@ namespace WebApplication1.Controllers
                 obstacledata = new ObstacleData
                 {
                     ObstacleName = form["ObstacleName"],
-                    ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : default,
+                    // Use converted meters (may be null if no input)
+                    ObstacleHeight = heightMetersFromInput,
                     ObstacleDescription = form["ObstacleDescription"],
-                    Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : (decimal?)null,
-                    Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : (decimal?)null,
+                    Latitude = ParseDecimalRaw(form["Latitude"]),
+                    Longitude = ParseDecimalRaw(form["Longitude"]),
                     ReportedAt = DateTime.UtcNow,
                     DateData = DateTime.UtcNow
                 };
@@ -98,7 +149,7 @@ namespace WebApplication1.Controllers
                     obstacledata.ReporterOrganization = user.Organization;
                 }
 
-                // ✅ Set category when creating
+                // Set category when creating
                 if (int.TryParse(form["CategoryId"], out var categoryId))
                 {
                     obstacledata.CategoryId = categoryId;
@@ -112,6 +163,7 @@ namespace WebApplication1.Controllers
             // Validate if not draft
             if (!isDraft && !TryValidateModel(obstacledata))
             {
+                // Repopulate category options if validation fails
                 ViewBag.CategoryOptions = _context.ObstacleCategories
                     .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                     {
@@ -125,7 +177,7 @@ namespace WebApplication1.Controllers
 
             await _context.SaveChangesAsync();
 
-            // ✅ Load Category navigation property before showing overview
+            // Load Category navigation property before showing overview
             await _context.Entry(obstacledata).Reference(o => o.Category).LoadAsync();
 
             return View("Overview", obstacledata);
@@ -177,4 +229,3 @@ namespace WebApplication1.Controllers
         }
     }
 }
- 

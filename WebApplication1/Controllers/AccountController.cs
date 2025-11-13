@@ -8,8 +8,8 @@ using WebApplication1.ViewModels;
 namespace WebApplication1.Controllers
 {
     /// <summary>
-    /// Minimal AccountController: Register, Login, Logout.
-    /// Keep it simple for the mockup. Public registration can be toggled via config.
+    /// AccountController: Register, Login, Logout, ForceChangePassword, ChangePassword.
+    /// Public registration can be toggled via config.
     /// </summary>
     public class AccountController : Controller
     {
@@ -30,15 +30,12 @@ namespace WebApplication1.Controllers
         }
 
         // GET: /Account/Register
-        // Only show registration if allowed in configuration (development demo toggle).
         [HttpGet]
         public IActionResult Register()
         {
             bool allow = _configuration.GetValue<bool>("Authentication:AllowSelfRegistration");
             if (!allow)
             {
-                // Not available in current configuration; show 404 so external users can't see
-                // the page. For a nicer UX you could redirect to a "Request account" page.
                 return NotFound();
             }
 
@@ -46,7 +43,6 @@ namespace WebApplication1.Controllers
         }
 
         // POST: /Account/Register
-        // Creates a user and (for demo) assigns the "Pilot" role automatically.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel vm)
@@ -62,7 +58,8 @@ namespace WebApplication1.Controllers
                 Email = vm.Email,
                 FullName = vm.FullName,
                 Organization = vm.Organization,
-                EmailConfirmed = true // For demo: skip confirmation to simplify testing
+                EmailConfirmed = true,
+                MustChangePassword = false // Self-registered users don't need forced change
             };
 
             var createResult = await _userManager.CreateAsync(user, vm.Password);
@@ -73,20 +70,14 @@ namespace WebApplication1.Controllers
                 return View(vm);
             }
 
-            // Ensure Pilot role exists (harmless if it already does)
             if (!await _roleManager.RoleExistsAsync("Pilot"))
             {
                 await _roleManager.CreateAsync(new IdentityRole("Pilot"));
             }
 
-            // For the mockup/demo: automatically put self-registered users into "Pilot".
-            // In a real deployment you might require admin approval instead.
             await _userManager.AddToRoleAsync(user, "Pilot");
-
-            // Sign the user in immediately (non-persistent cookie).
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            // PRG pattern: redirect to Home after POST.
             return RedirectToAction("Index", "Home");
         }
 
@@ -107,6 +98,12 @@ namespace WebApplication1.Controllers
             var result = await _signInManager.PasswordSignInAsync(vm.Email, vm.Password, vm.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded)
             {
+                var user = await _userManager.FindByEmailAsync(vm.Email);
+                if (user != null && user.MustChangePassword)
+                {
+                    return RedirectToAction("ForceChangePassword");
+                }
+
                 if (!string.IsNullOrEmpty(vm.ReturnUrl) && Url.IsLocalUrl(vm.ReturnUrl))
                     return Redirect(vm.ReturnUrl);
 
@@ -114,6 +111,75 @@ namespace WebApplication1.Controllers
             }
 
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return View(vm);
+        }
+
+        // GET: /Account/ForceChangePassword
+        [HttpGet]
+        public IActionResult ForceChangePassword()
+        {
+            return View(new ForceChangePasswordViewModel());
+        }
+
+        // POST: /Account/ForceChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForceChangePassword(ForceChangePasswordViewModel vm)
+        {
+            if (!ModelState.IsValid) return View(vm);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, vm.OldPassword, vm.NewPassword);
+            if (result.Succeeded)
+            {
+                user.MustChangePassword = false;
+                await _userManager.UpdateAsync(user);
+                await _signInManager.RefreshSignInAsync(user);
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            foreach (var e in result.Errors)
+                ModelState.AddModelError(string.Empty, e.Description);
+
+            return View(vm);
+        }
+
+        // GET: /Account/ChangePassword (My Account)
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View(new ChangePasswordViewModel());
+        }
+
+        // POST: /Account/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
+        {
+            if (!ModelState.IsValid) return View(vm);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, vm.OldPassword, vm.NewPassword);
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+                return RedirectToAction("Index", "Home");
+            }
+
+            foreach (var e in result.Errors)
+                ModelState.AddModelError(string.Empty, e.Description);
+
             return View(vm);
         }
 
