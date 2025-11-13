@@ -39,7 +39,7 @@ namespace WebApplication1.Models
         /// Height of the obstacle in meters.
         /// Must be between 0 and 1000.
         /// </summary>
-        [Required]
+        
         [Range(0, 1000, ErrorMessage = "Height must be between 0 and 1000 meters.")]
         [DisplayName("Height (m)")]
         public decimal? ObstacleHeight { get; set; }
