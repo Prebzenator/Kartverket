@@ -113,7 +113,6 @@ try
 
     logger.LogInformation("Environment: {EnvironmentName}", env.EnvironmentName);
 
-    if (env.IsDevelopment())
     {
         logger.LogInformation("Applying migrations...");
 
@@ -133,12 +132,13 @@ try
                 {
                     // RoleSeeder.SeedAsync expects an IServiceProvider
                     // Call synchronously to keep top-level statements simple
-                    RoleSeeder.SeedAsync(services).GetAwaiter().GetResult();
+                    await RoleSeeder.SeedAsync(services);
                     logger.LogInformation("Role seeding completed.");
                 }
                 catch (Exception seedEx)
                 {
-                    logger.LogError(seedEx, "Role seeding failed.");
+                    logger.LogError(seedEx, "Role seeding failed: {Message}", seedEx.Message);
+                    // don't rethrow, as seeding failure shouldn't block startup
                 }
 
                 break;

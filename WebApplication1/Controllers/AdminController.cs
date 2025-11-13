@@ -9,23 +9,26 @@ using WebApplication1.ViewModels;
 namespace WebApplication1.Controllers
 {
     /// <summary>
-    /// Simple admin UI for creating users for demo/provisioning.
-    /// Only users in "Registry Administrator" role can access.
+    /// System Administrator controller for user management.
+    /// Only users in "System Administrator" role can access.
+    /// Separated from Registry Administrator functions.
     /// </summary>
-    [Authorize(Roles = "Registry Administrator")]
+    [Authorize(Roles = "System Administrator")]
     public class AdminController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AdminController(UserManager<ApplicationUser> userManager)
+        public AdminController(UserManager<ApplicationUser> userManager,
+                             RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         // GET: /Admin/CreateUser
         public IActionResult CreateUser()
         {
-            // Provide a simple view model. The Role select can be hard-coded in the view.
             return View(new CreateUserViewModel());
         }
 
@@ -47,7 +50,7 @@ namespace WebApplication1.Controllers
             };
 
             // Generate a simple temporary password that meets policy.
-            var tempPassword = "Temp!" + Guid.NewGuid().ToString("N").Substring(0, 8); // Temp! + 8 chars
+            var tempPassword = "Temp!" + Guid.NewGuid().ToString("N").Substring(0, 8);
 
             // Create user with temp password
             var createResult = await _userManager.CreateAsync(user, tempPassword);
@@ -57,26 +60,38 @@ namespace WebApplication1.Controllers
                 return View(vm);
             }
 
-            // Add to selected role (expects "Pilot" or "Registry Administrator")
+            // Ensure the selected role exists
             if (!string.IsNullOrWhiteSpace(vm.Role))
             {
+                if (!await _roleManager.RoleExistsAsync(vm.Role))
+                {
+                    ModelState.AddModelError("", $"Role '{vm.Role}' does not exist.");
+                    await _userManager.DeleteAsync(user); // Cleanup
+                    return View(vm);
+                }
                 await _userManager.AddToRoleAsync(user, vm.Role);
             }
+            else
+            {
+                // Default to Pilot if no role selected
+                await _userManager.AddToRoleAsync(user, "Pilot");
+            }
 
-            // For the mockup: show the temp password to the admin so they can give it to the user.
-            // In production you would send a secure email/invite link instead.
+            // For the mockup: show the temp password to the admin
             var successVm = new CreateUserSuccessViewModel
             {
                 FullName = vm.FullName,
                 Organization = vm.Organization,
                 Email = vm.Email,
-                Role = vm.Role,
+                Role = vm.Role ?? "Pilot",
                 TempPassword = tempPassword
             };
 
             return View("CreateUserSuccess", successVm);
         }
 
-        // Optional: Users list, delete, or role management can be added later.
+        // Optional future: GET /Admin/ManageUsers - list all users
+        // Optional future: POST /Admin/DeleteUser/{id}
+        // Optional future: POST /Admin/EditUser/{id}
     }
 }

@@ -2,29 +2,26 @@
 @using WebApplication1.Models
 
 @{
-    ViewData["Title"] = "Organization Reports";
+    ViewData["Title"] = $"{ViewBag.OrganizationName} Reports";
     var currentUserId = ViewBag.CurrentUserId as string;
-    var orgName = ViewBag.OrganizationName as string;
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-1">@orgName Reports</h1>
-            <p class="text-muted mb-0">View and manage reports from your organization</p>
+            <h1 class="h3 mb-1">@ViewBag.OrganizationName Reports</h1>
+            <p class="text-muted mb-0">View all obstacle reports from your organization</p>
         </div>
-        <a asp-controller="Obstacle" asp-action="DataForm" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> New Report
-        </a>
+        <div class="btn-group">
+            <a asp-action="Log" class="btn btn-outline-secondary">
+                <i class="bi bi-person"></i> My Reports
+            </a>
+            <a asp-action="OrganizationReports" class="btn btn-primary active">
+                <i class="bi bi-building"></i> Organization Reports
+            </a>
+        </div>
     </div>
 
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show">
@@ -36,20 +33,22 @@
     @if (!Model.Any())
     {
         <div class="text-center py-5">
-            <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
-            <p class="text-muted mt-3">No reports from @orgName yet.</p>
-            <a asp-controller="Obstacle" asp-action="DataForm" class="btn btn-primary">
-                <i class="bi bi-plus-circle"></i> Submit Your First Report
-            </a>
+            <i class="bi bi-building" style="font-size: 3rem; opacity: 0.3;"></i>
+            <p class="text-muted mt-3">No reports from @ViewBag.OrganizationName yet.</p>
         </div>
     }
     else
     {
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle"></i>
+            <strong>Organization View:</strong> This shows all submitted reports from @ViewBag.OrganizationName members.
+            Draft reports are not included for privacy.
+        </div>
+
         <div class="row g-3">
             @foreach (var report in Model)
             {
                 var isOwnReport = report.ReportedByUserId == currentUserId;
-                var isDraft = report.IsProbablyDraft;
 
                 <div class="col-12">
                     <div class="card shadow-sm @(isOwnReport ? "border-primary" : "")">
@@ -61,122 +60,93 @@
                         }
                         <div class="card-body">
                             <div class="row">
+                                <!-- Report Info -->
                                 <div class="col-md-8">
                                     <h5 class="card-title mb-2">
                                         @report.ObstacleName
-                                        @if (isDraft && isOwnReport)
-                                        {
-                                            <span class="badge bg-secondary ms-2">
-                                                <i class="bi bi-file-earmark-text"></i> Draft
-                                            </span>
-                                        }
-                                </h5>
+                                    </h5>
 
-                                <p class="card-text text-muted mb-2">
-                                    @(report.ObstacleDescription?.Length > 120
-                                                                    ? report.ObstacleDescription.Substring(0, 120) + "..."
-                                                                    : report.ObstacleDescription)
-                            </p>
+                                    <p class="card-text text-muted mb-2">
+                                        @* FIX 2: Consolidated truncation logic to a single line to resolve CS8635 on '...' *@
+                                        @(report.ObstacleDescription?.Length > 120 ? report.ObstacleDescription.Substring(0, 120) + "..." : report.ObstacleDescription)
+                                    </p>
 
                                     <div class="small text-muted mb-2">
-                                @if (!isOwnReport)
-                                        {
-                                            <span><i class="bi bi-person"></i> @report.ReporterName</span>
-                                            <span class="mx-2">•</span>
-                                        }
+                                        <i class="bi bi-person"></i> Reported by: <strong>@report.ReporterName</strong>
+                                        <span class="mx-2">•</span>
                                         <i class="bi bi-rulers"></i> Height: @report.ObstacleHeight?.ToString("0.##") m
                                         <span class="mx-2">•</span>
                                         <i class="bi bi-calendar3"></i> @report.ReportedAt.ToString("dd.MM.yyyy HH:mm")
                                     </div>
 
+                                    <!-- Status Badge -->
                                     <div class="mb-2">
-                                        @if (isDraft && isOwnReport)
+                                        @switch (report.Status)
                                         {
-                                            <span class="badge bg-secondary">
-                                                <i class="bi bi-file-earmark-text"></i> Draft - Not Submitted
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            switch (report.Status)
-                                            {
-                                                case ReportStatus.Pending:
-                                                    <span class="badge bg-warning text-dark">
-                                                        <i class="bi bi-clock"></i> Pending Review
+                                            case ReportStatus.Pending:
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-clock"></i> Pending Review
+                                                </span>
+                                                break;
+                                            case ReportStatus.Approved:
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i> Approved
+                                                </span>
+                                                if (!string.IsNullOrEmpty(report.ReviewedByName))
+                                                {
+                                                    <span class="small text-muted ms-2">
+                                                        by @report.ReviewedByName on @report.LastReviewedAt?.ToString("dd.MM.yyyy")
                                                     </span>
-                                                    break;
-                                                case ReportStatus.Approved:
-                                                    <span class="badge bg-success">
-                                                        <i class="bi bi-check-circle"></i> Approved
+                                                }
+                                                break;
+                                            case ReportStatus.NotApproved:
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle"></i> Rejected
+                                                </span>
+                                                if (!string.IsNullOrEmpty(report.ReviewedByName))
+                                                {
+                                                    <span class="small text-muted ms-2">
+                                                        by @report.ReviewedByName on @report.LastReviewedAt?.ToString("dd.MM.yyyy")
                                                     </span>
-                                                    if (!string.IsNullOrEmpty(report.ReviewedByName))
-                                                    {
-                                                        <span class="small text-muted ms-2">
-                                                            by @report.ReviewedByName
-                                                        </span>
-                                                    }
-                                                    break;
-                                                case ReportStatus.NotApproved:
-                                                    if (!isDraft)
-                                                    {
-                                                        <span class="badge bg-danger">
-                                                            <i class="bi bi-x-circle"></i> Rejected
-                                                        </span>
-                                                        if (!string.IsNullOrEmpty(report.ReviewedByName))
-                                                        {
-                                                            <span class="small text-muted ms-2">
-                                                                by @report.ReviewedByName
-                                                            </span>
-                                                        }
-                                                    }
-                                                    break;
-                                            }
+                                                }
+                                                break;
                                         }
                                     </div>
 
-                                    @if (isOwnReport && report.Status == ReportStatus.NotApproved && !isDraft && !string.IsNullOrEmpty(report.AdminComments))
+                                    <!-- Location Info -->
+                                    @if (report.Latitude.HasValue && report.Longitude.HasValue)
                                     {
-                                        <div class="alert alert-danger mb-0 mt-2">
-                                            <div class="d-flex">
-                                                <i class="bi bi-info-circle me-2"></i>
-                                                <div>
-                                                    <strong>Rejection Feedback:</strong>
-                                                    <p class="mb-0 mt-1">@report.AdminComments</p>
-                                                </div>
-                                            </div>
+                                        <div class="small text-muted">
+                                            <i class="bi bi-geo-alt"></i>
+                                            Location: @(report.Latitude?.ToString("0.####"))°, @(report.Longitude?.ToString("0.####"))°
                                         </div>
                                     }
                                 </div>
 
+                                <!-- Actions -->
                                 <div class="col-md-4 d-flex align-items-center justify-content-end">
-                                    <div class="btn-group-vertical gap-2">
-                                        @if (isOwnReport)
-                                        {
-                                            <a asp-action="EditReport" asp-route-id="@report.Id"
-                                               class="btn btn-primary btn-sm">
-                                                <i class="bi bi-pencil"></i> Edit Report
-                                            </a>
-                                            <a asp-action="ViewReport" asp-route-id="@report.Id"
-                                               class="btn btn-outline-primary btn-sm">
-                                                <i class="bi bi-eye"></i> View Details
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#reportModal@(report.Id)">
-                                                <i class="bi bi-eye"></i> View Details
-                                            </button>
-                                        }
-                                    </div>
+                                    @if (isOwnReport)
+                                    {
+                                        <a asp-action="ViewReport" asp-route-id="@report.Id"
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye"></i> View My Report
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#reportModal@(report.Id)">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </button>
+                                    }
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                @* Modal for viewing other people's reports *@
+                <!-- Modal for viewing other people's reports (read-only) -->
                 @if (!isOwnReport)
                 {
                     <div class="modal fade" id="reportModal@(report.Id)" tabindex="-1">
@@ -201,6 +171,8 @@
                                         <dd class="col-sm-8">
                                             @if (report.Latitude.HasValue && report.Longitude.HasValue)
                                             {
+                                                @* FIX 1: The entire output is wrapped in a <span> tag to force Razor into markup mode,
+                                                    which solves the parser confusion with the '°' symbol (RZ1005). *@
                                                 <span>@(report.Latitude?.ToString("0.######"))°, @(report.Longitude?.ToString("0.######"))°</span>
                                             }
                                             else
@@ -231,6 +203,16 @@
                                                     break;
                                             }
                                         </dd>
+
+                                        @if (report.Status == ReportStatus.NotApproved && !string.IsNullOrEmpty(report.AdminComments))
+                                        {
+                                            <dt class="col-sm-4">Rejection Reason</dt>
+                                            <dd class="col-sm-8">
+                                                <div class="alert alert-danger mb-0">
+                                                    @report.AdminComments
+                                                </div>
+                                            </dd>
+                                        }
                                     </dl>
                                 </div>
                                 <div class="modal-footer">
@@ -243,6 +225,7 @@
             }
         </div>
 
+        <!-- Summary Statistics -->
         <div class="row mt-4">
             <div class="col-md-3">
                 <div class="card border-secondary">
@@ -271,8 +254,8 @@
             <div class="col-md-3">
                 <div class="card border-danger">
                     <div class="card-body text-center">
-                        <h6 class="text-muted">Drafts</h6>
-                        <p class="h4 mb-0">@Model.Count(r => r.IsProbablyDraft)</p>
+                        <h6 class="text-muted">Rejected</h6>
+                        <p class="h4 mb-0">@Model.Count(r => r.Status == ReportStatus.NotApproved)</p>
                     </div>
                 </div>
             </div>

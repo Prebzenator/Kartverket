@@ -8,20 +8,18 @@
         <div class="row justify-content-center text-center">
             <div class="col-12 col-lg-8">
 
-                <!-- Logo og tittel -->
                 <div class="mb-4">
                     <img src="~/images/Kartverket-logoutentekst.png" alt="Kartverket logo" class="img-fluid" style="max-height: 100px;" />
                     <h2 class="mt-2 fw-semibold">Kartverket</h2>
                 </div>
 
-                <!-- Overskrift og beskrivelse -->
                 <h1 class="display-5 mb-3 fw-semibold">Register aviation obstacles</h1>
                 <p class="lead text-muted mb-4">
                     Ensure safe navigation by reporting new or missing obstacles.
                 </p>
 
-                <!-- Admin-knapp (kun for innloggede administratorer) -->
-                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
+                @* Admin button (ONLY for System Administrators) *@
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("System Administrator"))
                 {
                     <div class="mb-4">
                         <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-outline-primary">
@@ -30,7 +28,6 @@
                     </div>
                 }
 
-                <!-- Handlingsknapper -->
                 <div class="d-grid gap-3 d-sm-flex justify-content-center">
                     <a asp-action="DataForm" asp-controller="Obstacle"
                        class="btn btn-primary btn-lg d-flex align-items-center gap-2">
@@ -42,7 +39,6 @@
                         <i class="bi bi-search"></i> <span>Report missing obstacle</span>
                     </a>
 
-                    @* Pilot quick-link (visible only to users in role Pilot) *@
                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
                     {
                         <a asp-controller="Pilot" asp-action="Log"
@@ -56,7 +52,6 @@
     </div>
 </section>
 
-<!-- Info og lenke nederst -->
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8 text-center">

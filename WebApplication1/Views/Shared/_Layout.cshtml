@@ -1,5 +1,4 @@
-﻿@* Views/Shared/_Layout.cshtml *@
-@using WebApplication1.Models
+﻿@using WebApplication1.Models
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -11,7 +10,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - Obstacle App</title>
 
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
@@ -20,10 +18,11 @@
     <!-- Leaflet + Draw (CSS) -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          crossorigin="anonymous">
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="anonymous" />
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
-          crossorigin="anonymous">
+          crossorigin="anonymous" />
 
     <style>
         /* Standard høyde for kartet */
@@ -33,7 +32,6 @@
         }
     </style>
 
-    <!-- Site styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
 </head>
@@ -60,25 +58,8 @@
                                 <i class="bi bi-house-door"></i><span>Home</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-1"
-                               asp-area="" asp-controller="Home" asp-action="Privacy">
-                                <i class="bi bi-shield-lock"></i><span>Privacy</span>
-                            </a>
-                        </li>
 
-                        @* Admin review page link (visible only to Registry Administrators) *@
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-controller="Obstacle" asp-action="Review">
-                                    <i class="bi bi-clipboard-check"></i><span>Review Reports</span>
-                                </a>
-                            </li>
-                        }
-
-                        @* Pilot log link (visible only to users in role Pilot) *@
+                        @* My Reports (Pilots only) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
                         {
                             <li class="nav-item">
@@ -88,21 +69,50 @@
                                 </a>
                             </li>
                         }
+
+                        @* Review Reports (Registry Administrators only) *@
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="AdminObstacle" asp-action="Dashboard">
+                                    <i class="bi bi-clipboard-check"></i><span>Review Reports</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* Manage Users (System Administrators ONLY) *@
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("System Administrator"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="Admin" asp-action="CreateUser">
+                                    <i class="bi bi-person-plus"></i><span>Manage Users</span>
+                                </a>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <a class="nav-link d-flex align-items-center gap-1"
+                               asp-area="" asp-controller="Home" asp-action="Privacy">
+                                <i class="bi bi-shield-lock"></i><span>Privacy</span>
+                            </a>
+                        </li>
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
-                        <!-- Theme toggle -->
                         <button id="theme-toggle" class="btn btn-outline-secondary" type="button" aria-label="Toggle theme">
                             <i id="theme-icon" class="bi bi-moon"></i>
                         </button>
 
-                        <!-- Register obstacle -->
-                        <a class="btn btn-primary d-flex align-items-center gap-1"
-                           asp-area="" asp-controller="Obstacle" asp-action="DataForm">
-                            <i class="bi bi-plus-circle"></i><span>Register obstacle</span>
-                        </a>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="btn btn-primary d-flex align-items-center gap-1"
+                               asp-area="" asp-controller="Obstacle" asp-action="DataForm">
+                                <i class="bi bi-plus-circle"></i><span>Register obstacle</span>
+                            </a>
+                        }
 
-                        <!-- Login/Logout -->
                         <partial name="_LoginPartial" />
                     </div>
                 </div>
@@ -119,10 +129,28 @@
     <footer class="border-top py-3 text-center text-muted small">
         <div class="container">
             &copy; @DateTime.Now.Year — Obstacle App
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span class="mx-2">•</span>
+                <span>
+                    Logged in as
+                    @if (User.IsInRole("System Administrator"))
+                    {
+                        <strong>System Administrator</strong>
+                    }
+                    else if (User.IsInRole("Registry Administrator"))
+                    {
+                        <strong>Registry Administrator</strong>
+                    }
+                    else if (User.IsInRole("Pilot"))
+                    {
+                        <strong>Pilot</strong>
+                    }
+                </span>
+            }
         </div>
     </footer>
 
-    <!-- Core scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
