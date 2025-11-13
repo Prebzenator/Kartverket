@@ -12,9 +12,13 @@
         <div class="col">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h1 class="h3 mb-0">Obstacle Reports Dashboard</h1>
-                <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-primary">
-                    <i class="bi bi-person-plus"></i> Create User
-                </a>
+                @* FIXED: Only show Create User button for System Administrators *@
+                @if (User.IsInRole("System Administrator"))
+                {
+                    <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-primary">
+                        <i class="bi bi-person-plus"></i> Create User
+                    </a>
+                }
             </div>
             <div class="row g-3">
                 <div class="col-sm-6 col-md-3">
@@ -154,23 +158,32 @@
                                     <small class="text-muted">@report.ReportedAt.ToString("HH:mm")</small>
                                 </td>
                                 <td class="align-middle">
-                                    @switch (report.Status)
+                                    @if (report.IsProbablyDraft)
                                     {
-                                        case ReportStatus.Pending:
-                                            <span class="badge bg-warning text-dark">
-                                                <i class="bi bi-clock"></i> Pending
-                                            </span>
-                                            break;
-                                        case ReportStatus.Approved:
-                                            <span class="badge bg-success">
-                                                <i class="bi bi-check-circle"></i> Approved
-                                            </span>
-                                            break;
-                                        case ReportStatus.NotApproved:
-                                            <span class="badge bg-danger">
-                                                <i class="bi bi-x-circle"></i> Rejected
-                                            </span>
-                                            break;
+                                        <span class="badge bg-secondary">
+                                            <i class="bi bi-file-earmark-text"></i> Draft
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        switch (report.Status)
+                                        {
+                                            case ReportStatus.Pending:
+                                                <span class="badge bg-warning text-dark">
+                                                    <i class="bi bi-clock"></i> Pending
+                                                </span>
+                                                break;
+                                            case ReportStatus.Approved:
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i> Approved
+                                                </span>
+                                                break;
+                                            case ReportStatus.NotApproved:
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle"></i> Rejected
+                                                </span>
+                                                break;
+                                        }
                                     }
                                     @if (report.LastReviewedAt.HasValue)
                                     {
