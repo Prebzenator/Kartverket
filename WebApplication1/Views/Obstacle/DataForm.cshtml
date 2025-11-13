@@ -9,7 +9,7 @@
             <div class="card shadow-sm rounded-4">
                 <div class="card-body p-4">
                     <h1 class="h3 mb-2">Obstacle Registration</h1>
-                    <p class="text-muted mb-4">Click the map to choose a location.</p>
+                    <p class="text-muted mb-4">Click the map to choose a location or use the tools.</p>
 
                     <form asp-controller="Obstacle" asp-action="DataForm" method="post">
                         @Html.AntiForgeryToken()
@@ -44,12 +44,22 @@
                             <span asp-validation-for="ObstacleDescription" class="text-danger"></span>
                         </div>
 
+                        <!-- Controls + Map -->
+                        <div class="mb-2 d-flex flex-wrap gap-2">
+                            <button type="button" id="btn-locate" class="btn btn-primary btn-sm">Finn min posisjon</button>
+                            <button type="button" id="btn-drop-pin" class="btn btn-outline-primary btn-sm">Legg nål på posisjonen min</button>
+                            <button type="button" id="btn-clear" class="btn btn-outline-danger btn-sm">Tøm tegninger</button>
+                        </div>
+
                         <div class="mb-3">
-                            <div id="map" style="height: 320px; border-radius: 0.75rem;"></div>
+                            <div id="map" style="height:60vh;min-height:420px;border-radius:.75rem;"></div>
                             <small class="text-muted d-block mt-1">
-                                Click on the map to set location. Tiles © OpenStreetMap contributors.
+                                Use the tools on the left to draw (polygon, line, rectangle, circle, marker). Tiles © OpenStreetMap contributors.
                             </small>
                         </div>
+
+                        <!-- Hidden field for drawn geometry -->
+                        <input type="hidden" id="GeometryJson" name="GeometryJson" />
 
                         <div class="row g-3 mb-4">
                             <div class="col">
@@ -67,13 +77,12 @@
                         <div class="d-grid gap-2">
                             <button type="submit" name="IsDraft" value="false" class="btn btn-primary btn-lg">Submit</button>
                             <button type="submit" name="IsDraft" value="true" formnovalidate class="btn btn-outline-warning">Submit as Draft</button>
-
                             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
                         </div>
                     </form>
                 </div>
             </div>
-            <p class="text-center text-muted mt-3 small">Map click sets coordinates. You can adjust by clicking again.</p>
+            <p class="text-center text-muted mt-3 small">Click the map to set coordinates, or use the tools. You can adjust by clicking again.</p>
         </div>
     </div>
 </div>
@@ -82,40 +91,111 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        const defaultCenter = [59.9139, 10.7522];
-        const map = L.map('map').setView(defaultCenter, 12);
+        (function () {
+          // --- Map ---
+          const map = L.map('map', { zoomControl: true }).setView([60.472, 8.4689], 5);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+          }).addTo(map);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+          // --- Draw layer + toolbar (left) ---
+          const drawnItems = new L.FeatureGroup(); map.addLayer(drawnItems);
+          if (L.Control && L.Control.Draw) {
+            const drawControl = new L.Control.Draw({
+              position: 'topleft',
+              draw: { polygon:true, polyline:true, rectangle:true, circle:true, marker:true, circlemarker:false },
+              edit: { featureGroup: drawnItems, remove:true }
+            });
+            map.addControl(drawControl);
+          }
 
-        let marker;
-        const fmt = new Intl.NumberFormat(navigator.language || 'nb-NO', { maximumFractionDigits: 6 });
-        const latInput = document.getElementById('Latitude');
-        const lngInput = document.getElementById('Longitude');
+          // --- Hidden GeoJSON field ---
+          const geoInput = document.getElementById('GeometryJson');
+          function updateGeoJson(){ geoInput.value = JSON.stringify(drawnItems.toGeoJSON()); }
+          map.on(L.Draw ? L.Draw.Event.CREATED : 'noop', e => { drawnItems.addLayer(e.layer); updateGeoJson(); });
+          map.on(L.Draw ? L.Draw.Event.EDITED : 'noop', updateGeoJson);
+          map.on(L.Draw ? L.Draw.Event.DELETED : 'noop', updateGeoJson);
 
-        (function initFromInputs() {
-            const lat = latInput?.value?.replace(',', '.');
-            const lng = lngInput?.value?.replace(',', '.');
-            if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
-                const p = [parseFloat(lat), parseFloat(lng)];
-                marker = L.marker(p).addTo(map);
-                map.setView(p, 14);
-            }
-        })();
+          // --- Lat/Lng inputs ---
+          const latInput = document.getElementById('Latitude');
+          const lngInput = document.getElementById('Longitude');
+          const fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
 
-        function setPoint(latlng) {
-            if (marker) {
-                marker.setLatLng(latlng);
-            } else {
-                marker = L.marker(latlng).addTo(map);
-            }
+          // click-to-set point
+          let clickMarker = null;
+          function setPoint(latlng){
+            if (clickMarker) clickMarker.setLatLng(latlng);
+            else clickMarker = L.marker(latlng).addTo(map).bindPopup("Valgt posisjon");
             latInput.value = fmt.format(latlng.lat);
             lngInput.value = fmt.format(latlng.lng);
-        }
+          }
+          map.on('click', e => setPoint(e.latlng));
 
-        map.on('click', (e) => setPoint(e.latlng));
+          // --- Geolocation with IP fallback ---
+          let lastLocation=null, myMarker=null, accCircle=null;
+
+          function onLocationFound(e){
+            lastLocation = e.latlng;
+
+            if (!myMarker) myMarker = L.marker(e.latlng, {title:"Din posisjon"}).addTo(map).bindPopup("Du er her");
+            else myMarker.setLatLng(e.latlng);
+
+            if (!accCircle) accCircle = L.circle(e.latlng, {radius: e.accuracy}).addTo(map);
+            else accCircle.setLatLng(e.latlng).setRadius(e.accuracy);
+
+            map.flyTo(e.latlng, 15);
+            setPoint(e.latlng);
+          }
+
+          async function locateByIP(){
+            try {
+              const r = await fetch('https://ipapi.co/json/');
+              const j = await r.json();
+              if (j?.latitude && j?.longitude) {
+                const ll = L.latLng(parseFloat(j.latitude), parseFloat(j.longitude));
+                onLocationFound({ latlng: ll, accuracy: 5000 });
+              } else {
+                alert("Kunne ikke hente IP-posisjon.");
+              }
+            } catch { alert("IP-posisjon feilet."); }
+          }
+
+          function locateWithFallback(){
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                pos => onLocationFound({
+                  latlng: L.latLng(pos.coords.latitude, pos.coords.longitude),
+                  accuracy: pos.coords.accuracy
+                }),
+                _ => locateByIP(),
+                { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }
+              );
+            } else { locateByIP(); }
+          }
+
+          map.on('locationerror', _ => locateByIP());
+
+          document.getElementById('btn-locate').addEventListener('click', locateWithFallback);
+          document.getElementById('btn-drop-pin').addEventListener('click', () => {
+            if (!lastLocation) { locateWithFallback(); return; }
+            drawnItems.addLayer(L.marker(lastLocation).bindPopup("Nål: din posisjon"));
+            updateGeoJson();
+          });
+          document.getElementById('btn-clear').addEventListener('click', () => {
+            drawnItems.clearLayers(); updateGeoJson();
+          });
+
+          // init from existing inputs if present
+          (function initFromInputs(){
+            const lat = parseFloat((latInput?.value || '').toString().replace(',', '.'));
+            const lng = parseFloat((lngInput?.value || '').toString().replace(',', '.'));
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const p = L.latLng(lat, lng);
+              setPoint(p);
+              map.setView(p, 14);
+            }
+          })();
+        })();
     </script>
 
     @if (ViewBag.Missing == true)
@@ -123,17 +203,11 @@
         <script>
             const input = document.getElementById("ObstacleNameInput");
             const prefix = "MISSING - ";
-
-            // Prevent deletion of the prefix via backspace or delete
             input.addEventListener("keydown", (e) => {
-                const cursorPos = input.selectionStart;
-                if ((e.key === "Backspace" && cursorPos <= prefix.length) ||
-                    (e.key === "Delete" && cursorPos < prefix.length)) {
-                    e.preventDefault();
-                }
+                const c = input.selectionStart;
+                if ((e.key === "Backspace" && c <= prefix.length) ||
+                    (e.key === "Delete" && c < prefix.length)) e.preventDefault();
             });
-
-            // Restore prefix if removed
             input.addEventListener("input", () => {
                 if (!input.value.startsWith(prefix)) {
                     const suffix = input.value.replace(prefix, "");
@@ -141,8 +215,6 @@
                     input.setSelectionRange(prefix.length, prefix.length);
                 }
             });
-
-            // Ensure cursor starts after prefix
             input.addEventListener("focus", () => {
                 if (input.selectionStart < prefix.length) {
                     input.setSelectionRange(prefix.length, prefix.length);
