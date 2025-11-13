@@ -1,0 +1,211 @@
+﻿@model WebApplication1.Models.ObstacleData
+@using WebApplication1.Models
+@using System.Globalization
+
+@{
+    @* Set page title and format coordinates *@
+    ViewData["Title"] = $"Report #{Model.Id}";
+    var lat = Model.Latitude?.ToString("0.######", CultureInfo.InvariantCulture);
+    var lng = Model.Longitude?.ToString("0.######", CultureInfo.InvariantCulture);
+
+    @* FIXED: Use IsProbablyDraft instead of IsDraft *@
+    var isDraft = Model.IsProbablyDraft;
+}
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Report #@Model.Id</h1>
+            <p class="text-muted mb-0">
+                Reported by @Model.ReporterName on @Model.ReportedAt.ToString("dd.MM.yyyy HH:mm")
+            </p>
+        </div>
+        <a asp-action="Log" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Organization Reports
+        </a>
+    </div>
+
+    <!-- Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Left Column: Obstacle Details -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Obstacle Information</h5>
+                    @* Show edit button for all own reports (not just drafts) *@
+                    @if (ViewBag.CanEdit == true)
+                    {
+                        <a asp-action="EditReport" asp-route-id="@Model.Id" class="btn btn-sm btn-primary">
+                            <i class="bi bi-pencil-square"></i> Edit Report
+                        </a>
+                    }
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">Name</dt>
+                        <dd class="col-sm-9">@Model.ObstacleName</dd>
+
+                        <dt class="col-sm-3">Height</dt>
+                        <dd class="col-sm-9">@Model.ObstacleHeight?.ToString("0.00") meters</dd>
+
+                        <dt class="col-sm-3">Description</dt>
+                        <dd class="col-sm-9">@Model.ObstacleDescription</dd>
+
+                        <dt class="col-sm-3">Latitude</dt>
+                        <dd class="col-sm-9">@lat</dd>
+
+                        <dt class="col-sm-3">Longitude</dt>
+                        <dd class="col-sm-9">@lng</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Map Display -->
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Location</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 400px;"></div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Right Column: Status & Reporter Info -->
+        <div class="col-lg-4">
+            <!-- Current Status -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Current Status</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 text-center">
+                        @{
+                            string badgeClass = "bg-secondary";
+                            string statusText = "Draft";
+                            string iconClass = "bi-file-earmark";
+
+                            // FIXED: Properly handle draft vs rejected vs other statuses
+                            if (isDraft)
+                            {
+                                // Draft: NotApproved without admin review
+                                badgeClass = "bg-secondary";
+                                statusText = "Draft - Not Submitted";
+                                iconClass = "bi-file-earmark-text";
+                            }
+                            else
+                            {
+                                // Not a draft, check actual status
+                                switch (Model.Status)
+                                {
+                                    case ReportStatus.Pending:
+                                        badgeClass = "bg-warning text-dark";
+                                        statusText = "Pending Review";
+                                        iconClass = "bi-clock";
+                                        break;
+                                    case ReportStatus.Approved:
+                                        badgeClass = "bg-success";
+                                        statusText = "Approved";
+                                        iconClass = "bi-check-circle";
+                                        break;
+                                    case ReportStatus.NotApproved:
+                                        // NotApproved with admin comments = rejected
+                                        badgeClass = "bg-danger";
+                                        statusText = "Rejected";
+                                        iconClass = "bi-x-circle";
+                                        break;
+                                }
+                            }
+                        }
+                        <h4>
+                            <span class="badge @badgeClass w-100 py-2">
+                                <i class="bi @iconClass"></i> @statusText
+                            </span>
+                        </h4>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.ReviewedByName))
+                    {
+                        <p class="mb-1"><strong>Reviewed by:</strong> @Model.ReviewedByName</p>
+                        <p class="text-muted small">@Model.LastReviewedAt?.ToString("dd.MM.yyyy HH:mm")</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Reporter Info -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Reporter Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Name:</strong> @Model.ReporterName</p>
+                    <p class="mb-1"><strong>Organization:</strong> @Model.ReporterOrganization</p>
+                    <p class="mb-0"><strong>User ID:</strong> <small class="text-muted">@Model.ReportedByUserId</small></p>
+                </div>
+            </div>
+
+            <!-- Admin Comments Display (only for rejected reports, not drafts) -->
+            @if (!isDraft && Model.Status == ReportStatus.NotApproved && !string.IsNullOrEmpty(Model.AdminComments))
+            {
+                <div class="card shadow-sm border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> Rejection Feedback
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">@Model.AdminComments</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    {
+        <script>
+            // Ensure data types are handled safely and convert Razor variables to JS variables
+            const lat = parseFloat("@lat");
+            const lng = parseFloat("@lng");
+
+            // Check if map container exists and coordinates are valid
+            if (!isNaN(lat) && !isNaN(lng) && document.getElementById('map')) {
+                const map = L.map('map').setView([lat, lng], 14);
+
+                // Note: L.tileLayer is used here. Since Leaflet JS is loaded globally in _Layout.cshtml,
+                // the 'L' object is guaranteed to be available here.
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup("Obstacle Location")
+                    .openPopup();
+
+                // Ensure map initializes correctly even in nested containers
+                setTimeout(() => { map.invalidateSize(); }, 200);
+            }
+        </script>
+    }
+}

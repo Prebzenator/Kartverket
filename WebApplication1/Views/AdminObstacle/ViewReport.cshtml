@@ -108,29 +108,40 @@
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        @switch (Model.Status)
+                        @if (Model.IsProbablyDraft)
                         {
-                            case ReportStatus.Pending:
-                                <h4>
-                                    <span class="badge bg-warning text-dark w-100 py-2">
-                                        <i class="bi bi-clock"></i> Pending Review
-                                    </span>
-                                </h4>
-                                break;
-                            case ReportStatus.Approved:
-                                <h4>
-                                    <span class="badge bg-success w-100 py-2">
-                                        <i class="bi bi-check-circle"></i> Approved
-                                    </span>
-                                </h4>
-                                break;
-                            case ReportStatus.NotApproved:
-                                <h4>
-                                    <span class="badge bg-danger w-100 py-2">
-                                        <i class="bi bi-x-circle"></i> Rejected
-                                    </span>
-                                </h4>
-                                break;
+                            <h4>
+                                <span class="badge bg-secondary w-100 py-2">
+                                    <i class="bi bi-file-earmark-text"></i> Draft
+                                </span>
+                            </h4>
+                        }
+                        else
+                        {
+                            switch (Model.Status)
+                            {
+                                case ReportStatus.Pending:
+                                    <h4>
+                                        <span class="badge bg-warning text-dark w-100 py-2">
+                                            <i class="bi bi-clock"></i> Pending Review
+                                        </span>
+                                    </h4>
+                                    break;
+                                case ReportStatus.Approved:
+                                    <h4>
+                                        <span class="badge bg-success w-100 py-2">
+                                            <i class="bi bi-check-circle"></i> Approved
+                                        </span>
+                                    </h4>
+                                    break;
+                                case ReportStatus.NotApproved:
+                                    <h4>
+                                        <span class="badge bg-danger w-100 py-2">
+                                            <i class="bi bi-x-circle"></i> Rejected
+                                        </span>
+                                    </h4>
+                                    break;
+                            }
                         }
                     </div>
 
@@ -191,7 +202,8 @@
                         <input type="hidden" name="id" value="@Model.Id" />
 
                         <div class="mb-3">
-                            <label class="form-label">Assign to Administrator</label>
+                            @* FIXED: Use "Registry Administrator" instead of just "Administrator" *@
+                            <label class="form-label">Assign to Registry Administrator</label>
                             <select name="assignToUserId" class="form-select">
                                 <option value="">Unassigned</option>
                                 @foreach (var admin in administrators)
