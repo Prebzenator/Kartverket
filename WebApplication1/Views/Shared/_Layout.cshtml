@@ -11,19 +11,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - Obstacle App</title>
 
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
           crossorigin="anonymous" />
-
-    <!-- Leaflet -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin="" />
-
-    <!-- Site styles -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
 </head>
@@ -44,7 +39,6 @@
 
                 <div id="mainNav" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto">
-                        <!-- Home (everyone) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-1"
                                asp-area="" asp-controller="Home" asp-action="Index">
@@ -52,32 +46,18 @@
                             </a>
                         </li>
 
-                        <!-- My Reports (Pilots only) -->
+                        @* My Reports (Pilots only) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center gap-1"
-                                   href="#" role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-controller="Pilot" asp-action="Log">
                                     <i class="bi bi-journal-text"></i><span>Reports</span>
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Pilot" asp-action="Log">
-                                            <i class="bi bi-person"></i> My Reports
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" asp-controller="Pilot" asp-action="OrganizationReports">
-                                            <i class="bi bi-building"></i> Organization Reports
-                                        </a>
-                                    </li>
-                                </ul>
                             </li>
                         }
 
-                        <!-- Review Reports (Registry Administrators only) -->
+                        @* Review Reports (Registry Administrators only) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
                         {
                             <li class="nav-item">
@@ -88,7 +68,7 @@
                             </li>
                         }
 
-                        <!-- Manage Users (System Administrators only) -->
+                        @* Manage Users (System Administrators ONLY) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("System Administrator"))
                         {
                             <li class="nav-item">
@@ -99,7 +79,6 @@
                             </li>
                         }
 
-                        <!-- Privacy (everyone) -->
                         <li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-1"
                                asp-area="" asp-controller="Home" asp-action="Privacy">
@@ -109,12 +88,10 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
-                        <!-- Theme toggle -->
                         <button id="theme-toggle" class="btn btn-outline-secondary" type="button" aria-label="Toggle theme">
                             <i id="theme-icon" class="bi bi-moon"></i>
                         </button>
 
-                        <!-- Register obstacle (authenticated users only) -->
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <a class="btn btn-primary d-flex align-items-center gap-1"
@@ -123,7 +100,6 @@
                             </a>
                         }
 
-                        <!-- Login/Logout -->
                         <partial name="_LoginPartial" />
                     </div>
                 </div>
@@ -162,7 +138,6 @@
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

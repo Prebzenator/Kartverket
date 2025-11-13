@@ -7,9 +7,10 @@
     ViewData["Title"] = $"Report #{Model.Id}";
     var lat = Model.Latitude?.ToString("0.######", CultureInfo.InvariantCulture);
     var lng = Model.Longitude?.ToString("0.######", CultureInfo.InvariantCulture);
-    var isDraft = Model.IsDraft;
-}
 
+    @* FIXED: Use IsProbablyDraft instead of IsDraft *@
+    var isDraft = Model.IsProbablyDraft;
+}
 
 <div class="container py-4">
     <!-- Header -->
@@ -21,7 +22,7 @@
             </p>
         </div>
         <a asp-action="Log" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back to My Reports
+            <i class="bi bi-arrow-left"></i> Back to Organization Reports
         </a>
     </div>
 
@@ -42,15 +43,16 @@
     }
 
     <div class="row g-4">
-        <!-- Left Column: Obstacle Details (Read-Only) -->
+        <!-- Left Column: Obstacle Details -->
         <div class="col-lg-8">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Obstacle Information</h5>
-                    @if (isDraft)
+                    @* Show edit button for all own reports (not just drafts) *@
+                    @if (ViewBag.CanEdit == true)
                     {
                         <a asp-action="EditReport" asp-route-id="@Model.Id" class="btn btn-sm btn-primary">
-                            <i class="bi bi-pencil-square"></i> Edit Draft
+                            <i class="bi bi-pencil-square"></i> Edit Report
                         </a>
                     }
                 </div>
@@ -102,23 +104,36 @@
                             string statusText = "Draft";
                             string iconClass = "bi-file-earmark";
 
-                            switch (Model.Status)
+                            // FIXED: Properly handle draft vs rejected vs other statuses
+                            if (isDraft)
                             {
-                                case ReportStatus.Pending:
-                                    badgeClass = "bg-warning text-dark";
-                                    statusText = "Pending Review";
-                                    iconClass = "bi-clock";
-                                    break;
-                                case ReportStatus.Approved:
-                                    badgeClass = "bg-success";
-                                    statusText = "Approved";
-                                    iconClass = "bi-check-circle";
-                                    break;
-                                case ReportStatus.NotApproved:
-                                    badgeClass = "bg-danger";
-                                    statusText = "Rejected";
-                                    iconClass = "bi-x-circle";
-                                    break;
+                                // Draft: NotApproved without admin review
+                                badgeClass = "bg-secondary";
+                                statusText = "Draft - Not Submitted";
+                                iconClass = "bi-file-earmark-text";
+                            }
+                            else
+                            {
+                                // Not a draft, check actual status
+                                switch (Model.Status)
+                                {
+                                    case ReportStatus.Pending:
+                                        badgeClass = "bg-warning text-dark";
+                                        statusText = "Pending Review";
+                                        iconClass = "bi-clock";
+                                        break;
+                                    case ReportStatus.Approved:
+                                        badgeClass = "bg-success";
+                                        statusText = "Approved";
+                                        iconClass = "bi-check-circle";
+                                        break;
+                                    case ReportStatus.NotApproved:
+                                        // NotApproved with admin comments = rejected
+                                        badgeClass = "bg-danger";
+                                        statusText = "Rejected";
+                                        iconClass = "bi-x-circle";
+                                        break;
+                                }
                             }
                         }
                         <h4>
@@ -148,12 +163,14 @@
                 </div>
             </div>
 
-            <!-- Admin Comments Display -->
-            @if (!string.IsNullOrEmpty(Model.AdminComments) && Model.Status == ReportStatus.NotApproved)
+            <!-- Admin Comments Display (only for rejected reports, not drafts) -->
+            @if (!isDraft && Model.Status == ReportStatus.NotApproved && !string.IsNullOrEmpty(Model.AdminComments))
             {
-                <div class="card shadow-sm mt-4 border-danger">
+                <div class="card shadow-sm border-danger">
                     <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">Rejection Feedback</h5>
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> Rejection Feedback
+                        </h5>
                     </div>
                     <div class="card-body">
                         <p class="mb-0">@Model.AdminComments</p>
@@ -162,8 +179,6 @@
             }
         </div>
     </div>
-
-
 </div>
 
 @section Scripts {
@@ -174,23 +189,23 @@
             const lat = parseFloat("@lat");
             const lng = parseFloat("@lng");
 
-                    // Check if map container exists and coordinates are valid
-                    if (!isNaN(lat) && !isNaN(lng) && document.getElementById('map')) {
-                        const map = L.map('map').setView([lat, lng], 14);
+            // Check if map container exists and coordinates are valid
+            if (!isNaN(lat) && !isNaN(lng) && document.getElementById('map')) {
+                const map = L.map('map').setView([lat, lng], 14);
 
-                        // Note: L.tileLayer is used here. Since Leaflet JS is loaded globally in _Layout.cshtml,
-                        // the 'L' object is guaranteed to be available here.
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            maxZoom: 19,
-                            attribution: '&copy; OpenStreetMap contributors'
-                        }).addTo(map);
-                        L.marker([lat, lng]).addTo(map).bindPopup("Obstacle Location").openPopup();
+                // Note: L.tileLayer is used here. Since Leaflet JS is loaded globally in _Layout.cshtml,
+                // the 'L' object is guaranteed to be available here.
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup("Obstacle Location")
+                    .openPopup();
 
-                        // Ensure map initializes correctly even in nested containers
-                        setTimeout(() => { map.invalidateSize(); }, 200);
-                    }
+                // Ensure map initializes correctly even in nested containers
+                setTimeout(() => { map.invalidateSize(); }, 200);
+            }
         </script>
     }
-
-
 }
