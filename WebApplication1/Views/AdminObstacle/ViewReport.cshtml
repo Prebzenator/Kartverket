@@ -291,12 +291,32 @@
         <script>
             const lat = parseFloat("@lat");
             const lng = parseFloat("@lng");
+
+            // Initier kart
             const map = L.map('map').setView([lat, lng], 14);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
-            L.marker([lat, lng]).addTo(map);
+
+            // Marker som kan flyttes
+            let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+
+            // Oppdater inputfelter når markøren dras
+            marker.on('dragend', function () {
+                const pos = marker.getLatLng();
+                document.getElementById('Latitude').value = pos.lat.toFixed(6);
+                document.getElementById('Longitude').value = pos.lng.toFixed(6);
+            });
+
+            // Oppdater inputfelter når kartet klikkes
+            map.on('click', function (e) {
+                const pos = e.latlng;
+                marker.setLatLng(pos);
+                document.getElementById('Latitude').value = pos.lat.toFixed(6);
+                document.getElementById('Longitude').value = pos.lng.toFixed(6);
+            });
         </script>
     }
 }
+

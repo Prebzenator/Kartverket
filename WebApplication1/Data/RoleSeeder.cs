@@ -41,7 +41,8 @@ namespace WebApplication1.Data
                     Email = adminEmail,
                     FullName = adminName,
                     Organization = adminOrg,
-                    EmailConfirmed = true
+                    EmailConfirmed = true,
+                    MustChangePassword = true // 👈 viktig: tving passordendring ved første login
                 };
                 var result = await userManager.CreateAsync(admin, adminPassword);
                 if (result.Succeeded)
@@ -75,6 +76,13 @@ namespace WebApplication1.Data
                 if (string.IsNullOrEmpty(admin.Organization))
                 {
                     admin.Organization = adminOrg;
+                    needsUpdate = true;
+                }
+
+                // Hvis admin allerede finnes, men MustChangePassword ikke er satt, kan vi sette det
+                if (!admin.MustChangePassword)
+                {
+                    admin.MustChangePassword = true;
                     needsUpdate = true;
                 }
 

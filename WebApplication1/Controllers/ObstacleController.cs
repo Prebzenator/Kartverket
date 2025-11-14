@@ -4,8 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
 using WebApplication1.Data;
+using WebApplication1.Helpers;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
+using System.Globalization;
 
 namespace WebApplication1.Controllers
 {
@@ -45,6 +48,15 @@ namespace WebApplication1.Controllers
                 ViewBag.Missing = true;
             }
 
+            // Populate category options for dropdown
+            ViewBag.CategoryOptions = _context.ObstacleCategories
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
+                .ToList();
+
             return View(model);
         }
 
@@ -58,13 +70,44 @@ namespace WebApplication1.Controllers
         /// <param name="id">Optional: ID of existing report to update (null for new reports)</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DataForm(IFormCollection form, string? IsDraft, int? id)
+        public async Task<IActionResult> DataForm(Microsoft.AspNetCore.Http.IFormCollection form, string? IsDraft, int? id)
         {
             // Parse draft flag - case-insensitive check for "true"
             var isDraft = string.Equals(IsDraft, "true", System.StringComparison.OrdinalIgnoreCase);
 
             // Get current authenticated user for ownership tracking
             var user = await _userManager.GetUserAsync(User);
+
+            // Helper: parse a raw input string into decimal? (robust against cultures)
+            decimal? ParseDecimalRaw(string? raw)
+            {
+                if (string.IsNullOrWhiteSpace(raw)) return null;
+
+                raw = raw.Trim();
+                if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.InvariantCulture, out var inv)) return inv;
+                if (decimal.TryParse(raw, NumberStyles.Number, CultureInfo.CurrentCulture, out var cur)) return cur;
+                return null;
+            }
+
+            // Read the raw height input from the form (we use HeightInputRaw in the view)
+            var heightRaw = form["HeightInputRaw"].FirstOrDefault();
+            var parsedHeightInput = ParseDecimalRaw(heightRaw);
+
+            // Convert parsed input to canonical meters depending on role
+            decimal? heightMetersFromInput = null;
+            if (parsedHeightInput.HasValue)
+            {
+                if (User.IsInRole("Pilot"))
+                {
+                    // input is in feet -> convert to meters
+                    heightMetersFromInput = UnitConverter.ToMeters(parsedHeightInput);
+                }
+                else
+                {
+                    // input is in meters
+                    heightMetersFromInput = parsedHeightInput;
+                }
+            }
 
             ObstacleData obstacledata;
 
@@ -82,13 +125,22 @@ namespace WebApplication1.Controllers
 
                 // Update all editable fields from the form
                 obstacledata.ObstacleName = form["ObstacleName"];
-                obstacledata.ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var h) ? h : obstacledata.ObstacleHeight;
+
+                // If user provided a height input we use the parsed/converted value, otherwise keep existing
+                obstacledata.ObstacleHeight = heightMetersFromInput ?? obstacledata.ObstacleHeight;
+
                 obstacledata.ObstacleDescription = form["ObstacleDescription"];
                 obstacledata.Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : obstacledata.Latitude;
                 obstacledata.Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : obstacledata.Longitude;
 
                 // Update timestamp to reflect the edit
                 obstacledata.ReportedAt = DateTime.UtcNow;
+
+                // Update category if provided
+                if (int.TryParse(form["CategoryId"], out var categoryId))
+                {
+                    obstacledata.CategoryId = categoryId;
+                }
             }
             else
             {
@@ -96,10 +148,11 @@ namespace WebApplication1.Controllers
                 obstacledata = new ObstacleData
                 {
                     ObstacleName = form["ObstacleName"],
-                    ObstacleHeight = decimal.TryParse(form["ObstacleHeight"], out var height) ? height : default,
+                    // Use converted meters (may be null if no input)
+                    ObstacleHeight = heightMetersFromInput,
                     ObstacleDescription = form["ObstacleDescription"],
-                    Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : (decimal?)null,
-                    Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : (decimal?)null,
+                    Latitude = ParseDecimalRaw(form["Latitude"]),
+                    Longitude = ParseDecimalRaw(form["Longitude"]),
                     ReportedAt = DateTime.UtcNow,
                     DateData = DateTime.UtcNow // Set creation timestamp (never changes)
                 };
@@ -110,6 +163,12 @@ namespace WebApplication1.Controllers
                     obstacledata.ReportedByUserId = user.Id;
                     obstacledata.ReporterName = user.FullName;
                     obstacledata.ReporterOrganization = user.Organization;
+                }
+
+                // Set category when creating
+                if (int.TryParse(form["CategoryId"], out var categoryId))
+                {
+                    obstacledata.CategoryId = categoryId;
                 }
 
                 _context.Obstacles.Add(obstacledata);

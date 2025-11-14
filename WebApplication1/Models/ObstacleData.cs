@@ -30,11 +30,29 @@ namespace WebApplication1.Models
         public string ObstacleName { get; set; } = string.Empty;
 
         /// <summary>
+<<<<<<< HEAD
+        /// Height of the obstacle in meters.
+        /// Must be between 0 and 1000 meters per aviation regulations.
+        /// Nullable to allow drafts without complete information.
+=======
+        /// Foreign key to obstacle category.
+>>>>>>> origin/Origin/main-final
+        /// </summary>
+        [Required]
+        [DisplayName("Category")]
+        public int CategoryId { get; set; }
+
+        /// <summary>
+        /// Navigation property to category.
+        /// </summary>
+        [ForeignKey("CategoryId")]
+        public ObstacleCategory? Category { get; set; }
+        /// <summary>
         /// Height of the obstacle in meters.
         /// Must be between 0 and 1000 meters per aviation regulations.
         /// Nullable to allow drafts without complete information.
         /// </summary>
-        [Required]
+        
         [Range(0, 1000, ErrorMessage = "Height must be between 0 and 1000 meters.")]
         [DisplayName("Height (m)")]
         public decimal? ObstacleHeight { get; set; }
