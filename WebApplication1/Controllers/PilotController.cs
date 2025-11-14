@@ -115,6 +115,15 @@ namespace WebApplication1.Controllers
                 return Forbid(); // Return 403 Forbidden
             }
 
+            // ✅ Legg til kategori-valgene for dropdown
+            ViewBag.CategoryOptions = _context.ObstacleCategories
+                .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                })
+                .ToList();
+
             // Reuse existing DataForm view for editing
             // The view detects editing mode by checking if model.Id > 0
             return View("~/Views/Obstacle/DataForm.cshtml", report);

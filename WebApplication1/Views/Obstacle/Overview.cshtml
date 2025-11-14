@@ -22,6 +22,10 @@
                         <dt class="col-5 col-md-4">Name</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleName</dd>
 
+                        <!-- ✅ Ny rad for kategori -->
+                        <dt class="col-5 col-md-4">Category</dt>
+                        <dd class="col-7 col-md-8">@Model.Category?.Name</dd>
+
                         <dt class="col-5 col-md-4">Height</dt>
                         <dd class="col-7 col-md-8">
                             @(Model.ObstacleHeight != null

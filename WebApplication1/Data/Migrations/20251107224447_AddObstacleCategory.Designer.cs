@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApplication1.Data;
 
@@ -11,9 +12,11 @@ using WebApplication1.Data;
 namespace WebApplication1.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251107224447_AddObstacleCategory")]
+    partial class AddObstacleCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,9 +186,6 @@ namespace WebApplication1.Data.Migrations
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<bool>("MustChangePassword")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -229,51 +229,6 @@ namespace WebApplication1.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WebApplication1.Models.ObstacleCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ObstacleCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Mast or Tower"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Power Line"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Construction Crane"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Name = "Cable"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Name = "Other"
-                        });
-                });
-
             modelBuilder.Entity("WebApplication1.Models.ObstacleData", b =>
                 {
                     b.Property<int>("Id")
@@ -282,28 +237,7 @@ namespace WebApplication1.Data.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AdminComments")
-                        .HasMaxLength(1000)
-                        .HasColumnType("varchar(1000)");
-
-                    b.Property<string>("AssignedToName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("AssignedToUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("DateData")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("GeometryJson")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime?>("LastReviewedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal?>("Latitude")
@@ -340,20 +274,10 @@ namespace WebApplication1.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<string>("ReviewedByName")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("ReviewedByUserId")
-                        .HasMaxLength(450)
-                        .HasColumnType("varchar(450)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Obstacles");
                 });
@@ -407,17 +331,6 @@ namespace WebApplication1.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("WebApplication1.Models.ObstacleData", b =>
-                {
-                    b.HasOne("WebApplication1.Models.ObstacleCategory", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 #pragma warning restore 612, 618
         }
