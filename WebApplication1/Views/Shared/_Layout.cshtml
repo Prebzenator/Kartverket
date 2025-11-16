@@ -87,17 +87,17 @@
                             <li class="nav-item">
                                 <a class="nav-link d-flex align-items-center gap-1"
                                    asp-controller="Admin" asp-action="CreateUser">
-                                    <i class="bi bi-person-plus"></i><span>Manage Users</span>
+                                    <i class="bi bi-person-plus"></i><span>Create User</span>
                                 </a>
                             </li>
                         }
-
-                        <li class="nav-item">
+                        @*Removed privacy button when its not in use.*@
+                        @*<li class="nav-item">
                             <a class="nav-link d-flex align-items-center gap-1"
                                asp-area="" asp-controller="Home" asp-action="Privacy">
                                 <i class="bi bi-shield-lock"></i><span>Privacy</span>
                             </a>
-                        </li>
+                        </li>*@
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
@@ -113,7 +113,41 @@
                             </a>
                         }
 
-                        <partial name="_LoginPartial" />
+                        @* Bruker-dropdown: viser e-post/brukernavn, Change password og Log out *@
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            var currentUser = await UserManager.GetUserAsync(User);
+                            var userEmailOrName = currentUser != null
+                            ? (await UserManager.GetEmailAsync(currentUser)) ?? currentUser.UserName
+                            : User.Identity?.Name ?? "User";
+
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2"
+                                        type="button" id="userMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span class="small text-truncate" style="max-width: 10rem;">@userEmailOrName</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Account" asp-action="ChangePassword">
+                                            <i class="bi bi-key me-2"></i> Change password
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="m-0">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right me-2"></i> Log out
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Log in</a>
+                        }
                     </div>
                 </div>
             </div>
@@ -190,7 +224,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-<li class="nav-item">
-    <a class="nav-link" asp-controller="Account" asp-action="ChangePassword">My Account</a>
-</li>

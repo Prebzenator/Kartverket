@@ -17,6 +17,10 @@ namespace WebApplication1.ViewModels
         public string CurrentStatusFilter { get; set; } = "all";
         public string CurrentOrgFilter { get; set; } = "all";
 
+        // Added: category filter and search query used by dashboard view
+        public string CurrentCategoryFilter { get; set; } = "all";
+        public string? Query { get; set; }
+
         // Statistics
         public int TotalReports => Reports.Count;
         public int PendingCount => Reports.Count(r => r.Status == ReportStatus.Pending);

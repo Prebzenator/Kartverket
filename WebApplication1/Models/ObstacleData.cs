@@ -32,15 +32,15 @@ namespace WebApplication1.Models
         /// <summary>
         /// Foreign key to obstacle category.
         /// </summary>
-        [Required]
         [DisplayName("Category")]
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; } // Make CategoryID nullable to allow drafts without complete info
 
         /// <summary>
         /// Navigation property to category.
         /// </summary>
         [ForeignKey("CategoryId")]
         public ObstacleCategory? Category { get; set; }
+
         /// <summary>
         /// Height of the obstacle in meters.
         /// Must be between 0 and 1000 meters per aviation regulations.
@@ -76,6 +76,13 @@ namespace WebApplication1.Models
         /// </summary>
         [DisplayName("Longitude")]
         public decimal? Longitude { get; set; }
+
+        /// <summary>
+        /// Save the full geometry as GeoJSON string.
+        /// </summary>
+        [DisplayName("Geometry (GeoJSON)")]
+        public string? GeometryJson { get; set; }
+
 
         /// <summary>
         /// UTC timestamp when the report was submitted by the user.

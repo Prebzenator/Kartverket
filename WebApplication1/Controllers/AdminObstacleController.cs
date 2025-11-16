@@ -61,50 +61,92 @@ namespace WebApplication1.Controllers
         /// <param name="filterStatus">Status filter (all, Pending, Approved, NotApproved)</param>
         /// <param name="filterOrg">Organization filter (all, or specific organization name)</param>
         [HttpGet]
-        public async Task<IActionResult> Dashboard(string sortBy = "date", string filterStatus = "all", string filterOrg = "all")
+        public async Task<IActionResult> Dashboard(
+    string sortBy = "date",
+    string filterStatus = "all",
+    string filterOrg = "all",
+    string filterCategory = "all",
+    string q = null)
         {
-            // Get ALL reports - no filtering by IsDraft like before
-            // This includes drafts, pending, approved, and rejected reports
-            var query = _context.Obstacles.AsQueryable();
+            // Baseline query — include Category so navigation property is populated
+            var query = _context.Obstacles
+                .AsNoTracking()
+                .Include(o => o.Category)
+                .AsQueryable();
 
-            // Apply status filter if requested
+            // Optional search (obstacle name or reporter)
+            if (!string.IsNullOrWhiteSpace(q))
+            {
+                var qTrim = q.Trim();
+                query = query.Where(o => o.ObstacleName.Contains(qTrim) || o.ReporterName.Contains(qTrim));
+            }
+
+            // Apply status filter when requested
             if (filterStatus != "all" && Enum.TryParse<ReportStatus>(filterStatus, out var status))
             {
                 query = query.Where(o => o.Status == status);
             }
 
-            // Apply organization filter if requested
+            // Organization filter
             if (filterOrg != "all")
             {
                 query = query.Where(o => o.ReporterOrganization == filterOrg);
             }
 
-            // Apply sorting based on selected field
+            // Category filter: support "all", "uncategorized" (CategoryId == null) or categoryId as int
+            if (!string.IsNullOrEmpty(filterCategory) && filterCategory != "all")
+            {
+                if (filterCategory == "uncategorized")
+                {
+                    query = query.Where(o => o.CategoryId == null);
+                }
+                else if (int.TryParse(filterCategory, out var catId))
+                {
+                    query = query.Where(o => o.CategoryId == catId);
+                }
+                // else: ignore invalid value defensively
+            }
+
+            // Apply sorting
             query = sortBy switch
             {
-                "date" => query.OrderByDescending(o => o.ReportedAt),      // Newest first (default)
-                "date-asc" => query.OrderBy(o => o.ReportedAt),            // Oldest first
-                "name" => query.OrderBy(o => o.ObstacleName),              // Alphabetical
-                "height" => query.OrderByDescending(o => o.ObstacleHeight), // Tallest first
-                "status" => query.OrderBy(o => o.Status),                  // Group by status
-                "reporter" => query.OrderBy(o => o.ReporterName),          // Alphabetical by reporter
-                "organization" => query.OrderBy(o => o.ReporterOrganization), // Group by org
-                _ => query.OrderByDescending(o => o.ReportedAt)            // Default to newest
+                "date" => query.OrderByDescending(o => o.ReportedAt),
+                "date-asc" => query.OrderBy(o => o.ReportedAt),
+                "name" => query.OrderBy(o => o.ObstacleName),
+                "height" => query.OrderByDescending(o => o.ObstacleHeight),
+                "status" => query.OrderBy(o => o.Status),
+                "reporter" => query.OrderBy(o => o.ReporterName),
+                "organization" => query.OrderBy(o => o.ReporterOrganization),
+                _ => query.OrderByDescending(o => o.ReportedAt)
             };
 
+            // Materialize results
             var reports = await query.ToListAsync();
 
+            // DEBUG: counts of what query returned (use null checks for uncategorized)
+            ViewBag.Debug_ReturnedCount = reports.Count;
+            ViewBag.Debug_ReturnedUncategorized = reports.Count(r => r.CategoryId == null);
+
             // Get all Registry Administrators for assignment dropdown
-            // Allows admins to assign reports to specific reviewers for workload distribution
             var admins = await _userManager.GetUsersInRoleAsync("Registry Administrator");
 
             // Get distinct organizations for filter dropdown
-            // Allows filtering dashboard by organization (e.g., show only NLA reports)
             var organizations = await _context.Obstacles
                 .Where(o => o.ReporterOrganization != null)
                 .Select(o => o.ReporterOrganization)
                 .Distinct()
                 .ToListAsync();
+
+            // Categories for the filter dropdown (Id + Name) — DO NOT add synthetic Id=0 here
+            var categoriesFromDb = await _context.ObstacleCategories
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => new { c.Id, c.Name })
+                .ToListAsync();
+
+            // Baseline debug counters (database-wide)
+            ViewBag.Debug_TotalInDb = await _context.Obstacles.CountAsync();
+            ViewBag.Debug_UncategorizedInDb = await _context.Obstacles.CountAsync(o => o.CategoryId == null);
 
             // Build view model with all data needed for dashboard
             var viewModel = new AdminDashboardViewModel
@@ -114,11 +156,18 @@ namespace WebApplication1.Controllers
                 Organizations = organizations,
                 CurrentSort = sortBy,
                 CurrentStatusFilter = filterStatus,
-                CurrentOrgFilter = filterOrg
+                CurrentOrgFilter = filterOrg,
+                CurrentCategoryFilter = filterCategory,
+                Query = q
             };
+
+            // Send categories and admins to view for dropdowns (no synthetic 'Uncategorized' entry)
+            ViewBag.Categories = categoriesFromDb;
+            ViewBag.Administrators = admins;
 
             return View(viewModel);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> ViewReport(int id)
@@ -210,23 +259,30 @@ namespace WebApplication1.Controllers
                 return NotFound();
 
             var currentUser = await _userManager.GetUserAsync(User);
+            var currentUserId = currentUser?.Id;
+            var currentUserName = currentUser?.FullName ?? currentUser?.Email ?? currentUser?.UserName ?? "Unknown";
 
             // Update status to Approved
             report.Status = ReportStatus.Approved;
 
             // Record who approved it and when (audit trail)
-            report.ReviewedByUserId = currentUser?.Id;
-            report.ReviewedByName = currentUser?.FullName ?? currentUser?.Email;
+            report.ReviewedByUserId = currentUserId;
+            report.ReviewedByName = currentUserName;
             report.LastReviewedAt = DateTime.UtcNow;
 
             // Clear any previous rejection comments (approval = no issues)
             report.AdminComments = null;
 
+            // Assign to the approver
+            report.AssignedToUserId = currentUserId;
+            report.AssignedToName = currentUserName;
+
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Report approved successfully.";
+            TempData["SuccessMessage"] = $"Report #{id} approved and assigned to {currentUserName}.";
             return RedirectToAction(nameof(Dashboard));
         }
+
 
         /// <summary>
         /// POST: /AdminObstacle/RejectReport

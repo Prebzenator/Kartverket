@@ -4,237 +4,502 @@
 
 @{
     ViewData["Title"] = "Admin Dashboard";
+
+    // Read categories from ViewBag (DB categories only)
+    var rawCategories = (ViewBag.Categories as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>()).ToList();
+    var categories = rawCategories.Where(c => (int)c.Id != 0).ToList();
+
+    // Preferred exact order
+    var preferredOrder = new[]
+    {
+        "Mast or Tower",
+        "Power Line",
+        "Construction Crane",
+        "Cable",
+        "Other"
+    };
+
+    // Build ordered categories: preferred first, then remaining alphabetically
+    var ordered = preferredOrder
+        .Select(name => categories.FirstOrDefault(c => string.Equals((string)c.Name, name, StringComparison.OrdinalIgnoreCase)))
+        .Where(c => c != null)
+        .ToList();
+
+    var remaining = categories
+        .Where(c => !ordered.Any(o => (int)o.Id == (int)c.Id))
+        .OrderBy(c => (string)c.Name)
+        .ToList();
+
+    ordered.AddRange(remaining);
+    var orderedCategories = ordered;
+
+    // Administrators list from ViewBag (used to display assigned user if available)
+    var admins = (ViewBag.Administrators as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>()).ToList();
+
+    string DashOr(string? text) => string.IsNullOrWhiteSpace(text) ? "—" : text;
 }
 
 <div class="container-fluid py-4">
-    <!-- Header with Statistics -->
-    <div class="row mb-4">
-        <div class="col">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h1 class="h3 mb-0">Obstacle Reports Dashboard</h1>
-                @* FIXED: Only show Create User button for System Administrators *@
-                @if (User.IsInRole("System Administrator"))
-                {
-                    <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-primary">
-                        <i class="bi bi-person-plus"></i> Create User
-                    </a>
-                }
+    <!-- Header -->
+    <div class="d-flex align-items-start justify-content-between mb-3 gap-3">
+        <div>
+            <h1 class="h3 mb-1">Obstacle Reports Dashboard</h1>
+            <p class="text-muted small mb-0">Overview of incoming reports — review, assign and act.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            @if (User.IsInRole("System Administrator"))
+            {
+                <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-outline-primary">
+                    <i class="bi bi-person-plus me-1" aria-hidden="true"></i> Create user
+                </a>
+            }
+            <a asp-controller="AdminObstacle" asp-action="ExportCsv" class="btn btn-outline-secondary" title="Export current view">
+                <i class="bi bi-download me-1" aria-hidden="true"></i> Export
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <small class="text-muted">Total</small>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0">@Model.TotalReports</h3>
+                        <i class="bi bi-archive-fill fs-3 text-secondary"></i>
+                    </div>
+                </div>
             </div>
-            <div class="row g-3">
-                <div class="col-sm-6 col-md-3">
-                    <div class="card border-primary">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-muted">Total Reports</h6>
-                            <p class="card-text h3 mb-0">@Model.TotalReports</p>
-                        </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <small class="text-muted">Pending</small>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0 text-warning">@Model.PendingCount</h3>
+                        <i class="bi bi-clock-history fs-3 text-warning"></i>
                     </div>
                 </div>
-                <div class="col-sm-6 col-md-3">
-                    <div class="card border-warning">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-muted">Pending</h6>
-                            <p class="card-text h3 mb-0 text-warning">@Model.PendingCount</p>
-                        </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 border-success">
+                <div class="card-body">
+                    <small class="text-muted">Approved</small>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0 text-success">@Model.ApprovedCount</h3>
+                        <i class="bi bi-check-circle-fill fs-3 text-success"></i>
                     </div>
                 </div>
-                <div class="col-sm-6 col-md-3">
-                    <div class="card border-success">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-muted">Approved</h6>
-                            <p class="card-text h3 mb-0 text-success">@Model.ApprovedCount</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-3">
-                    <div class="card border-danger">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-muted">Rejected</h6>
-                            <p class="card-text h3 mb-0 text-danger">@Model.RejectedCount</p>
-                        </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card h-100 border-danger">
+                <div class="card-body">
+                    <small class="text-muted">Rejected</small>
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h3 class="mb-0 text-danger">@Model.RejectedCount</h3>
+                        <i class="bi bi-x-circle-fill fs-3 text-danger"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Success/Error Messages -->
+    <!-- Flash messages -->
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <!-- Filters and Sorting -->
+    <!-- Filters -->
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" asp-action="Dashboard" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Sort By</label>
-                    <select name="sortBy" class="form-select" onchange="this.form.submit()">
-                        <option value="date" selected="@(Model.CurrentSort == "date")">Date (Newest First)</option>
-                        <option value="date-asc" selected="@(Model.CurrentSort == "date-asc")">Date (Oldest First)</option>
-                        <option value="status" selected="@(Model.CurrentSort == "status")">Status</option>
-                        <option value="name" selected="@(Model.CurrentSort == "name")">Obstacle Name</option>
-                        <option value="height" selected="@(Model.CurrentSort == "height")">Height</option>
-                        <option value="reporter" selected="@(Model.CurrentSort == "reporter")">Reporter Name</option>
-                        <option value="organization" selected="@(Model.CurrentSort == "organization")">Organization</option>
-                    </select>
+                <div class="col-lg-3 col-md-4">
+                    <label class="form-label">Search</label>
+                    <input name="q" value="@(Model?.Query ?? "")" class="form-control" placeholder="Search by obstacle, reporter, or comments" />
                 </div>
 
-                <div class="col-md-3">
-                    <label class="form-label">Filter by Status</label>
-                    <select name="filterStatus" class="form-select" onchange="this.form.submit()">
-                        <option value="all" selected="@(Model.CurrentStatusFilter == "all")">All Statuses</option>
-                        <option value="Pending" selected="@(Model.CurrentStatusFilter == "Pending")">Pending</option>
-                        <option value="Approved" selected="@(Model.CurrentStatusFilter == "Approved")">Approved</option>
-                        <option value="NotApproved" selected="@(Model.CurrentStatusFilter == "NotApproved")">Rejected</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Filter by Organization</label>
-                    <select name="filterOrg" class="form-select" onchange="this.form.submit()">
-                        <option value="all" selected="@(Model.CurrentOrgFilter == "all")">All Organizations</option>
-                        @foreach (var org in Model.Organizations)
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label">Status</label>
+                    <select name="filterStatus" class="form-select">
+                        @if (Model.CurrentStatusFilter == "all")
                         {
-                            <option value="@org" selected="@(Model.CurrentOrgFilter == org)">@org</option>
+                            <option value="all" selected>All</option>
+                        }
+                        else
+                        {
+                            <option value="all">All</option>
+                        }
+
+                        @if (Model.CurrentStatusFilter == "Pending")
+                        {
+                            <option value="Pending" selected>Pending</option>
+                        }
+                        else
+                        {
+                            <option value="Pending">Pending</option>
+                        }
+
+                        @if (Model.CurrentStatusFilter == "Approved")
+                        {
+                            <option value="Approved" selected>Approved</option>
+                        }
+                        else
+                        {
+                            <option value="Approved">Approved</option>
+                        }
+
+                        @if (Model.CurrentStatusFilter == "NotApproved")
+                        {
+                            <option value="NotApproved" selected>Rejected</option>
+                        }
+                        else
+                        {
+                            <option value="NotApproved">Rejected</option>
                         }
                     </select>
                 </div>
 
-                <div class="col-md-3">
-                    <a asp-action="Dashboard" class="btn btn-outline-secondary w-100">Clear Filters</a>
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label">Organization</label>
+                    <select name="filterOrg" class="form-select">
+                        @if (Model.CurrentOrgFilter == "all")
+                        {
+                            <option value="all" selected>All</option>
+                        }
+                        else
+                        {
+                            <option value="all">All</option>
+                        }
+
+                        @if (Model.Organizations != null)
+                        {
+                            foreach (var org in Model.Organizations.OrderBy(o => o))
+                            {
+                                if (Model.CurrentOrgFilter == org)
+                                {
+                                    <option value="@org" selected>@org</option>
+                                }
+                                else
+                                {
+                                    <option value="@org">@org</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-3">
+                    <label class="form-label">Category</label>
+                    <select name="filterCategory" class="form-select">
+                        @if (Model.CurrentCategoryFilter == "all")
+                        {
+                            <option value="all" selected>All categories</option>
+                        }
+                        else
+                        {
+                            <option value="all">All categories</option>
+                        }
+
+                        @if (Model.CurrentCategoryFilter == "uncategorized")
+                        {
+                            <option value="uncategorized" selected>Uncategorized</option>
+                        }
+                        else
+                        {
+                            <option value="uncategorized">Uncategorized</option>
+                        }
+
+                        @foreach (var c in orderedCategories)
+                        {
+                            if (Model.CurrentCategoryFilter == c.Id.ToString())
+                            {
+                                <option value="@c.Id" selected>@c.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-lg-3 col-md-12 d-flex gap-2 align-items-center">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                    <a asp-action="Dashboard" class="btn btn-outline-secondary">Clear</a>
+                    <div class="ms-auto">
+                        <small class="text-muted">Results: <strong>@(Model.Reports?.Count() ?? 0)</strong></small>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-text">
+                        Tip: Press “/” to focus the search field. Choose “Uncategorized” to see reports with no category.
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Reports Table -->
+    <!-- Table -->
     <div class="card">
         <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
+            <div class="table-responsive border-top">
+                <table class="table table-hover mb-0 align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Obstacle</th>
-                            <th>Height</th>
-                            <th>Reporter</th>
-                            <th>Organization</th>
-                            <th>Reported Date</th>
-                            <th>Status</th>
-                            <th>Assigned To</th>
-                            <th class="text-end">Actions</th>
+                            <th style="width:6%">ID</th>
+                            <th style="width:26%">Obstacle</th>
+                            <th style="width:8%">Height</th>
+                            <th style="width:14%">Reporter</th>
+                            <th style="width:14%">Assigned to</th>
+                            <th style="width:12%">Organization</th>
+                            <th style="width:10%">Reported</th>
+                            <th style="width:6%">Status</th>
+                            <th style="width:10%" class="text-end">Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        @foreach (var report in Model.Reports)
+                        @if (Model.Reports != null && Model.Reports.Any())
+                        {
+                            foreach (var report in Model.Reports)
+                            {
+                                // Determine category name
+                                string catName = null;
+                                if (report.Category != null && !string.IsNullOrEmpty(report.Category.Name))
+                                {
+                                    catName = report.Category.Name;
+                                }
+                                else if (report.CategoryId == null)
+                                {
+                                    catName = "Uncategorized";
+                                }
+                                else
+                                {
+                                    var match = orderedCategories.FirstOrDefault(c => (int)c.Id == report.CategoryId);
+                                    if (match != null) { catName = match.Name; }
+                                }
+
+                                // Determine assigned user display (show assigned person if any, otherwise "Not assigned")
+                                string assignedDisplay;
+                                if (!string.IsNullOrWhiteSpace(report.AssignedToUserId))
+                                {
+                                    var foundAdmin = admins.FirstOrDefault(a => (string)a.Id == (string)report.AssignedToUserId);
+                                    if (foundAdmin != null)
+                                    {
+                                        assignedDisplay = (string?)foundAdmin.FullName ?? (string?)foundAdmin.Email ?? (report.AssignedToName ?? "Not assigned");
+                                    }
+                                    else
+                                    {
+                                        assignedDisplay = report.AssignedToName ?? "Not assigned";
+                                    }
+                                }
+                                else if (!string.IsNullOrWhiteSpace(report.AssignedToName))
+                                {
+                                    assignedDisplay = report.AssignedToName;
+                                }
+                                else
+                                {
+                                    assignedDisplay = "Not assigned";
+                                }
+
+                                <tr>
+                                    <td><strong>#@report.Id</strong></td>
+
+                                    <td>
+                                        <div class="fw-semibold text-truncate" style="max-width:40ch;">@report.ObstacleName</div>
+                                        <div class="text-muted small mt-1">
+                                            Category:
+                                            @Html.Raw(string.IsNullOrEmpty(catName) ? " &mdash;" : System.Net.WebUtility.HtmlEncode(catName))
+                                        </div>
+
+                                        @if (!string.IsNullOrWhiteSpace(report.ObstacleDescription))
+                                        {
+                                            <details class="mt-1">
+                                                <summary class="small text-muted">Show description</summary>
+                                                <div class="small">@report.ObstacleDescription</div>
+                                            </details>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (report.ObstacleHeight.HasValue)
+                                        {
+                                            @report.ObstacleHeight.Value.ToString("0.##", CultureInfo.InvariantCulture) <text>m</text>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-semibold">@DashOr(report.ReporterName)</div>
+                                    </td>
+
+                                    <td>
+                                        <div class="fw-normal text-truncate" style="max-width:20ch;">
+                                            @Html.Raw(System.Net.WebUtility.HtmlEncode(assignedDisplay))
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        @if (string.IsNullOrEmpty(report.ReporterOrganization))
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                        else
+                                        {
+                                            @report.ReporterOrganization
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div>@report.ReportedAt.ToString("dd.MM.yyyy")</div>
+                                        <div class="text-muted small">@report.ReportedAt.ToString("HH:mm")</div>
+                                        @if (report.LastReviewedAt.HasValue)
+                                        {
+                                            <div class="text-muted small mt-1">Reviewed @report.LastReviewedAt.Value.ToString("dd.MM.yyyy HH:mm")</div>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (report.IsProbablyDraft)
+                                        {
+                                            <span class="badge bg-secondary"><i class="bi bi-file-earmark-text me-1"></i> Draft</span>
+                                        }
+                                        else
+                                        {
+                                            @switch (report.Status)
+                                            {
+                                                case ReportStatus.Pending:
+                                                    <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i> Pending</span>
+                                                    break;
+                                                case ReportStatus.Approved:
+                                                    <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Approved</span>
+                                                    break;
+                                                case ReportStatus.NotApproved:
+                                                    <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i> Rejected</span>
+                                                    break;
+                                            }
+                                        }
+                                    </td>
+
+                                    <td class="text-end">
+                                        <div class="btn-group" role="group" aria-label="Actions for report @report.Id">
+                                            <a asp-action="ViewReport" asp-route-id="@report.Id" class="btn btn-outline-primary btn-sm" title="View details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            @if (report.Status == ReportStatus.Pending)
+                                            {
+                                                <form asp-action="ApproveReport" method="post" class="d-inline ms-1" onsubmit="return confirm('@($"Approve report #{report.Id}?")');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@report.Id" />
+                                                    <button type="submit" class="btn btn-success btn-sm" title="Approve">
+                                                        <i class="bi bi-check-lg"></i>
+                                                    </button>
+                                                </form>
+
+                                                <button class="btn btn-outline-danger btn-sm ms-1" data-bs-toggle="modal" data-bs-target="#rejectModal-@report.Id" title="Reject">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
+
+                                                <div class="modal fade" id="rejectModal-@report.Id" tabindex="-1" aria-hidden="true" aria-labelledby="rejectModalLabel-@report.Id">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="rejectModalLabel-@report.Id">Reject report #@report.Id</h5>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <form asp-action="RejectReport" method="post">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="id" value="@report.Id" />
+                                                                <div class="modal-body">
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label">Reason (required)</label>
+                                                                        <textarea name="adminComments" class="form-control" rows="3" required></textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                                    <button type="submit" class="btn btn-danger">Reject report</button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-                                <td class="align-middle">
-                                    <strong>#@report.Id</strong>
-                                </td>
-                                <td class="align-middle">
-                                    <div>@report.ObstacleName</div>
-                                    <small class="text-muted">@(report.ObstacleDescription?.Length > 50 ? report.ObstacleDescription.Substring(0, 50) + "..." : report.ObstacleDescription)</small>
-                                </td>
-                                <td class="align-middle">@report.ObstacleHeight?.ToString("0.##") m</td>
-                                <td class="align-middle">
-                                    <div>@report.ReporterName</div>
-                                    <small class="text-muted">@report.ReportedByUserId</small>
-                                </td>
-                                <td class="align-middle">@report.ReporterOrganization</td>
-                                <td class="align-middle">
-                                    <div>@report.ReportedAt.ToString("dd.MM.yyyy")</div>
-                                    <small class="text-muted">@report.ReportedAt.ToString("HH:mm")</small>
-                                </td>
-                                <td class="align-middle">
-                                    @if (report.IsProbablyDraft)
-                                    {
-                                        <span class="badge bg-secondary">
-                                            <i class="bi bi-file-earmark-text"></i> Draft
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        switch (report.Status)
-                                        {
-                                            case ReportStatus.Pending:
-                                                <span class="badge bg-warning text-dark">
-                                                    <i class="bi bi-clock"></i> Pending
-                                                </span>
-                                                break;
-                                            case ReportStatus.Approved:
-                                                <span class="badge bg-success">
-                                                    <i class="bi bi-check-circle"></i> Approved
-                                                </span>
-                                                break;
-                                            case ReportStatus.NotApproved:
-                                                <span class="badge bg-danger">
-                                                    <i class="bi bi-x-circle"></i> Rejected
-                                                </span>
-                                                break;
-                                        }
-                                    }
-                                    @if (report.LastReviewedAt.HasValue)
-                                    {
-                                        <br />
-                                        <small class="text-muted">by @report.ReviewedByName</small>
-                                    }
-                                </td>
-                                <td class="align-middle">
-                                    @if (!string.IsNullOrEmpty(report.AssignedToName))
-                                    {
-                                        <span class="badge bg-info text-dark">
-                                            <i class="bi bi-person"></i> @report.AssignedToName
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted">Unassigned</span>
-                                    }
-                                </td>
-                                <td class="align-middle text-end">
-                                    <div class="btn-group btn-group-sm">
-                                        <a asp-action="ViewReport" asp-route-id="@report.Id"
-                                           class="btn btn-outline-primary" title="View Details">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-
-                                        @if (report.Status == ReportStatus.Pending)
-                                        {
-                                            <form asp-action="ApproveReport" method="post" class="d-inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@report.Id" />
-                                                <button type="submit" class="btn btn-outline-success" title="Quick Approve">
-                                                    <i class="bi bi-check"></i>
-                                                </button>
-                                            </form>
-                                        }
-                                    </div>
-                                </td>
+                                <td colspan="9" class="text-center text-muted py-4">No reports available.</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+
+            <!-- Summary footer -->
+            <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                <div class="text-muted small">Showing @(Model.Reports?.Count() ?? 0) reports</div>
+                <div class="text-muted small">Server-side paging not configured</div>
+            </div>
         </div>
     </div>
 
-    @if (!Model.Reports.Any())
+    @if (Model.Reports == null || !Model.Reports.Any())
     {
         <div class="text-center py-5">
-            <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+            <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.35;"></i>
             <p class="text-muted mt-3">No reports match your filters.</p>
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            // Focus search when pressing "/" on desktop
+            document.addEventListener('keydown', function (e) {
+                if (e.key === '/' && !/input|textarea/i.test(document.activeElement.tagName)) {
+                    const q = document.querySelector('input[name="q"]');
+                    if (q) { e.preventDefault(); q.focus(); q.select(); }
+                }
+            });
+
+            // Preserve scroll position (optional)
+            const key = 'admin-dashboard-scroll';
+            window.addEventListener('beforeunload', () => {
+                sessionStorage.setItem(key, String(window.scrollY));
+            });
+            const prev = sessionStorage.getItem(key);
+            if (prev) {
+                window.scrollTo({ top: Number(prev), behavior: 'instant' });
+            }
+        })();
+    </script>
+}
