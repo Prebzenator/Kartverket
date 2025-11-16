@@ -16,7 +16,7 @@ namespace WebApplication1.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); // Viktig for Identity
+            base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ObstacleCategory>().HasData(
                 new ObstacleCategory { Id = 1, Name = "Mast or Tower" },

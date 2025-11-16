@@ -71,16 +71,16 @@
                                                 <i class="bi bi-file-earmark-text"></i> Draft
                                             </span>
                                         }
-                                    </h5>
+                                </h5>
 
-                                    <p class="card-text text-muted mb-2">
-                                        @(report.ObstacleDescription?.Length > 120
+                                <p class="card-text text-muted mb-2">
+                                    @(report.ObstacleDescription?.Length > 120
                                                                     ? report.ObstacleDescription.Substring(0, 120) + "..."
                                                                     : report.ObstacleDescription)
-                                    </p>
+                            </p>
 
                                     <div class="small text-muted mb-2">
-                                        @if (!isOwnReport)
+                                @if (!isOwnReport)
                                         {
                                             <span><i class="bi bi-person"></i> @report.ReporterName</span>
                                             <span class="mx-2">•</span>
@@ -244,89 +244,4 @@
             }
         </div>
     }
-    <h2 class="mb-3">My Reports</h2>
-
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Obstacle</th>
-                <th>Height (@(User.IsInRole("Pilot") ? "ft" : "m"))</th>
-                <th>Reported At</th>
-                <th>Status</th>
-                <th class="text-end">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.ObstacleName</td>
-                    <td>
-                        @{
-                            // ObstacleHeight is decimal?; UnitConverter uses decimal arithmetic.
-                            if (User.IsInRole("Pilot"))
-                            {
-                                var feet = UnitConverter.ToFeet(item.ObstacleHeight);
-                                if (feet.HasValue)
-                                {
-                                    // Round to nearest whole foot for pilot display
-                                    <text>@Math.Round(feet.Value, 0).ToString("F0")</text>
-                                }
-                                else
-                                {
-                                    <text>—</text>
-                                }
-                            }
-                            else
-                            {
-                                if (item.ObstacleHeight.HasValue)
-                                {
-                                    // Show meters with one decimal for admin/others
-                                    <text>@item.ObstacleHeight.Value.ToString("F1")</text>
-                                }
-                                else
-                                {
-                                    <text>—</text>
-                                }
-                            }
-                        }
-                    </td>
-                    <td>@item.ReportedAt.ToString("g")</td>
-                    <td>
-                        @switch (item.Status)
-                        {
-                            case ReportStatus.Pending:
-                                <span class="badge bg-warning text-dark">
-                                    <i class="bi bi-clock"></i> Pending Review
-                                </span>;
-                                break;
-                            case ReportStatus.Approved:
-                                <span class="badge bg-success">
-                                    <i class="bi bi-check-circle"></i> Approved
-                                </span>;
-                                break;
-                            case ReportStatus.NotApproved:
-                                <span class="badge bg-danger">
-                                    <i class="bi bi-x-circle"></i> Rejected
-                                </span>;
-                                break;
-                        }
-                    </td>
-                    <td class="text-end">
-                        <a asp-action="ViewReport" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">
-                            <i class="bi bi-eye"></i> View
-                        </a>
-                        @if (item.ReportedByUserId == currentUserId)
-                        {
-                            <a asp-action="EditReport" asp-route-id="@item.Id" class="btn btn-primary btn-sm">
-                                <i class="bi bi-pencil"></i> Edit
-                            </a>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 </div>

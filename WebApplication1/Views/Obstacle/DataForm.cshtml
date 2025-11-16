@@ -7,13 +7,13 @@
 
 <div class="container py-4">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
+        <div class="col-12 col-md-10 col-lg-8">
             <div class="card shadow-sm rounded-4">
                 <div class="card-body p-4">
                     <h1 class="h3 mb-2">Obstacle Registration</h1>
                     <p class="text-muted mb-4">Click the map to choose a location or use the tools.</p>
 
-                    <form asp-controller="Obstacle" asp-action="DataForm" method="post" novalidate>
+                    <form asp-controller="Obstacle" asp-action="DataForm" method="post" novalidate id="obstacle-form">
                         @Html.AntiForgeryToken()
                         @if (Model != null && Model.Id > 0)
                         {
@@ -24,7 +24,7 @@
 
                         <div class="mb-3">
                             <label asp-for="ObstacleName" class="form-label"></label>
-                            <input asp-for="ObstacleName" class="form-control" id="ObstacleNameInput" placeholder="e.g., Fallen tree" />
+                            <input asp-for="ObstacleName" class="form-control" id="ObstacleNameInput" placeholder="e.g., Radio mast" />
                             <span asp-validation-for="ObstacleName" class="text-danger"></span>
                             @if ((ViewBag.Missing as bool?) ?? false)
                             {
@@ -42,25 +42,25 @@
                             <span asp-validation-for="CategoryId" class="text-danger"></span>
                         </div>
 
-                        <!-- HEIGHT INPUT: show feet for Pilot, meters for others -->
                         <div class="mb-3">
                             <label class="form-label">Height (@(User.IsInRole("Pilot") ? "ft" : "m"))</label>
 
-                            <input name="HeightInputRaw" class="form-control"
+                            <input name="HeightInputRaw" id="HeightInputRaw" class="form-control"
                                    value="@(User.IsInRole("Pilot")
-                                             ? (Model?.ObstacleHeight.HasValue == true
-                                                    ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
-                                                    : string.Empty)
-                                             : (Model?.ObstacleHeight.HasValue == true
-                                                    ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
-                                                    : string.Empty))"
-                                   placeholder="e.g., @(User.IsInRole("Pilot") ? "100" : "1.25")" />
+                                                                                                                   ? (Model?.ObstacleHeight.HasValue == true
+                                                                                                                          ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
+                                                                                                                          : string.Empty)
+                                                                                                                   : (Model?.ObstacleHeight.HasValue == true
+                                                                                                                          ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
+                                                                                                                          : string.Empty))"
+                                   placeholder="e.g., @(User.IsInRole("Pilot") ? "100" : "1.25")" aria-describedby="heightHelp" />
 
-                            <div class="form-text">
+                            <div id="heightHelp" class="form-text">
                                 @(User.IsInRole("Pilot")
-                                    ? "Enter height in feet; it will be stored as meters."
-                                    : "Enter height in meters.")
+                                                                ? "Enter height in feet; it will be stored as meters."
+                                                                : "Enter height in meters.")
                             </div>
+                            <div id="heightError" class="text-danger visually-hidden" role="alert"></div>
                             <span asp-validation-for="ObstacleHeight" class="text-danger"></span>
                         </div>
 
@@ -71,39 +71,52 @@
                         </div>
 
                         <!-- Controls + Map -->
-                        <div class="mb-2 d-flex flex-wrap gap-2">
-                            <button type="button" id="btn-locate" class="btn btn-primary btn-sm">Finn min posisjon</button>
-                            <button type="button" id="btn-drop-pin" class="btn btn-outline-primary btn-sm">Legg nål på posisjonen min</button>
-                            <button type="button" id="btn-clear" class="btn btn-outline-danger btn-sm">Tøm tegninger</button>
+                        <div class="mb-2 d-flex flex-wrap gap-2 align-items-center control-row">
+                            <div class="btn-group btn-group-lg map-action-group" role="group" aria-label="Map controls">
+                                <button type="button" id="btn-locate" class="btn btn-primary d-flex align-items-center gap-2" aria-label="Use my position">
+                                    <i class="bi bi-geo-alt-fill" aria-hidden="true"></i><span class="d-none d-sm-inline">Use my position</span>
+                                </button>
+
+                                <button type="button" id="btn-clear" class="btn btn-outline-danger d-flex align-items-center gap-2" aria-label="Clear drawings">
+                                    <i class="bi bi-trash" aria-hidden="true"></i><span class="d-none d-sm-inline">Clear drawings</span>
+                                </button>
+
+                                <button type="button" id="btn-open-map" class="btn btn-outline-secondary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#mapModal" aria-controls="mapModal" aria-label="Open map fullscreen">
+                                    <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i><span class="d-none d-sm-inline">Open map</span>
+                                </button>
+                            </div>
+
+                            <div class="ms-auto small text-muted d-none d-md-block pe-2">
+                                Tap the map to set coordinates. Use tools to draw areas or markers.
+                            </div>
                         </div>
 
                         <div class="mb-3">
-                            <div id="map" style="height:60vh;min-height:420px;border-radius:.75rem;"></div>
+                            <div id="map" style="height:56vh;min-height:360px;border-radius:.75rem;" role="application" aria-label="Map preview"></div>
                             <small class="text-muted d-block mt-1">
                                 Use the tools on the left to draw (polygon, line, rectangle, circle, marker). Tiles © OpenStreetMap contributors.
                             </small>
                         </div>
 
-                        <!-- Hidden field for drawn geometry -->
                         <input type="hidden" id="GeometryJson" name="GeometryJson" />
 
                         <div class="row g-3 mb-4">
                             <div class="col">
                                 <label asp-for="Latitude" class="form-label"></label>
-                                <input asp-for="Latitude" class="form-control" readonly type="text" />
+                                <input asp-for="Latitude" class="form-control" readonly type="text" id="Latitude" />
                                 <span asp-validation-for="Latitude" class="text-danger"></span>
                             </div>
                             <div class="col">
                                 <label asp-for="Longitude" class="form-label"></label>
-                                <input asp-for="Longitude" class="form-control" readonly type="text" />
+                                <input asp-for="Longitude" class="form-control" readonly type="text" id="Longitude" />
                                 <span asp-validation-for="Longitude" class="text-danger"></span>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" name="IsDraft" value="false" class="btn btn-primary btn-lg">Submit</button>
-                            <button type="submit" name="IsDraft" value="true" formnovalidate class="btn btn-outline-warning">Submit as Draft</button>
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back to Home</a>
+                            <button type="submit" name="IsDraft" value="false" class="btn btn-primary btn-lg rounded-pill">Submit</button>
+                            <button type="submit" name="IsDraft" value="true" formnovalidate class="btn btn-outline-warning rounded-pill">Submit as Draft</button>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill">Back to Home</a>
                         </div>
                     </form>
                 </div>
@@ -113,114 +126,342 @@
     </div>
 </div>
 
+@* Fullscreen/modal map with improved layout for iPad touch targets *@
+<div class="modal fade" id="mapModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content h-100">
+            <div class="modal-header border-0 bg-dark text-white d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <h5 class="modal-title text-white mb-0">Map — Fullscreen</h5>
+                    <button type="button" id="modal-use-position" class="btn btn-primary btn-sm rounded-pill d-flex align-items-center gap-2" aria-label="Use my position in fullscreen">
+                        <i class="bi bi-geo-alt-fill" aria-hidden="true"></i><span class="d-none d-sm-inline">Use my position</span>
+                    </button>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-light btn-sm rounded-circle modal-close-btn" data-bs-dismiss="modal" aria-label="Close fullscreen map">
+                        <i class="bi bi-x-lg" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-body p-0 bg-dark position-relative">
+                <div id="map-fullscreen" style="height:100vh; width:100%;" role="application" aria-label="Fullscreen map"></div>
+                <div id="fs-map-toast" class="fs-toast visually-hidden" role="status" aria-live="polite"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js" crossorigin="anonymous"></script>
+
     <script>
         (function () {
-          // --- Map ---
-          const map = L.map('map', { zoomControl: true }).setView([60.472, 8.4689], 5);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
-          }).addTo(map);
+            // Utility helpers
+            const el = id => document.getElementById(id) ?? null;
+            const hasDraw = !!(window.L && L.Control && L.Control.Draw);
 
-          // --- Draw layer + toolbar (left) ---
-          const drawnItems = new L.FeatureGroup(); map.addLayer(drawnItems);
-          if (L.Control && L.Control.Draw) {
-            const drawControl = new L.Control.Draw({
-              position: 'topleft',
-              draw: { polygon:true, polyline:true, rectangle:true, circle:true, marker:true, circlemarker:false },
-              edit: { featureGroup: drawnItems, remove:true }
-            });
-            map.addControl(drawControl);
-          }
+            // Elements
+            const geoInput = el('GeometryJson');
+            const latInput = el('Latitude');
+            const lngInput = el('Longitude');
+            const heightInput = el('HeightInputRaw');
+            const heightError = el('heightError');
+            const fsToast = el('fs-map-toast');
+            const mapModalEl = el('mapModal');
 
-          // --- Hidden GeoJSON field ---
-          const geoInput = document.getElementById('GeometryJson');
-          function updateGeoJson(){ geoInput.value = JSON.stringify(drawnItems.toGeoJSON()); }
-          map.on(L.Draw ? L.Draw.Event.CREATED : 'noop', e => { drawnItems.addLayer(e.layer); updateGeoJson(); });
-          map.on(L.Draw ? L.Draw.Event.EDITED : 'noop', updateGeoJson);
-          map.on(L.Draw ? L.Draw.Event.DELETED : 'noop', updateGeoJson);
+            // Formatters
+            const fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
 
-          // --- Lat/Lng inputs ---
-          const latInput = document.getElementById('Latitude');
-          const lngInput = document.getElementById('Longitude');
-          const fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
+            // Main map init
+            const map = L.map('map', { zoomControl: true }).setView([60.472, 8.4689], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-          // click-to-set point
-          let clickMarker = null;
-          function setPoint(latlng){
-            if (clickMarker) clickMarker.setLatLng(latlng);
-            else clickMarker = L.marker(latlng).addTo(map).bindPopup("Valgt posisjon");
-            latInput.value = fmt.format(latlng.lat);
-            lngInput.value = fmt.format(latlng.lng);
-          }
-          map.on('click', e => setPoint(e.latlng));
+            // Draw layer + control encapsulation
+            const drawnItems = new L.FeatureGroup();
+            map.addLayer(drawnItems);
 
-          // --- Geolocation with IP fallback ---
-          let lastLocation=null, myMarker=null, accCircle=null;
-
-          function onLocationFound(e){
-            lastLocation = e.latlng;
-
-            if (!myMarker) myMarker = L.marker(e.latlng, {title:"Din posisjon"}).addTo(map).bindPopup("Du er her");
-            else myMarker.setLatLng(e.latlng);
-
-            if (!accCircle) accCircle = L.circle(e.latlng, {radius: e.accuracy}).addTo(map);
-            else accCircle.setLatLng(e.latlng).setRadius(e.accuracy);
-
-            map.flyTo(e.latlng, 15);
-            setPoint(e.latlng);
-          }
-
-          async function locateByIP(){
-            try {
-              const r = await fetch('https://ipapi.co/json/');
-              const j = await r.json();
-              if (j?.latitude && j?.longitude) {
-                const ll = L.latLng(parseFloat(j.latitude), parseFloat(j.longitude));
-                onLocationFound({ latlng: ll, accuracy: 5000 });
-              } else {
-                alert("Kunne ikke hente IP-posisjon.");
-              }
-            } catch { alert("IP-posisjon feilet."); }
-          }
-
-          function locateWithFallback(){
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(
-                pos => onLocationFound({
-                  latlng: L.latLng(pos.coords.latitude, pos.coords.longitude),
-                  accuracy: pos.coords.accuracy
-                }),
-                _ => locateByIP(),
-                { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }
-              );
-            } else { locateByIP(); }
-          }
-
-          map.on('locationerror', _ => locateByIP());
-
-          document.getElementById('btn-locate').addEventListener('click', locateWithFallback);
-          document.getElementById('btn-drop-pin').addEventListener('click', () => {
-            if (!lastLocation) { locateWithFallback(); return; }
-            drawnItems.addLayer(L.marker(lastLocation).bindPopup("Nål: din posisjon"));
-            updateGeoJson();
-          });
-          document.getElementById('btn-clear').addEventListener('click', () => {
-            drawnItems.clearLayers(); updateGeoJson();
-          });
-
-          // init from existing inputs if present
-          (function initFromInputs(){
-            const lat = parseFloat((latInput?.value || '').toString().replace(',', '.'));
-            const lng = parseFloat((lngInput?.value || '').toString().replace(',', '.'));
-            if (!isNaN(lat) && !isNaN(lng)) {
-              const p = L.latLng(lat, lng);
-              setPoint(p);
-              map.setView(p, 14);
+            if (hasDraw) {
+                const drawControl = new L.Control.Draw({
+                    position: 'topleft',
+                    draw: { polygon:true, polyline:true, rectangle:true, circle:true, marker:true, circlemarker:false },
+                    edit: { featureGroup: drawnItems, remove:true }
+                });
+                map.addControl(drawControl);
             }
-          })();
+
+            function updateGeoJson() {
+                try {
+                    geoInput.value = JSON.stringify(drawnItems.toGeoJSON());
+                } catch (e) {
+                    geoInput.value = '';
+                    console.warn('Failed to serialize geometry', e);
+                }
+            }
+
+            if (hasDraw) {
+                map.on(L.Draw.Event.CREATED, e => { drawnItems.addLayer(e.layer); updateGeoJson(); });
+                map.on(L.Draw.Event.EDITED, e => updateGeoJson());
+                map.on(L.Draw.Event.DELETED, e => updateGeoJson());
+            }
+
+            // Lat/Lng click handling
+            let clickMarker = null;
+            function setPoint(latlng) {
+                if (clickMarker) clickMarker.setLatLng(latlng);
+                else clickMarker = L.marker(latlng).addTo(map).bindPopup("Selected position");
+                latInput.value = fmt.format(latlng.lat);
+                lngInput.value = fmt.format(latlng.lng);
+            }
+            map.on('click', e => setPoint(e.latlng));
+
+            // Geolocation with IP fallback (with basic status handling)
+            let lastLocation = null, myMarker = null, accCircle = null;
+
+            function onLocationFound(e) {
+                lastLocation = e.latlng;
+                if (!myMarker) myMarker = L.marker(e.latlng, { title: "Your position" }).addTo(map).bindPopup("You are here");
+                else myMarker.setLatLng(e.latlng);
+
+                if (!accCircle) accCircle = L.circle(e.latlng, { radius: e.accuracy || 1000 }).addTo(map);
+                else accCircle.setLatLng(e.latlng).setRadius(e.accuracy || 1000);
+
+                map.flyTo(e.latlng, 15);
+                setPoint(e.latlng);
+                showFsToast('Location found');
+            }
+
+            async function locateByIP() {
+                showFsToast('Locating by IP...');
+                try {
+                    const controller = new AbortController();
+                    const timeout = setTimeout(() => controller.abort(), 6000);
+                    const r = await fetch('https://ipapi.co/json/', { signal: controller.signal, cache: 'no-store' });
+                    clearTimeout(timeout);
+                    if (!r.ok) throw new Error('IP API error ' + r.status);
+                    const j = await r.json();
+                    if (j?.latitude && j?.longitude) {
+                        const ll = L.latLng(parseFloat(j.latitude), parseFloat(j.longitude));
+                        onLocationFound({ latlng: ll, accuracy: 5000 });
+                    } else {
+                        showFsToast('Could not retrieve IP location', true);
+                    }
+                } catch (err) {
+                    showFsToast('IP location failed', true);
+                }
+            }
+
+            function locateWithFallback() {
+                showFsToast('Requesting location...');
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        pos => onLocationFound({ latlng: L.latLng(pos.coords.latitude, pos.coords.longitude), accuracy: pos.coords.accuracy }),
+                        _ => locateByIP(),
+                        { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 }
+                    );
+                } else {
+                    locateByIP();
+                }
+            }
+            map.on('locationerror', _ => locateByIP());
+
+            // Buttons main view
+            const btnLocate = el('btn-locate');
+            const btnClear = el('btn-clear');
+            const btnOpenMap = el('btn-open-map');
+
+            if (btnLocate) btnLocate.addEventListener('click', locateWithFallback);
+            if (btnClear) btnClear.addEventListener('click', () => { drawnItems.clearLayers(); updateGeoJson(); showFsToast('Cleared drawings'); });
+
+            // Init from existing inputs and geometry
+            (function initFromInputs() {
+                const lat = parseFloat((latInput?.value || '').toString().replace(',', '.'));
+                const lng = parseFloat((lngInput?.value || '').toString().replace(',', '.'));
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const p = L.latLng(lat, lng);
+                    setPoint(p);
+                    map.setView(p, 14);
+                }
+                try {
+                    const existing = geoInput?.value;
+                    if (existing) {
+                        const geo = JSON.parse(existing);
+                        const tmp = L.geoJSON(geo);
+                        tmp.eachLayer(l => drawnItems.addLayer(l));
+                        updateGeoJson();
+                    }
+                } catch (e) { /* ignore parse errors */ }
+            })();
+
+            // ----------------------------
+            // Fullscreen / Enlarge handling
+            // ----------------------------
+            let fsMap = null;
+            let fsDrawnItems = null;
+
+            function copyGroup(sourceGroup, targetGroup) {
+                targetGroup.clearLayers();
+                sourceGroup.eachLayer(l => {
+                    try {
+                        const gj = l.toGeoJSON();
+                        L.geoJSON(gj).eachLayer(ml => targetGroup.addLayer(ml));
+                    } catch (e) {
+                        try { targetGroup.addLayer(l); } catch (_) { /* ignore */ }
+                    }
+                });
+            }
+
+            function showFsToast(text, isError) {
+                if (!fsToast) return;
+                fsToast.classList.remove('visually-hidden');
+                fsToast.textContent = text;
+                fsToast.style.background = isError ? 'rgba(220,53,69,0.95)' : 'rgba(0,0,0,0.6)';
+                fsToast.style.color = isError ? '#fff' : '#fff';
+                fsToast.style.padding = '8px 12px';
+                fsToast.style.borderRadius = '6px';
+                clearTimeout(fsToast._hideTimer);
+                fsToast._hideTimer = setTimeout(() => {
+                    if (fsToast) fsToast.classList.add('visually-hidden');
+                }, 2500);
+            }
+
+            if (mapModalEl) {
+                mapModalEl.addEventListener('shown.bs.modal', function () {
+                    // create fsMap once
+                    if (!fsMap) {
+                        fsMap = L.map('map-fullscreen', { zoomControl: true }).setView(map.getCenter(), map.getZoom());
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
+                        }).addTo(fsMap);
+
+                        fsDrawnItems = new L.FeatureGroup(); fsMap.addLayer(fsDrawnItems);
+                        if (hasDraw) {
+                            const fsDrawControl = new L.Control.Draw({
+                                position: 'topleft',
+                                draw: { polygon:true, polyline:true, rectangle:true, circle:true, marker:true, circlemarker:false },
+                                edit: { featureGroup: fsDrawnItems, remove:true }
+                            });
+                            fsMap.addControl(fsDrawControl);
+
+                            fsMap.on(L.Draw.Event.CREATED, e => { fsDrawnItems.addLayer(e.layer); });
+                            fsMap.on(L.Draw.Event.EDITED, e => {});
+                            fsMap.on(L.Draw.Event.DELETED, e => {});
+                        }
+
+                        // clicking on fsMap sets the main inputs and main map marker
+                        fsMap.on('click', function (e) {
+                            const latlng = e.latlng;
+                            latInput.value = fmt.format(latlng.lat);
+                            lngInput.value = fmt.format(latlng.lng);
+                            if (fsMap._clickMarker) fsMap._clickMarker.setLatLng(latlng);
+                            else fsMap._clickMarker = L.marker(latlng).addTo(fsMap).bindPopup("Selected position");
+                            setPoint(latlng); // also set on main map
+                        });
+                    }
+
+                    // copy geometry from main drawnItems into fsDrawnItems (recreate)
+                    copyGroup(drawnItems, fsDrawnItems);
+
+                    // sync view
+                    fsMap.setView(map.getCenter(), map.getZoom());
+                    setTimeout(()=> fsMap.invalidateSize(), 120);
+
+                    // move keyboard focus to close button for accessibility
+                    const closeBtn = mapModalEl.querySelector('.modal-close-btn');
+                    if (closeBtn) closeBtn.focus();
+                });
+
+                mapModalEl.addEventListener('hidden.bs.modal', function () {
+                    if (fsDrawnItems) {
+                        drawnItems.clearLayers();
+                        copyGroup(fsDrawnItems, drawnItems);
+                        updateGeoJson();
+                    }
+                    setTimeout(()=> map.invalidateSize(), 120);
+
+                    // return focus to open map button
+                    const openBtn = el('btn-open-map');
+                    if (openBtn) openBtn.focus();
+                });
+            }
+
+            // Use my position inside modal
+            const modalUseBtn = el('modal-use-position');
+            if (modalUseBtn) {
+                modalUseBtn.addEventListener('click', () => {
+                    const success = (pos) => {
+                        const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+                        if (fsMap) {
+                            if (!fsMap._youMarker) fsMap._youMarker = L.marker(latlng, { title: "Your position" }).addTo(fsMap).bindPopup("You are here");
+                            else fsMap._youMarker.setLatLng(latlng);
+                            fsMap.flyTo(latlng, 15);
+                        }
+                        onLocationFound({ latlng: latlng, accuracy: pos.coords.accuracy || 1000 });
+                    };
+                    const failure = () => locateByIP();
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(success, failure, { enableHighAccuracy: true, timeout: 7000, maximumAge: 0 });
+                    } else {
+                        locateByIP();
+                    }
+                });
+            }
+
+            // Height input validation + conversion before submit
+            function parseHeightInput() {
+                const raw = (heightInput?.value || '').toString().trim().replace(',', '.');
+                if (!raw) return { ok: true, value: null };
+                const n = Number(raw);
+                if (isNaN(n)) return { ok: false, message: 'Height not a number' };
+                if (@(User.IsInRole("Pilot") ? "true" : "false")) {
+                    // user entered feet -> convert to meters
+                    const meters = (n * 0.3048);
+                    return { ok: true, value: meters };
+                } else {
+                    // entered meters
+                    if (n < 0) return { ok: false, message: 'Height must be positive' };
+                    return { ok: true, value: n };
+                }
+            }
+
+            const form = el('obstacle-form');
+            if (form) {
+                form.addEventListener('submit', function (ev) {
+                    // client-side validate/convert height
+                    const res = parseHeightInput();
+                    if (!res.ok) {
+                        ev.preventDefault();
+                        if (heightError) {
+                            heightError.classList.remove('visually-hidden');
+                            heightError.textContent = res.message;
+                        }
+                        heightInput.focus();
+                        return;
+                    } else {
+                        if (heightError) { heightError.classList.add('visually-hidden'); heightError.textContent = ''; }
+                        // set the actual ObstacleHeight field if conversion needed by adding/updating a hidden input
+                        const hiddenName = 'ObstacleHeight';
+                        let hidden = document.querySelector('input[name="' + hiddenName + '"]');
+                        if (!hidden) {
+                            hidden = document.createElement('input');
+                            hidden.type = 'hidden';
+                            hidden.name = hiddenName;
+                            form.appendChild(hidden);
+                        }
+                        hidden.value = res.value ?? '';
+                    }
+
+                    // ensure geometry is up to date before submit
+                    updateGeoJson();
+                });
+            }
+
         })();
     </script>
 
@@ -229,23 +470,96 @@
         <script>
             const input = document.getElementById("ObstacleNameInput");
             const prefix = "MISSING - ";
-            input.addEventListener("keydown", (e) => {
-                const c = input.selectionStart;
-                if ((e.key === "Backspace" && c <= prefix.length) ||
-                    (e.key === "Delete" && c < prefix.length)) e.preventDefault();
-            });
-            input.addEventListener("input", () => {
-                if (!input.value.startsWith(prefix)) {
-                    const suffix = input.value.replace(prefix, "");
-                    input.value = prefix + suffix;
-                    input.setSelectionRange(prefix.length, prefix.length);
-                }
-            });
-            input.addEventListener("focus", () => {
-                if (input.selectionStart < prefix.length) {
-                    input.setSelectionRange(prefix.length, prefix.length);
-                }
-            });
+            if (input) {
+                input.addEventListener("keydown", (e) => {
+                    const c = input.selectionStart;
+                    if ((e.key === "Backspace" && c <= prefix.length) ||
+                        (e.key === "Delete" && c < prefix.length)) e.preventDefault();
+                });
+                input.addEventListener("input", () => {
+                    if (!input.value.startsWith(prefix)) {
+                        const suffix = input.value.replace(prefix, "");
+                        input.value = prefix + suffix;
+                        input.setSelectionRange(prefix.length, prefix.length);
+                    }
+                });
+                input.addEventListener("focus", () => {
+                    if (input.selectionStart < prefix.length) {
+                        input.setSelectionRange(prefix.length, prefix.length);
+                    }
+                });
+            }
         </script>
     }
 }
+
+<style>
+    /* Visual polish: pill buttons and larger touch targets for iPad */
+    .btn-primary {
+        border-radius: 999px;
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        font-size: 1rem;
+    }
+
+    .btn-outline-secondary, .btn-outline-danger {
+        border-radius: 999px;
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .card {
+        border: 0.5px solid rgba(0,0,0,0.02);
+    }
+
+    #map, #map-fullscreen {
+        border-radius: .75rem;
+    }
+
+    /* Fullscreen modal header: keep close button on right and Make 'Use my position' separated on left */
+    .modal-header .modal-close-btn {
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+
+    /* Make group buttons easier to tap on iPad */
+    .map-action-group .btn {
+        min-width: 56px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Small toast for fs map */
+    .fs-toast {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 6000;
+        pointer-events: none;
+        transition: opacity 160ms ease-in-out;
+    }
+
+    /* Accessibility helpers */
+    .visually-hidden {
+        position: absolute !important;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+        clip: rect(1px, 1px, 1px, 1px);
+        white-space: nowrap;
+        border: 0;
+        padding: 0;
+        margin: -1px;
+    }
+</style>

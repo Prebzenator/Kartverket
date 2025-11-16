@@ -3,66 +3,110 @@
     ViewData["Title"] = "Obstacle";
 }
 
-<section class="bg-body-tertiary border-bottom">
-    <div class="container py-5">
-        <div class="row justify-content-center text-center">
-            <div class="col-12 col-lg-8">
-
-                <div class="mb-4">
-                    <img src="~/images/Kartverket-logoutentekst.png" alt="Kartverket logo" class="img-fluid" style="max-height: 100px;" />
-                    <h2 class="mt-2 fw-semibold">Kartverket</h2>
+<section class="bg-gradient py-5" style="background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);">
+    <div class="container py-4">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 mb-4 mb-md-0 text-center text-md-start">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="~/images/Kartverket-logoutentekst.png" alt="Kartverket logo" class="img-fluid" style="max-height:72px;" />
+                    <div>
+                        <h2 class="h5 mb-0 fw-semibold">Kartverket</h2>
+                        <p class="text-muted small mb-0">Nasjonalt register over luftfartshindre</p>
+                    </div>
                 </div>
 
-                <h1 class="display-5 mb-3 fw-semibold">Register aviation obstacles</h1>
-                <p class="lead text-muted mb-4">
-                    Ensure safe navigation by reporting new or missing obstacles.
-                </p>
+                <h1 class="display-6 mt-4 mb-3 fw-semibold">Report aviation obstacles quickly and safely</h1>
+                <p class="lead text-muted mb-4">Help keep low-altitude flights safe — report new or missing obstacles with location, type and optional photo.</p>
 
-                @* Admin button (ONLY for System Administrators) *@
-                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("System Administrator"))
-                {
-                    <div class="mb-4">
-                        <a asp-controller="Admin" asp-action="CreateUser" class="btn btn-outline-primary">
-                            <i class="bi bi-person-plus"></i> Admin: Create user
-                        </a>
-                    </div>
-                }
-
-                <div class="d-grid gap-3 d-sm-flex justify-content-center">
+                <div class="d-flex flex-column flex-sm-row gap-2">
                     <a asp-action="DataForm" asp-controller="Obstacle"
-                       class="btn btn-primary btn-lg d-flex align-items-center gap-2">
-                        <i class="bi bi-plus-circle"></i> <span>Report new obstacle</span>
+                       class="btn btn-primary btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Report new obstacle">
+                        <i class="bi bi-plus-circle"></i><span>Report new obstacle</span>
                     </a>
 
                     <a href="/Obstacle/DataForm?missing=true"
-                       class="btn btn-outline-primary btn-lg d-flex align-items-center gap-2">
-                        <i class="bi bi-search"></i> <span>Report missing obstacle</span>
+                       class="btn btn-outline-primary btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Report missing obstacle">
+                        <i class="bi bi-search"></i><span>Report missing obstacle</span>
                     </a>
 
                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
                     {
                         <a asp-controller="Pilot" asp-action="Log"
-                           class="btn btn-outline-success btn-lg d-flex align-items-center gap-2">
-                            <i class="bi bi-journal-text"></i> <span>Reports</span>
+                           class="btn btn-outline-info btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Reports">
+                            <i class="bi bi-journal-text"></i><span>Reports</span>
                         </a>
                     }
                 </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+                @* Lite preview-kart for kontekst; interaktivt men lettvektsinitialisering *@
+                <div id="hero-map" style="height:240px; border-radius:.75rem; box-shadow:0 6px 18px rgba(16,24,40,0.06);"></div>
+                <small class="text-muted d-block mt-2">Map preview. Click "Report new obstacle" to open full map tools.</small>
             </div>
         </div>
     </div>
 </section>
 
-<div class="container py-4">
-    <div class="row justify-content-center">
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">What to report</h5>
+                    <p class="card-text text-muted mb-0">Tall structures, power lines and other man-made objects that pose a hazard—normally &gt;15 m (30 m in dense areas).</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Why it matters</h5>
+                    <p class="card-text text-muted mb-0">Accurate obstacle data helps pilots, air ambulance and emergency services plan safer routes.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">How reviews work</h5>
+                    <p class="card-text text-muted mb-0">Submissions are reviewed by Kartverket. You may be contacted for clarification; approved items go into the national register.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
         <div class="col-12 col-lg-8 text-center">
-            <p class="text-muted">
-                Learn more about building Web apps with ASP.NET Core at
-                <a href="https://learn.microsoft.com/aspnet/core" target="_blank" rel="noopener">Microsoft Learn</a>.
-            </p>
             @if (!string.IsNullOrWhiteSpace(Model))
             {
-                <p class="small text-muted">@Model</p>
+                <p class="small text-muted mb-0">@Model</p>
             }
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            try {
+                const map = L.map('hero-map', { zoomControl: false, dragging: true }).setView([60.472, 8.4689], 5);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '' }).addTo(map);
+
+                // subtle hint markers — not loaded from server, just illustrative
+                const sample = [
+                    [59.91, 10.75],
+                    [63.43, 10.4],
+                    [58.97, 5.73]
+                ];
+                sample.forEach(c => L.circleMarker(c, { radius: 6, color: '#0d6efd', fillColor: '#0d6efd', fillOpacity: 0.85 }).addTo(map));
+            } catch (e) {
+                // Leaflet not available or map init failed — fail silently
+                console.warn('Hero map init failed', e);
+            }
+        })();
+    </script>
+}
