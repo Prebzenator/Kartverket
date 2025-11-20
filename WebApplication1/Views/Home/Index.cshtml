@@ -16,7 +16,7 @@
                 </div>
 
                 <h1 class="display-6 mt-4 mb-3 fw-semibold">Report aviation obstacles quickly and safely</h1>
-                <p class="lead text-muted mb-4">Help keep low-altitude flights safe — report new or missing obstacles with location, type and optional photo.</p>
+                <p class="lead text-muted mb-4">Help keep low-altitude flights safe — report new or missing obstacles with location, type and description.</p>
 
                 <div class="d-flex flex-column flex-sm-row gap-2">
                     <a asp-action="DataForm" asp-controller="Obstacle"
@@ -25,7 +25,7 @@
                     </a>
 
                     <a href="/Obstacle/DataForm?missing=true"
-                       class="btn btn-outline-primary btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Report missing obstacle">
+                       class="btn btn-missing btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Report missing obstacle">
                         <i class="bi bi-search"></i><span>Report missing obstacle</span>
                     </a>
 
@@ -87,6 +87,29 @@
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        /* Hvit-aktig "missing" knapp — god kontrast, tydelig kant og subtile hover-effekter */
+        .btn-missing {
+            background: #ffffff; /* hvit-aktig */
+            color: #0f1724; /* mørk tekst for kontrast */
+            border: 1px solid #d1d5db; /* lys grå kant for å skille */
+            box-shadow: 0 2px 6px rgba(2,6,23,0.06);
+        }
+
+            .btn-missing:hover, .btn-missing:focus {
+                background: #f8fafc; /* veldig lys skjermtoning ved hover */
+                color: #0b1220;
+                border-color: #c7cbd1;
+                text-decoration: none;
+            }
+
+            .btn-missing:active {
+                box-shadow: 0 1px 3px rgba(2,6,23,0.08) inset;
+            }
+    </style>
+}
 
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>

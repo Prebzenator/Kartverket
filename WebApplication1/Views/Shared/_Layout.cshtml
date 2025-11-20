@@ -34,6 +34,9 @@
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+
+    @* Render optional page-specific Styles section to avoid InvalidOperationException *@
+    @RenderSection("Styles", required: false)
 </head>
 <body class="bg-body">
     <header class="border-bottom bg-body">
@@ -91,13 +94,6 @@
                                 </a>
                             </li>
                         }
-                        @*Removed privacy button when its not in use.*@
-                        @*<li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-1"
-                               asp-area="" asp-controller="Home" asp-action="Privacy">
-                                <i class="bi bi-shield-lock"></i><span>Privacy</span>
-                            </a>
-                        </li>*@
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
@@ -146,7 +142,10 @@
                         }
                         else
                         {
-                            <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Log in</a>
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-outline-primary" asp-controller="Account" asp-action="Login">Log in</a>
+                                <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Register</a>
+                            </div>
                         }
                     </div>
                 </div>
@@ -221,6 +220,7 @@
         })();
     </script>
 
+    @* Render optional per-page scripts *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
