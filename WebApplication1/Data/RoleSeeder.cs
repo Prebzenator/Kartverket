@@ -79,12 +79,8 @@ namespace WebApplication1.Data
                     needsUpdate = true;
                 }
 
-                // Hvis admin allerede finnes, men MustChangePassword ikke er satt, kan vi sette det
-                if (!admin.MustChangePassword)
-                {
-                    admin.MustChangePassword = true;
-                    needsUpdate = true;
-                }
+                // REMOVED: The block that forced MustChangePassword = true on every restart.
+                // This prevents the loop where admin is forced to change password repeatedly.
 
                 if (needsUpdate)
                 {

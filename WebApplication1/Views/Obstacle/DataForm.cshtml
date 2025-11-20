@@ -47,12 +47,12 @@
 
                             <input name="HeightInputRaw" id="HeightInputRaw" class="form-control"
                                    value="@(User.IsInRole("Pilot")
-                                                                                                                                                      ? (Model?.ObstacleHeight.HasValue == true
-                                                                                                                                                             ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
-                                                                                                                                                             : string.Empty)
-                                                                                                                                                      : (Model?.ObstacleHeight.HasValue == true
-                                                                                                                                                             ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
-                                                                                                                                                             : string.Empty))"
+                                                                                                                                   ? (Model?.ObstacleHeight.HasValue == true
+                                                                                                                                       ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
+                                                                                                                                       : string.Empty)
+                                                                                                          : (Model?.ObstacleHeight.HasValue == true
+                                                                                                                                   ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
+                                                                                                                                                          : string.Empty))"
                                    placeholder="e.g., @(User.IsInRole("Pilot") ? "100" : "1.25")" aria-describedby="heightHelp" />
 
                             <div id="heightHelp" class="form-text">
@@ -70,7 +70,6 @@
                             <span asp-validation-for="ObstacleDescription" class="text-danger"></span>
                         </div>
 
-                        <!-- Controls + Map -->
                         <div class="mb-2 d-flex flex-wrap gap-2 align-items-center control-row">
                             <div class="btn-group btn-group-lg map-action-group" role="group" aria-label="Map controls">
                                 <button type="button" id="btn-locate" class="btn btn-primary d-flex align-items-center gap-2" aria-label="Use my position">
@@ -147,7 +146,7 @@
             </div>
 
             <div class="modal-body p-0 bg-dark position-relative">
-                <div id="map-fullscreen" style="height:100vh; width:100%;" role="application" aria-label="Fullscreen map"></div>
+                <div id="map-fullscreen" style="height:100vh;width:100%;" role="application" aria-label="Fullscreen map"></div>
                 <div id="fs-map-toast" class="fs-toast visually-hidden" role="status" aria-live="polite"></div>
             </div>
         </div>
@@ -264,13 +263,11 @@
 
             // Formatters
             const fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
-
             // Main map init
             const map = L.map('map', { zoomControl: true }).setView([60.472, 8.4689], 5);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
-
             // Draw layer + control encapsulation
             const drawnItems = new L.FeatureGroup();
             map.addLayer(drawnItems);
@@ -308,15 +305,12 @@
                 lngInput.value = fmt.format(latlng.lng);
             }
             map.on('click', e => setPoint(e.latlng));
-
             // Geolocation with IP fallback (with basic status handling)
             let lastLocation = null, myMarker = null, accCircle = null;
-
             function onLocationFound(e) {
                 lastLocation = e.latlng;
                 if (!myMarker) myMarker = L.marker(e.latlng, { title: "Your position" }).addTo(map).bindPopup("You are here");
                 else myMarker.setLatLng(e.latlng);
-
                 if (!accCircle) accCircle = L.circle(e.latlng, { radius: e.accuracy || 1000 }).addTo(map);
                 else accCircle.setLatLng(e.latlng).setRadius(e.accuracy || 1000);
 
@@ -358,7 +352,6 @@
                 }
             }
             map.on('locationerror', _ => locateByIP());
-
             // Buttons main view
             const btnLocate = el('btn-locate');
             const btnClear = el('btn-clear');
@@ -366,7 +359,6 @@
 
             if (btnLocate) btnLocate.addEventListener('click', locateWithFallback);
             if (btnClear) btnClear.addEventListener('click', () => { drawnItems.clearLayers(); updateGeoJson(); showFsToast('Cleared drawings'); });
-
             // Init from existing inputs and geometry
             (function initFromInputs() {
                 const lat = parseFloat((latInput?.value || '').toString().replace(',', '.'));
@@ -386,7 +378,6 @@
                     }
                 } catch (e) { /* ignore parse errors */ }
             })();
-
             // ----------------------------
             // Fullscreen / Enlarge handling
             // ----------------------------
@@ -434,7 +425,6 @@
                                 edit: { featureGroup: fsDrawnItems, remove:true }
                             });
                             fsMap.addControl(fsDrawControl);
-
                             fsMap.on(L.Draw.Event.CREATED, e => { fsDrawnItems.addLayer(e.layer); });
                             fsMap.on(L.Draw.Event.EDITED, e => {});
                             fsMap.on(L.Draw.Event.DELETED, e => {});
@@ -455,7 +445,6 @@
 
                     // copy geometry from main drawnItems into fsDrawnItems (recreate)
                     copyGroup(drawnItems, fsDrawnItems);
-
                     // sync view
                     fsMap.setView(map.getCenter(), map.getZoom());
                     setTimeout(()=> fsMap.invalidateSize(), 120);
@@ -651,4 +640,3 @@
         margin: -1px;
     }
 </style>
-
