@@ -141,6 +141,8 @@ namespace WebApplication1.Controllers
                 await _userManager.UpdateAsync(user);
                 await _signInManager.RefreshSignInAsync(user);
 
+                // UPDATED: Success message
+                TempData["SuccessMessage"] = "Password changed successfully.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -174,6 +176,9 @@ namespace WebApplication1.Controllers
             if (result.Succeeded)
             {
                 await _signInManager.RefreshSignInAsync(user);
+
+                // UPDATED: Success message
+                TempData["SuccessMessage"] = "Password changed successfully.";
                 return RedirectToAction("Index", "Home");
             }
 

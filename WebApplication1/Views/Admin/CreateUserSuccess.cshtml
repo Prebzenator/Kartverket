@@ -15,10 +15,18 @@
                 </p>
             </div>
 
-            <div class="card p-3 shadow-sm">
-                <p><strong>Temporary password (for demo only):</strong></p>
-                <p class="mb-0"><code>@Model.TempPassword</code></p>
-                <p class="small text-muted mt-3">Share this password with the user. On first login they can change it in a profile page (not implemented in the mockup).</p>
+            <div class="alert alert-warning rounded-4 shadow-sm border-warning">
+                <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill"></i> Action Required</h5>
+                <p class="mb-2">Please copy the temporary password below and send it to the user immediately.</p>
+
+                <div class="bg-white p-3 rounded border d-flex align-items-center justify-content-between">
+                    <code class="fs-5 text-dark">@Model.TempPassword</code>
+                    <span class="badge bg-secondary">Temporary</span>
+                </div>
+
+                <p class="mb-0 mt-2 small">
+                    <strong>Note:</strong> This password will <em>not</em> be shown again. The user will be asked to change it upon first login.
+                </p>
             </div>
 
             <div class="mt-3">
