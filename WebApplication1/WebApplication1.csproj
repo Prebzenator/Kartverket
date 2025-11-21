@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>WebApplication1</RootNamespace>
 		<AssemblyName>WebApplication1</AssemblyName>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
 		<Deterministic>true</Deterministic>
 		<EnablePreviewFeatures>false</EnablePreviewFeatures>
 	  <UserSecretsId>79918d8e-b9ab-4e78-8c87-b11ba2bb8559</UserSecretsId>

@@ -109,7 +109,7 @@ namespace WebApplication1.Controllers
                 }
             }
 
-            ObstacleData obstacledata;
+            ObstacleData? obstacledata;
 
             if (id.HasValue && id.Value > 0)
             {
@@ -124,12 +124,12 @@ namespace WebApplication1.Controllers
                 }
 
                 // Update all editable fields from the form
-                obstacledata.ObstacleName = form["ObstacleName"];
+                obstacledata.ObstacleName = form["ObstacleName"].ToString() ?? string.Empty;
 
                 // If user provided a height input we use the parsed/converted value, otherwise keep existing
                 obstacledata.ObstacleHeight = heightMetersFromInput ?? obstacledata.ObstacleHeight;
 
-                obstacledata.ObstacleDescription = form["ObstacleDescription"];
+                obstacledata.ObstacleDescription = form["ObstacleDescription"].FirstOrDefault();
                 obstacledata.Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : obstacledata.Latitude;
                 obstacledata.Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : obstacledata.Longitude;
 
@@ -147,7 +147,7 @@ namespace WebApplication1.Controllers
                 // ===== CREATING NEW REPORT =====
                 obstacledata = new ObstacleData
                 {
-                    ObstacleName = form["ObstacleName"],
+                    ObstacleName = form["ObstacleName"].FirstOrDefault() ?? string.Empty,
                     // Use converted meters (may be null if no input)
                     ObstacleHeight = heightMetersFromInput,
                     ObstacleDescription = form["ObstacleDescription"],
@@ -231,7 +231,7 @@ namespace WebApplication1.Controllers
         [Authorize(Roles = "Registry Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int id, ReportStatus status)
+        public IActionResult UpdateStatus(int id, ReportStatus status)
         {
             // Redirect to dashboard - actual approve/reject logic is in AdminObstacleController
             return RedirectToAction("Dashboard", "AdminObstacle");

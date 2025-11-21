@@ -66,7 +66,7 @@ namespace WebApplication1.Controllers
     string filterStatus = "all",
     string filterOrg = "all",
     string filterCategory = "all",
-    string q = null)
+    string? q = null)
         {
             // Baseline query — include Category so navigation property is populated
             var query = _context.Obstacles
@@ -78,7 +78,7 @@ namespace WebApplication1.Controllers
             if (!string.IsNullOrWhiteSpace(q))
             {
                 var qTrim = q.Trim();
-                query = query.Where(o => o.ObstacleName.Contains(qTrim) || o.ReporterName.Contains(qTrim));
+                query = query.Where(o => o.ObstacleName.Contains(qTrim) || (o.ReporterName != null && o.ReporterName.Contains(qTrim)));
             }
 
             // Apply status filter when requested
@@ -90,7 +90,8 @@ namespace WebApplication1.Controllers
             // Organization filter
             if (filterOrg != "all")
             {
-                query = query.Where(o => o.ReporterOrganization == filterOrg);
+                // This ensures we only get reports with a non-null organization matching the filter
+                query = query.Where(o => o.ReporterOrganization != null && o.ReporterOrganization == filterOrg);
             }
 
             // Category filter: support "all", "uncategorized" (CategoryId == null) or categoryId as int
