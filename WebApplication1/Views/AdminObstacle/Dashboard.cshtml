@@ -6,8 +6,10 @@
     ViewData["Title"] = "Admin Dashboard";
 
     // Read categories from ViewBag (DB categories only)
-    var rawCategories = (ViewBag.Categories as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>()).ToList();
-    var categories = rawCategories.Where(c => (int)c.Id != 0).ToList();
+    var rawCategories = (ViewBag.Categories as IEnumerable<dynamic>) ?? Enumerable.Empty<dynamic>();
+    var categories = rawCategories
+        .Where(c => c != null && (c?.Id != null) && ((int?)c?.Id ?? 0) != 0)
+        .ToList();
 
     // Preferred exact order
     var preferredOrder = new[]
@@ -21,20 +23,20 @@
 
     // Build ordered categories: preferred first, then remaining alphabetically
     var ordered = preferredOrder
-        .Select(name => categories.FirstOrDefault(c => string.Equals((string)c.Name, name, StringComparison.OrdinalIgnoreCase)))
+        .Select(name => categories.FirstOrDefault(c => c != null && string.Equals((string?)c?.Name, name, StringComparison.OrdinalIgnoreCase)))
         .Where(c => c != null)
         .ToList();
 
     var remaining = categories
-        .Where(c => !ordered.Any(o => (int)o.Id == (int)c.Id))
-        .OrderBy(c => (string)c.Name)
+        .Where(c => !ordered.Any(o => o != null && ((int?)o?.Id ?? 0) == ((int?)c?.Id ?? 0)))
+        .OrderBy(c => (string?)c?.Name)
         .ToList();
 
     ordered.AddRange(remaining);
     var orderedCategories = ordered;
 
     // Administrators list from ViewBag (used to display assigned user if available)
-    var admins = (ViewBag.Administrators as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>()).ToList();
+    var admins = (ViewBag.Administrators as IEnumerable<dynamic>) ?? Enumerable.Empty<dynamic>();
 
     string DashOr(string? text) => string.IsNullOrWhiteSpace(text) ? "—" : text;
 }
@@ -139,7 +141,7 @@
                 <div class="col-lg-2 col-md-3">
                     <label class="form-label">Status</label>
                     <select name="filterStatus" class="form-select">
-                        @if (Model.CurrentStatusFilter == "all")
+                        @if (Model?.CurrentStatusFilter == "all")
                         {
                             <option value="all" selected>All</option>
                         }
@@ -148,7 +150,7 @@
                             <option value="all">All</option>
                         }
 
-                        @if (Model.CurrentStatusFilter == "Pending")
+                        @if (Model?.CurrentStatusFilter == "Pending")
                         {
                             <option value="Pending" selected>Pending</option>
                         }
@@ -157,7 +159,7 @@
                             <option value="Pending">Pending</option>
                         }
 
-                        @if (Model.CurrentStatusFilter == "Approved")
+                        @if (Model?.CurrentStatusFilter == "Approved")
                         {
                             <option value="Approved" selected>Approved</option>
                         }
@@ -166,7 +168,7 @@
                             <option value="Approved">Approved</option>
                         }
 
-                        @if (Model.CurrentStatusFilter == "NotApproved")
+                        @if (Model?.CurrentStatusFilter == "NotApproved")
                         {
                             <option value="NotApproved" selected>Rejected</option>
                         }
@@ -180,7 +182,7 @@
                 <div class="col-lg-2 col-md-3">
                     <label class="form-label">Organization</label>
                     <select name="filterOrg" class="form-select">
-                        @if (Model.CurrentOrgFilter == "all")
+                        @if (Model?.CurrentOrgFilter == "all")
                         {
                             <option value="all" selected>All</option>
                         }
@@ -189,7 +191,7 @@
                             <option value="all">All</option>
                         }
 
-                        @if (Model.Organizations != null)
+                        @if (Model?.Organizations != null)
                         {
                             foreach (var org in Model.Organizations.OrderBy(o => o))
                             {
@@ -209,7 +211,7 @@
                 <div class="col-lg-2 col-md-3">
                     <label class="form-label">Category</label>
                     <select name="filterCategory" class="form-select">
-                        @if (Model.CurrentCategoryFilter == "all")
+                        @if (Model?.CurrentCategoryFilter == "all")
                         {
                             <option value="all" selected>All categories</option>
                         }
@@ -218,7 +220,7 @@
                             <option value="all">All categories</option>
                         }
 
-                        @if (Model.CurrentCategoryFilter == "uncategorized")
+                        @if (Model?.CurrentCategoryFilter == "uncategorized")
                         {
                             <option value="uncategorized" selected>Uncategorized</option>
                         }
@@ -228,16 +230,18 @@
                         }
 
                         @foreach (var c in orderedCategories)
-                        {
-                            if (Model.CurrentCategoryFilter == c.Id.ToString())
-                            {
-                                <option value="@c.Id" selected>@c.Name</option>
-                            }
-                            else
-                            {
-                                <option value="@c.Id">@c.Name</option>
-                            }
-                        }
+{
+    var cIdStr = c?.Id?.ToString();
+    var cName = c?.Name ?? string.Empty;
+    if (Model?.CurrentCategoryFilter == cIdStr)
+    {
+        <option value="@(c?.Id ?? 0)" selected>@(string.IsNullOrEmpty(cName) ? "—" : cName)</option>
+    }
+    else
+    {
+        <option value="@(c?.Id ?? 0)">@(string.IsNullOrEmpty(cName) ? "—" : cName)</option>
+    }
+}
                     </select>
                 </div>
 
@@ -245,7 +249,7 @@
                     <button type="submit" class="btn btn-primary">Apply</button>
                     <a asp-action="Dashboard" class="btn btn-outline-secondary">Clear</a>
                     <div class="ms-auto">
-                        <small class="text-muted">Results: <strong>@(Model.Reports?.Count() ?? 0)</strong></small>
+                        <small class="text-muted">Results: <strong>@(Model?.Reports?.Count() ?? 0)</strong></small>
                     </div>
                 </div>
 
@@ -283,7 +287,7 @@
                             foreach (var report in Model.Reports)
                             {
                                 // Determine category name
-                                string catName = null;
+                                string? catName = null;
                                 if (report.Category != null && !string.IsNullOrEmpty(report.Category.Name))
                                 {
                                     catName = report.Category.Name;
@@ -294,18 +298,27 @@
                                 }
                                 else
                                 {
-                                    var match = orderedCategories.FirstOrDefault(c => (int)c.Id == report.CategoryId);
+                                    var match = orderedCategories.FirstOrDefault(c => c != null && (int?)(c?.Id) == report.CategoryId);
                                     if (match != null) { catName = match.Name; }
                                 }
 
                                 // Determine assigned user display (show assigned person if any, otherwise "Not assigned")
-                                string assignedDisplay;
+                                string assignedDisplay = "Not assigned";
+
                                 if (!string.IsNullOrWhiteSpace(report.AssignedToUserId))
                                 {
-                                    var foundAdmin = admins.FirstOrDefault(a => (string)a.Id == (string)report.AssignedToUserId);
+                                    var foundAdmin = admins.FirstOrDefault(a =>
+                                        a != null &&
+                                        a?.Id != null &&
+                                        report.AssignedToUserId != null &&
+                                        string.Equals((string?)(a?.Id), (string?)report.AssignedToUserId, StringComparison.Ordinal)
+                                    );
                                     if (foundAdmin != null)
                                     {
-                                        assignedDisplay = (string?)foundAdmin.FullName ?? (string?)foundAdmin.Email ?? (report.AssignedToName ?? "Not assigned");
+                                        // Safely get properties from dynamic object
+                                        string? fn = (string?)foundAdmin.FullName;
+                                        string? em = (string?)foundAdmin.Email;
+                                        assignedDisplay = fn ?? em ?? report.AssignedToName ?? "Not assigned";
                                     }
                                     else
                                     {
@@ -315,10 +328,6 @@
                                 else if (!string.IsNullOrWhiteSpace(report.AssignedToName))
                                 {
                                     assignedDisplay = report.AssignedToName;
-                                }
-                                else
-                                {
-                                    assignedDisplay = "Not assigned";
                                 }
 
                                 <tr>

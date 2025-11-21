@@ -8,14 +8,14 @@ namespace WebApplication1.ViewModels
         [Required]
         [EmailAddress]
         [Display(Name = "Email address")]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty; 
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        public bool RememberMe { get; set; } 
 
         // Optional returnUrl so Login redirects back to the originally requested page.
         public string? ReturnUrl { get; set; }
