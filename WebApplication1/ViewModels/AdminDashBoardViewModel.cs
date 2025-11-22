@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using WebApplication1.Models;
+﻿using WebApplication1.Models;
 
 namespace WebApplication1.ViewModels
 {
@@ -12,12 +11,9 @@ namespace WebApplication1.ViewModels
         public List<ApplicationUser> Administrators { get; set; } = new();
         public List<string?> Organizations { get; set; } = new();
 
-        // Current filter/sort state
         public string CurrentSort { get; set; } = "date";
         public string CurrentStatusFilter { get; set; } = "all";
         public string CurrentOrgFilter { get; set; } = "all";
-
-        // Added: category filter and search query used by dashboard view
         public string CurrentCategoryFilter { get; set; } = "all";
         public string? Query { get; set; }
 

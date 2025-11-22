@@ -2,8 +2,9 @@
 
 namespace WebApplication1.ViewModels
 {
-    // ViewModel used by the Register.cshtml form.
-    // Keeps form-specific fields separate from domain models.
+    /// <summary>
+    /// ViewModel for the user registration form.
+    /// </summary>
     public class RegisterViewModel
     {
         [Required]
@@ -29,6 +30,6 @@ namespace WebApplication1.ViewModels
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
-        public string ConfirmPassword { get; set; } = string.Empty; 
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 }
