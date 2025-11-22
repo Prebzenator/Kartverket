@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using System.Threading.Tasks;
 using WebApplication1.Models;
 using WebApplication1.ViewModels;
 
 namespace WebApplication1.Controllers
 {
     /// <summary>
-    /// AccountController: Register, Login, Logout, ForceChangePassword, ChangePassword.
-    /// Public registration can be toggled via config.
+    /// Manages user registration, login, logout, and password changes.
     /// </summary>
     public class AccountController : Controller
     {
@@ -29,7 +26,6 @@ namespace WebApplication1.Controllers
             _roleManager = roleManager;
         }
 
-        // GET: /Account/Register
         [HttpGet]
         public IActionResult Register()
         {
@@ -42,7 +38,6 @@ namespace WebApplication1.Controllers
             return View(new RegisterViewModel());
         }
 
-        // POST: /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel vm)
@@ -59,7 +54,7 @@ namespace WebApplication1.Controllers
                 FullName = vm.FullName,
                 Organization = vm.Organization,
                 EmailConfirmed = true,
-                MustChangePassword = false // Self-registered users don't need forced change
+                MustChangePassword = false
             };
 
             var createResult = await _userManager.CreateAsync(user, vm.Password);
@@ -81,14 +76,12 @@ namespace WebApplication1.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: /Account/Login
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
-        // POST: /Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel vm)
@@ -114,14 +107,12 @@ namespace WebApplication1.Controllers
             return View(vm);
         }
 
-        // GET: /Account/ForceChangePassword
         [HttpGet]
         public IActionResult ForceChangePassword()
         {
             return View(new ForceChangePasswordViewModel());
         }
 
-        // POST: /Account/ForceChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForceChangePassword(ForceChangePasswordViewModel vm)
@@ -141,7 +132,6 @@ namespace WebApplication1.Controllers
                 await _userManager.UpdateAsync(user);
                 await _signInManager.RefreshSignInAsync(user);
 
-                // UPDATED: Success message
                 TempData["SuccessMessage"] = "Password changed successfully.";
                 return RedirectToAction("Index", "Home");
             }
@@ -152,14 +142,12 @@ namespace WebApplication1.Controllers
             return View(vm);
         }
 
-        // GET: /Account/ChangePassword (My Account)
         [HttpGet]
         public IActionResult ChangePassword()
         {
             return View(new ChangePasswordViewModel());
         }
 
-        // POST: /Account/ChangePassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm)
@@ -177,7 +165,6 @@ namespace WebApplication1.Controllers
             {
                 await _signInManager.RefreshSignInAsync(user);
 
-                // UPDATED: Success message
                 TempData["SuccessMessage"] = "Password changed successfully.";
                 return RedirectToAction("Index", "Home");
             }
@@ -188,7 +175,6 @@ namespace WebApplication1.Controllers
             return View(vm);
         }
 
-        // POST: /Account/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
