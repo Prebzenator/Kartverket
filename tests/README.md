@@ -14,17 +14,35 @@ tests/
   WebApplication1.Tests.Security/
 ```
 
-### ✔ 1. Unit tests (Truls)
+### ✔ 1. Unit tests
 Small, isolated tests such as:
-- ModelState behavior in ObstacleController
-- Helper methods (UnitConverter)
+- ModelState behavior in `ObstacleController`
+- Helper methods (`UnitConverter`)
 - Basic validation logic
 
 Does **not** use database or authentication.
 
+#### Implemented tests:
+**`DataForm_Post_InvalidModelState_ReturnsViewWithErrors`**
+- Sends invalid form input to the controller action
+- Verifies `ModelState` contains expected errors
+- Ensures the action returns the view with the same model (no DB interaction)
+
+**`UnitConverter_ToMeters_InputInCentimeters_ReturnsCorrectValue`**
+- Tests conversion logic for typical and edge inputs
+- Verifies numeric accuracy and handling of zero/null inputs
+
+**`CreateUserViewModelValidator_InvalidEmail_AddsModelError`**
+- Validates view model rules for user registration
+- Ensures invalid email or missing required fields produce expected validation errors
+
+**`ObstacleController_Action_CallsExpectedServiceMethods`**
+- Mocks dependent services (`ILogger`, repository/service interfaces, `ITempDataProvider`)
+- Verifies controller calls into services with correct parameters and expected number of invocations
+
 ---
 
-### ✔ 2. Integration tests (Herman)
+### ✔ 2. Integration tests
 These tests use:
 - A real ObstacleController
 - Fake authenticated Pilot user
@@ -46,7 +64,7 @@ These tests use:
 
 ---
 
-### ✔ 3. Security tests (Herman)
+### ✔ 3. Security tests
 Security tests check **attributes** using reflection.
 
 **`Review_Action_ShouldRequire_RegistryAdministrator_Role`**
