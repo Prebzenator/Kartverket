@@ -496,7 +496,7 @@
                 if (!raw) return { ok: true, value: null };
                 const n = Number(raw);
                 if (isNaN(n)) return { ok: false, message: 'Height not a number' };
-                if (@(User.IsInRole("Pilot") ? "true" : "false")) {
+                if ("@(User.IsInRole("Pilot") ? "true" : "false")" === "true") {
                     // user entered feet -> convert to meters
                     const meters = (n * 0.3048);
                     return { ok: true, value: meters };

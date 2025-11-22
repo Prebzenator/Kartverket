@@ -2,6 +2,9 @@
 
 namespace WebApplication1.ViewModels
 {
+    /// <summary>
+    /// Data required to create a new user.
+    /// </summary>
     public class CreateUserViewModel
     {
         [Required]
@@ -17,15 +20,16 @@ namespace WebApplication1.ViewModels
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        // Role selected by admin; keep simple for mockup.
         [Required]
         public string Role { get; set; } = string.Empty;
     }
 
-    // ViewModel for success view (shows temp password)
+    /// <summary>
+    /// Data displayed upon successful user creation, including the temporary password.
+    /// </summary>
     public class CreateUserSuccessViewModel
     {
-        public string FullName { get; set; } = string.Empty; 
+        public string FullName { get; set; } = string.Empty;
         public string Organization { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
