@@ -48,12 +48,12 @@
 
                             <input name="HeightInputRaw" id="HeightInputRaw" class="form-control"
                                    value="@(User.IsInRole("Pilot")
-                                                                                                                   ? (Model?.ObstacleHeight.HasValue == true
-                                                                                                                          ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
-                                                                                                                          : string.Empty)
-                                                                                                                   : (Model?.ObstacleHeight.HasValue == true
-                                                                                                                          ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
-                                                                                                                          : string.Empty))"
+                                                                                                                                   ? (Model?.ObstacleHeight.HasValue == true
+                                                                                                                                       ? Math.Round(UnitConverter.ToFeet(Model!.ObstacleHeight).GetValueOrDefault(), 0).ToString("F0")
+                                                                                                                                       : string.Empty)
+                                                                                                          : (Model?.ObstacleHeight.HasValue == true
+                                                                                                                                   ? Model!.ObstacleHeight.GetValueOrDefault().ToString("F2")
+                                                                                                                                                          : string.Empty))"
                                    placeholder="e.g., @(User.IsInRole("Pilot") ? "100" : "1.25")" aria-describedby="heightHelp" />
 
                             <div id="heightHelp" class="form-text">
@@ -71,7 +71,6 @@
                             <span asp-validation-for="ObstacleDescription" class="text-danger"></span>
                         </div>
 
-                        <!-- Controls + Map -->
                         <div class="mb-2 d-flex flex-wrap gap-2 align-items-center control-row">
                             <div class="btn-group btn-group-lg map-action-group" role="group" aria-label="Map controls">
                                 <button type="button" id="btn-locate" class="btn btn-primary d-flex align-items-center gap-2" aria-label="Use my position">
@@ -82,7 +81,8 @@
                                     <i class="bi bi-trash" aria-hidden="true"></i><span class="d-none d-sm-inline">Clear drawings</span>
                                 </button>
 
-                                <button type="button" id="btn-open-map" class="btn btn-outline-secondary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#mapModal" aria-controls="mapModal" aria-label="Open map fullscreen">
+                                <!-- Open map styled differently from Use my position: white/outlined pill -->
+                                <button type="button" id="btn-open-map" class="btn btn-openmap d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#mapModal" aria-controls="mapModal" aria-label="Open map fullscreen">
                                     <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i><span class="d-none d-sm-inline">Open map</span>
                                 </button>
                             </div>
@@ -147,12 +147,99 @@
             </div>
 
             <div class="modal-body p-0 bg-dark position-relative">
-                <div id="map-fullscreen" style="height:100vh; width:100%;" role="application" aria-label="Fullscreen map"></div>
+                <div id="map-fullscreen" style="height:100vh;width:100%;" role="application" aria-label="Fullscreen map"></div>
                 <div id="fs-map-toast" class="fs-toast visually-hidden" role="status" aria-live="polite"></div>
             </div>
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        /* Pilot-friendly polish, only the changes: make Open map visually distinct (white pill)
+                   and ensure button groups follow same pill style as elsewhere */
+
+        .map-action-group .btn {
+            border-radius: 999px;
+            padding-left: 14px;
+            padding-right: 14px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+            /* Keep Use my position as primary filled */
+            .map-action-group .btn.btn-primary {
+                background: #0d6efd;
+                color: #ffffff;
+                border-color: #0d6efd;
+                box-shadow: 0 6px 18px rgba(13,110,253,0.06);
+                font-weight: 600;
+            }
+
+            /* Clear drawings remains dangerous outline */
+            .map-action-group .btn.btn-outline-danger {
+                border-width: 1px;
+            }
+
+        /* Open map: white / light pill to distinguish from primary "Use my position" */
+        .btn-openmap {
+            background: #ffffff;
+            color: #0f1724;
+            border: 1px solid #d1d5db;
+            min-width: 128px;
+            box-shadow: 0 6px 18px rgba(2,6,23,0.04);
+            font-weight: 600;
+        }
+
+            .btn-openmap i {
+                font-size: 1.1rem;
+            }
+
+            .btn-openmap:hover, .btn-openmap:focus {
+                background: #f8fafc;
+                border-color: #c7cbd1;
+                text-decoration: none;
+                outline: none;
+                box-shadow: 0 8px 24px rgba(2,6,23,0.06);
+            }
+
+        /* Minor map and card visual polish retained */
+        .card {
+            border: 0.5px solid rgba(0,0,0,0.02);
+        }
+
+        #map, #map-fullscreen {
+            border-radius: .75rem;
+        }
+
+        /* Accessibility helper: ensure modal close circle has target size */
+        .modal-close-btn {
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .fs-toast {
+            position: absolute;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6000;
+            pointer-events: none;
+            transition: opacity 160ms ease-in-out;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #fff;
+        }
+    </style>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -177,13 +264,11 @@
 
             // Formatters
             const fmt = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
-
             // Main map init
             const map = L.map('map', { zoomControl: true }).setView([60.472, 8.4689], 5);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
-
             // Draw layer + control encapsulation
             const drawnItems = new L.FeatureGroup();
             map.addLayer(drawnItems);
@@ -377,7 +462,6 @@
                 lngInput.value = fmt.format(latlng.lng);
             }
             map.on('click', e => setPoint(e.latlng));
-
             // Geolocation with IP fallback (with basic status handling)
             let lastLocation = null, myMarker = null, accCircle = null;
 
@@ -399,7 +483,6 @@
                 lastLocation = e.latlng;
                 if (!myMarker) myMarker = L.marker(e.latlng, { title: "Your position" }).addTo(map).bindPopup("You are here");
                 else myMarker.setLatLng(e.latlng);
-
                 if (!accCircle) accCircle = L.circle(e.latlng, { radius: e.accuracy || 1000 }).addTo(map);
                 else accCircle.setLatLng(e.latlng).setRadius(e.accuracy || 1000);
 
@@ -441,7 +524,6 @@
                 }
             }
             map.on('locationerror', _ => locateByIP());
-
             // Buttons main view
             const btnLocate = el('btn-locate');
             const btnClear = el('btn-clear');
@@ -449,7 +531,6 @@
 
             if (btnLocate) btnLocate.addEventListener('click', locateWithFallback);
             if (btnClear) btnClear.addEventListener('click', () => { drawnItems.clearLayers(); updateGeoJson(); showFsToast('Cleared drawings'); });
-
             // Init from existing inputs and geometry
             (function initFromInputs() {
                 const lat = parseFloat((latInput?.value || '').toString().replace(',', '.'));
@@ -472,7 +553,6 @@
                     }
                 } catch (e) { /* ignore parse errors */ }
             })();
-
             // ----------------------------
             // Fullscreen / Enlarge handling
             // ----------------------------
@@ -489,6 +569,18 @@
                         try { targetGroup.addLayer(l); } catch (_) { /* ignore */ }
                     }
                 });
+            }
+
+            function showFsToast(text, isError) {
+                if (!fsToast) return;
+                fsToast.classList.remove('visually-hidden');
+                fsToast.textContent = text;
+                fsToast.style.background = isError ? 'rgba(220,53,69,0.95)' : 'rgba(0,0,0,0.6)';
+                fsToast.style.color = '#fff';
+                clearTimeout(fsToast._hideTimer);
+                fsToast._hideTimer = setTimeout(() => {
+                    if (fsToast) fsToast.classList.add('visually-hidden');
+                }, 2500);
             }
 
             if (mapModalEl) {
@@ -537,13 +629,18 @@
                                 copyGroup(fsDrawnItems, drawnItems);
                                 updateGeoJson();
                             });
+                            fsMap.on(L.Draw.Event.CREATED, e => { fsDrawnItems.addLayer(e.layer); });
+                            fsMap.on(L.Draw.Event.EDITED, e => {});
+                            fsMap.on(L.Draw.Event.DELETED, e => {});
                         }
 
                         // clicking on fsMap sets the main inputs and main map marker
                         fsMap.on('click', function (e) {
                             const latlng = e.latlng;
-                            latInput.value = fmt.format(latlng.lat);
-                            lngInput.value = fmt.format(latlng.lng);
+                            const lat = latlng.lat;
+                            const lng = latlng.lng;
+                            latInput.value = fmt.format(lat);
+                            lngInput.value = fmt.format(lng);
                             if (fsMap._clickMarker) fsMap._clickMarker.setLatLng(latlng);
                             else fsMap._clickMarker = L.marker(latlng).addTo(fsMap).bindPopup("Selected position");
                             setPoint(latlng); // also set on main map
@@ -552,7 +649,6 @@
 
                     // copy geometry from main drawnItems into fsDrawnItems (recreate)
                     copyGroup(drawnItems, fsDrawnItems);
-
                     // sync view
                     fsMap.setView(map.getCenter(), map.getZoom());
                     setTimeout(()=> fsMap.invalidateSize(), 120);
@@ -604,7 +700,7 @@
                 if (!raw) return { ok: true, value: null };
                 const n = Number(raw);
                 if (isNaN(n)) return { ok: false, message: 'Height not a number' };
-                if (@(User.IsInRole("Pilot") ? "true" : "false")) {
+                if ("@(User.IsInRole("Pilot") ? "true" : "false")" === "true") {
                     // user entered feet -> convert to meters
                     const meters = (n * 0.3048);
                     return { ok: true, value: meters };

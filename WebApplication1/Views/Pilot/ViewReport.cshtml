@@ -8,7 +8,6 @@
     var lat = Model.Latitude?.ToString("0.######", CultureInfo.InvariantCulture);
     var lng = Model.Longitude?.ToString("0.######", CultureInfo.InvariantCulture);
 
-    @* FIXED: Use IsProbablyDraft instead of IsDraft *@
     var isDraft = Model.IsProbablyDraft;
 }
 
@@ -104,7 +103,6 @@
                             string statusText = "Draft";
                             string iconClass = "bi-file-earmark";
 
-                            // FIXED: Properly handle draft vs rejected vs other statuses
                             if (isDraft)
                             {
                                 // Draft: NotApproved without admin review

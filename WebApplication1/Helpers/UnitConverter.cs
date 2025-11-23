@@ -2,7 +2,6 @@ namespace WebApplication1.Helpers
 {
     public static class UnitConverter
     {
-        // Use decimal literal with 'm' suffix for consistent decimal arithmetic
         private const decimal MeterPerFoot = 0.3048m;
 
         public static decimal? ToFeet(decimal? meters)

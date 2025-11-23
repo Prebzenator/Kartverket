@@ -3,6 +3,16 @@
     ViewData["Title"] = "Obstacle";
 }
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="container pt-4">
+        <div class="alert alert-success alert-dismissible fade show rounded-pill shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
+
 <section class="bg-gradient py-5" style="background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);">
     <div class="container py-4">
         <div class="row align-items-center">
@@ -16,7 +26,9 @@
                 </div>
 
                 <h1 class="display-6 mt-4 mb-3 fw-semibold">Report aviation obstacles quickly and safely</h1>
-                <p class="lead text-muted mb-4">Help keep low-altitude flights safe — report new or missing obstacles with location, type and optional photo.</p>
+                <p class="lead text-muted mb-4">
+                    Help keep low-altitude flights safe. Use the tools below to report <strong>new obstacles</strong> discovered, or flag existing map items that are <strong>missing from reality</strong>.
+                </p>
 
                 <div class="d-flex flex-column flex-sm-row gap-2">
                     <a asp-action="DataForm" asp-controller="Obstacle"
@@ -24,9 +36,9 @@
                         <i class="bi bi-plus-circle"></i><span>Report new obstacle</span>
                     </a>
 
-                    <a href="/Obstacle/DataForm?missing=true"
-                       class="btn btn-outline-primary btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Report missing obstacle">
-                        <i class="bi bi-search"></i><span>Report missing obstacle</span>
+                    <a asp-action="DataForm" asp-controller="Obstacle" asp-route-missing="true"
+                       class="btn btn-missing btn-lg rounded-pill d-flex align-items-center gap-2" role="button" aria-label="Report missing obstacle">
+                        <i class="bi bi-x-circle"></i><span>Report missing obstacle</span>
                     </a>
 
                     @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
@@ -37,10 +49,16 @@
                         </a>
                     }
                 </div>
+
+                <div class="mt-2">
+                    <small class="text-muted fst-italic">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Use <strong>"Report missing"</strong> only if an obstacle on the map has been demolished or removed.
+                    </small>
+                </div>
             </div>
 
             <div class="col-12 col-md-6">
-                @* Lite preview-kart for kontekst; interaktivt men lettvektsinitialisering *@
                 <div id="hero-map" style="height:240px; border-radius:.75rem; box-shadow:0 6px 18px rgba(16,24,40,0.06);"></div>
                 <small class="text-muted d-block mt-2">Map preview. Click "Report new obstacle" to open full map tools.</small>
             </div>
@@ -88,6 +106,30 @@
     </div>
 </div>
 
+@section Styles {
+    <style>
+        /* Hvit-aktig "missing" knapp — god kontrast, tydelig kant og subtile hover-effekter */
+        .btn-missing {
+            background: #ffffff;
+            color: #0f1724;
+            border: 1px solid #d1d5db;
+            box-shadow: 0 2px 6px rgba(2,6,23,0.06);
+            text-decoration: none;
+        }
+
+            .btn-missing:hover, .btn-missing:focus {
+                background: #f8fafc;
+                color: #dc3545; /* Optional: Make text/icon turn Red on hover for extra feedback */
+                border-color: #c7cbd1;
+                text-decoration: none;
+            }
+
+            .btn-missing:active {
+                box-shadow: 0 1px 3px rgba(2,6,23,0.08) inset;
+            }
+    </style>
+}
+
 @section Scripts {
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
     <script>
@@ -96,7 +138,6 @@
                 const map = L.map('hero-map', { zoomControl: false, dragging: true }).setView([60.472, 8.4689], 5);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '' }).addTo(map);
 
-                // subtle hint markers — not loaded from server, just illustrative
                 const sample = [
                     [59.91, 10.75],
                     [63.43, 10.4],
@@ -104,7 +145,6 @@
                 ];
                 sample.forEach(c => L.circleMarker(c, { radius: 6, color: '#0d6efd', fillColor: '#0d6efd', fillOpacity: 0.85 }).addTo(map));
             } catch (e) {
-                // Leaflet not available or map init failed — fail silently
                 console.warn('Hero map init failed', e);
             }
         })();

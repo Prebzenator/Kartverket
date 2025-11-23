@@ -1,14 +1,9 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using System.Globalization;
 using WebApplication1.Data;
 using WebApplication1.Models;
-using System.Globalization;
-using System.Threading;
-using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.Extensions;
-using System.IO;
 
 // Set default culture to en-US for consistent formatting
 var defaultCulture = new CultureInfo("en-US");
@@ -18,18 +13,13 @@ CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
-/// <summary>
-/// Register ApplicationDbContext.
-/// - Automatically selects SQLite if the connection string begins with "Data Source".
-/// - Otherwise configures MySQL (Pomelo) with a retry policy and extended command timeout.
-/// </summary>
+// Configure ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    // Read connection string directly to support environment variable injection
     var conn = builder.Configuration.GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException("Missing connection string 'DefaultConnection'.");
 
-    // Hvis EF kjøres lokalt, bruk localhost i stedet for 'db'
+    // If EF is running locally, use localhost instead of 'db'
     if (AppContext.BaseDirectory.Contains("dotnet-ef"))
     {
         conn = conn.Replace("server=db", "server=localhost");
@@ -49,26 +39,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     }
     else
     {
-        // MySQL / MariaDB configuration with transient-fault handling
+        // MySQL / MariaDB configuration
         var serverVersion = new MySqlServerVersion(new Version(11, 0));
 
         options.UseMySql(conn, serverVersion, mySqlOptions =>
         {
-            // Enable retry on failure to handle transient DB startup/connectivity issues
             mySqlOptions.EnableRetryOnFailure(
                 maxRetryCount: 10,
                 maxRetryDelay: TimeSpan.FromSeconds(30),
                 errorNumbersToAdd: null);
 
-            // Increase command timeout to allow longer-running DDL during migrations
             mySqlOptions.CommandTimeout(120);
         });
     }
 });
 
-/// <summary>
-/// Identity configuration (ApplicationUser + Roles)
-/// </summary>
+// Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -81,23 +67,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-/// <summary>
-/// Adds support for MVC controllers and views.
-/// </summary>
 builder.Services.AddControllersWithViews();
 
-/// <summary>
-/// Data Protection configuration
-/// </summary>
+// Data Protection configuration
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/root/.aspnet/DataProtection-Keys"))
     .SetApplicationName("kartverket");
 
 var app = builder.Build();
 
-/// <summary>
-/// Apply pending EF Core migrations in Development environment.
-/// </summary>
+// Apply migrations and seed data
 try
 {
     using var scope = app.Services.CreateScope();
@@ -122,19 +101,14 @@ try
                 db.Database.Migrate();
                 logger.LogInformation("Migrations applied successfully.");
 
-                // Seed roles & admin user (development only)
                 try
                 {
-                    RoleSeeder.SeedAsync(services).GetAwaiter().GetResult();
-                    // RoleSeeder.SeedAsync expects an IServiceProvider
-                    // Call synchronously to keep top-level statements simple
                     await RoleSeeder.SeedAsync(services);
                     logger.LogInformation("Role seeding completed.");
                 }
                 catch (Exception seedEx)
                 {
                     logger.LogError(seedEx, "Role seeding failed: {Message}", seedEx.Message);
-                    // don't rethrow, as seeding failure shouldn't block startup
                 }
 
                 break;
@@ -163,9 +137,6 @@ catch (Exception ex)
     throw;
 }
 
-/// <summary>
-/// Configures middleware for error handling, static files, routing, authentication and authorization.
-/// </summary>
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -175,20 +146,13 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseRouting();
 
-// Add authentication before authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-/// <summary>
-/// Defines the default route pattern for MVC.
-/// </summary>
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-/// <summary>
-/// Simple health check endpoint to verify the app is running.
-/// </summary>
 app.MapGet("/health", () => "OK");
 
 app.Run();

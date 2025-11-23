@@ -4,7 +4,7 @@
 
 @{
     ViewData["Title"] = $"Report #{Model.Id}";
-    var administrators = ViewBag.Administrators as IEnumerable<ApplicationUser>;
+    var administrators = ViewBag.Administrators as IEnumerable<ApplicationUser> ?? Enumerable.Empty<ApplicationUser>();
     var lat = Model.Latitude?.ToString("0.######", CultureInfo.InvariantCulture);
     var lng = Model.Longitude?.ToString("0.######", CultureInfo.InvariantCulture);
 }

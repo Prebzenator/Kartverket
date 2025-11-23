@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models;
+using System.Globalization;
 using WebApplication1.Data;
 using WebApplication1.Helpers;
-using System.Linq;
-using System.Threading.Tasks;
-using System;
-using System.Globalization;
+using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
@@ -37,7 +33,7 @@ namespace WebApplication1.Controllers
         /// Displays the form for entering obstacle data.
         /// If 'missing' parameter is true, prefills ObstacleName with "MISSING - ".
         /// </summary>
-        /// <param name="missing">If true, prefill form for a missing obstacle report</param>
+        /// <param name="missing">If true, prefills the name for a missing obstacle report.</param>
         [HttpGet]
         public IActionResult DataForm(bool missing = false)
         {
@@ -50,7 +46,6 @@ namespace WebApplication1.Controllers
                 ViewBag.Missing = true;
             }
 
-            // Populate category options for dropdown
             ViewBag.CategoryOptions = _context.ObstacleCategories
                 .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
@@ -68,9 +63,6 @@ namespace WebApplication1.Controllers
         /// Supports both creating new reports and editing existing ones.
         /// Can save as draft (NotApproved) or submit for review (Pending).
         /// </summary>
-        /// <param name="form">Form data collection from the POST request</param>
-        /// <param name="IsDraft">String "true" if saving as draft, anything else for submission</param>
-        /// <param name="id">Optional: ID of existing report to update (null for new reports)</param>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DataForm(Microsoft.AspNetCore.Http.IFormCollection form, string? IsDraft, int? id)
@@ -109,7 +101,7 @@ namespace WebApplication1.Controllers
                 }
             }
 
-            ObstacleData obstacledata;
+            ObstacleData? obstacledata;
 
             if (id.HasValue && id.Value > 0)
             {
@@ -227,7 +219,7 @@ namespace WebApplication1.Controllers
         [Authorize(Roles = "Registry Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateStatus(int id, ReportStatus status)
+        public IActionResult UpdateStatus(int id, ReportStatus status)
         {
             return RedirectToAction("Dashboard", "AdminObstacle");
         }
