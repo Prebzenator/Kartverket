@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 using WebApplication1.Models;
 using WebApplication1.Data;
 
@@ -52,3 +52,4 @@ namespace WebApplication1.Controllers
         }
     }
 }
+

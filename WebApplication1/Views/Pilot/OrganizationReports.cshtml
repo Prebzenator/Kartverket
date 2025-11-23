@@ -66,8 +66,7 @@
                                         @report.ObstacleName
                                     </h5>
 
-                                    <p class="card-text text-muted mb-2">
-                                        @* FIX 2: Consolidated truncation logic to a single line to resolve CS8635 on '...' *@
+                                    <p class="card-text text-muted mb-2">                                        
                                         @(report.ObstacleDescription?.Length > 120 ? report.ObstacleDescription.Substring(0, 120) + "..." : report.ObstacleDescription)
                                     </p>
 
@@ -171,8 +170,7 @@
                                         <dd class="col-sm-8">
                                             @if (report.Latitude.HasValue && report.Longitude.HasValue)
                                             {
-                                                @* FIX 1: The entire output is wrapped in a <span> tag to force Razor into markup mode,
-                                                    which solves the parser confusion with the '°' symbol (RZ1005). *@
+                                                
                                                 <span>@(report.Latitude?.ToString("0.######"))°, @(report.Longitude?.ToString("0.######"))°</span>
                                             }
                                             else
