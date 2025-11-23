@@ -2,6 +2,8 @@
 @using WebApplication1.Models
 @using System.Globalization
 
+<input type="hidden" id="GeometryJson" name="GeometryJson" value='@Html.Raw(Model?.GeometryJson ?? "null")' />
+
 @{
     ViewData["Title"] = $"Report #{Model.Id}";
     var administrators = ViewBag.Administrators as IEnumerable<ApplicationUser> ?? Enumerable.Empty<ApplicationUser>();
@@ -70,11 +72,11 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Latitude" class="form-label"></label>
-                                <input asp-for="Latitude" class="form-control" />
+                                <input asp-for="Latitude" class="form-control" id="Latitude" />
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label asp-for="Longitude" class="form-label"></label>
-                                <input asp-for="Longitude" class="form-control" />
+                                <input asp-for="Longitude" class="form-control" id="Longitude" />
                             </div>
                         </div>
 
@@ -284,11 +286,10 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
     @if (!string.IsNullOrEmpty(Model?.GeometryJson) || (Model?.Latitude.HasValue == true && Model?.Longitude.HasValue == true))
     {
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
-
         <script>
             (function () {
                 const mapEl = document.getElementById('map');
@@ -365,8 +366,9 @@
                 try {
                     if (geometry) {
                         const filtered = filterPolygonsAndLines(geometry);
+                        let layer = null;
                         if (filtered) {
-                            const layer = L.geoJSON(filtered, {
+                            layer = L.geoJSON(filtered, {
                                 style: function (feature) {
                                     const t = feature && feature.geometry && feature.geometry.type;
                                     if (t && t.indexOf('Line') === 0) return { color: '#1f77b4', weight: 3, opacity: 0.9 };
@@ -404,39 +406,40 @@
                         }
 
                         // Create draggable marker if we have a position
-                        if (markerPos) {
-                            const repMarker = L.marker(markerPos, { draggable: true }).addTo(map);
+                            if (markerPos) {
+                                const repMarker = L.marker(markerPos, { draggable: true }).addTo(map);
 
-                            // Ensure inputs reflect initial marker pos
-                            setInputs(markerPos.lat, markerPos.lng);
+                                // Ensure inputs reflect initial marker pos
+                                setInputs(markerPos.lat, markerPos.lng);
 
-                            repMarker.on('dragend', function () {
-                                const pos = repMarker.getLatLng();
-                                setInputs(pos.lat, pos.lng);
-                            });
+                                repMarker.on('dragend', function () {
+                                    const pos = repMarker.getLatLng();
+                                    setInputs(pos.lat, pos.lng);
+                                });
 
-                            map.on('click', function (e) {
-                                const pos = e.latlng;
-                                repMarker.setLatLng(pos);
-                                setInputs(pos.lat, pos.lng);
-                            });
-                        } else {
-                            // If we have no usable geometry and no model coords, let clicks create/update a marker
-                            let tempMarker = null;
-                            map.on('click', function (e) {
-                                const pos = e.latlng;
-                                if (!tempMarker) {
-                                    tempMarker = L.marker(pos, { draggable: true }).addTo(map);
-                                    tempMarker.on('dragend', () => {
-                                        const p = tempMarker.getLatLng();
-                                        setInputs(p.lat, p.lng);
-                                    });
-                                } else {
-                                    tempMarker.setLatLng(pos);
-                                }
-                                setInputs(pos.lat, pos.lng);
-                            });
-                        }
+                                map.on('click', function (e) {
+                                    const pos = e.latlng;
+                                    repMarker.setLatLng(pos);
+                                    setInputs(pos.lat, pos.lng);
+                                });
+                            } else {
+                                // If we have no usable geometry and no model coords, let clicks create/update a marker
+                                let tempMarker = null;
+                                map.on('click', function (e) {
+                                    const pos = e.latlng;
+                                    if (!tempMarker) {
+                                        tempMarker = L.marker(pos, { draggable: true }).addTo(map);
+                                        tempMarker.on('dragend', () => {
+                                            const p = tempMarker.getLatLng();
+                                            setInputs(p.lat, p.lng);
+                                        });
+                                    } else {
+                                        tempMarker.setLatLng(pos);
+                                    }
+                                    setInputs(pos.lat, pos.lng);
+                                });
+                            }
+
                     } else {
                         // No geometry: fallback to model lat/lng if present — create draggable marker
                         if (!isNaN(latModel) && !isNaN(lngModel)) {
@@ -474,6 +477,77 @@
                 } finally {
                     setTimeout(() => { try { map.invalidateSize(); } catch (_) { } }, 120);
                 }
+
+                // --- Ensure drawnItems exists, move existing layers into it, sync to hidden input, and add draw controls ---
+                (function ensureDrawEditAndSync() {
+                    if (!map) return;
+
+                    // FeatureGroup to hold editable layers
+                    window.drawnItems = window.drawnItems || new L.FeatureGroup();
+                    if (!map.hasLayer(window.drawnItems)) map.addLayer(window.drawnItems);
+
+                    // Move existing polygon/line layers (variable `layer`) into drawnItems so they become editable
+                    try {
+                        if (typeof layer !== 'undefined' && layer && typeof layer.eachLayer === 'function') {
+                            layer.eachLayer(function (l) { window.drawnItems.addLayer(l); });
+                        }
+                    } catch (err) {
+                        console.warn('Could not move existing geojson layers into drawnItems', err);
+                    }
+
+                    // Helper: write drawnItems GeoJSON to hidden input
+                    function writeDrawnItemsToInput() {
+                        try {
+                            const gj = window.drawnItems.toGeoJSON();
+                            const el = document.getElementById('GeometryJson');
+                            if (el) el.value = JSON.stringify(gj);
+                        } catch (err) {
+                            console.warn('Could not serialize drawn items', err);
+                        }
+                    }
+
+                    // Initial write so server sees current geometry unless changed
+                    writeDrawnItemsToInput();
+
+                    // Guard: don't add control multiple times
+                    if (map._hasDrawControl) return;
+                    map._hasDrawControl = true;
+
+                    const drawControl = new L.Control.Draw({
+                        edit: { featureGroup: window.drawnItems, remove: true },
+                        draw: {
+                            polygon: { allowIntersection: false, showArea: true },
+                            polyline: true,
+                            rectangle: true,
+                            circle: true,
+                            marker: true
+                        }
+                    });
+
+                    map.addControl(drawControl);
+
+                    map.on(L.Draw.Event.CREATED, function (e) {
+                        const layerCreated = e.layer;
+                        window.drawnItems.addLayer(layerCreated);
+                        writeDrawnItemsToInput();
+                    });
+
+                    map.on(L.Draw.Event.EDITED, function (e) {
+                        writeDrawnItemsToInput();
+                    });
+
+                    map.on(L.Draw.Event.DELETED, function (e) {
+                        writeDrawnItemsToInput();
+                    });
+
+                    // Defensive cleanup: if multiple toolbars exist, keep the first
+                    (function removeExtraDrawToolbars() {
+                        const toolbars = document.querySelectorAll('.leaflet-draw .leaflet-draw-toolbar');
+                        if (toolbars.length > 1) {
+                            for (let i = 1; i < toolbars.length; i++) toolbars[i].remove();
+                        }
+                    })();
+                })();
             })();
         </script>
     }
