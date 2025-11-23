@@ -288,6 +288,9 @@
 </div>
 
 @section Scripts {
+    @* Note: Leaflet and Leaflet.draw should be included once globally (e.g., in _Layout). 
+       This view assumes they are already loaded. *@
+
     @if (!string.IsNullOrEmpty(Model?.GeometryJson) || (Model?.Latitude.HasValue == true && Model?.Longitude.HasValue == true))
     {
         <script>
@@ -406,40 +409,39 @@
                         }
 
                         // Create draggable marker if we have a position
-                            if (markerPos) {
-                                const repMarker = L.marker(markerPos, { draggable: true }).addTo(map);
+                        if (markerPos) {
+                            const repMarker = L.marker(markerPos, { draggable: true }).addTo(map);
 
-                                // Ensure inputs reflect initial marker pos
-                                setInputs(markerPos.lat, markerPos.lng);
+                            // Ensure inputs reflect initial marker pos
+                            setInputs(markerPos.lat, markerPos.lng);
 
-                                repMarker.on('dragend', function () {
-                                    const pos = repMarker.getLatLng();
-                                    setInputs(pos.lat, pos.lng);
-                                });
+                            repMarker.on('dragend', function () {
+                                const pos = repMarker.getLatLng();
+                                setInputs(pos.lat, pos.lng);
+                            });
 
-                                map.on('click', function (e) {
-                                    const pos = e.latlng;
-                                    repMarker.setLatLng(pos);
-                                    setInputs(pos.lat, pos.lng);
-                                });
-                            } else {
-                                // If we have no usable geometry and no model coords, let clicks create/update a marker
-                                let tempMarker = null;
-                                map.on('click', function (e) {
-                                    const pos = e.latlng;
-                                    if (!tempMarker) {
-                                        tempMarker = L.marker(pos, { draggable: true }).addTo(map);
-                                        tempMarker.on('dragend', () => {
-                                            const p = tempMarker.getLatLng();
-                                            setInputs(p.lat, p.lng);
-                                        });
-                                    } else {
-                                        tempMarker.setLatLng(pos);
-                                    }
-                                    setInputs(pos.lat, pos.lng);
-                                });
-                            }
-
+                            map.on('click', function (e) {
+                                const pos = e.latlng;
+                                repMarker.setLatLng(pos);
+                                setInputs(pos.lat, pos.lng);
+                            });
+                        } else {
+                            // If we have no usable geometry and no model coords, let clicks create/update a marker
+                            let tempMarker = null;
+                            map.on('click', function (e) {
+                                const pos = e.latlng;
+                                if (!tempMarker) {
+                                    tempMarker = L.marker(pos, { draggable: true }).addTo(map);
+                                    tempMarker.on('dragend', () => {
+                                        const p = tempMarker.getLatLng();
+                                        setInputs(p.lat, p.lng);
+                                    });
+                                } else {
+                                    tempMarker.setLatLng(pos);
+                                }
+                                setInputs(pos.lat, pos.lng);
+                            });
+                        }
                     } else {
                         // No geometry: fallback to model lat/lng if present — create draggable marker
                         if (!isNaN(latModel) && !isNaN(lngModel)) {
@@ -526,19 +528,92 @@
 
                     map.addControl(drawControl);
 
+                    // Simple sync: update hidden GeometryJson and lat/lng when shapes change
+                    function syncLatLngFromDrawnItems() {
+                        try {
+                            if (!window.drawnItems) return;
+                            const latEl = document.getElementById('Latitude');
+                            const lngEl = document.getElementById('Longitude');
+                            if (!latEl || !lngEl) return;
+
+                            // Prefer bounds center
+                            if (typeof window.drawnItems.getBounds === 'function') {
+                                const bounds = window.drawnItems.getBounds();
+                                if (bounds && bounds.isValid && bounds.isValid()) {
+                                    const c = bounds.getCenter();
+                                    latEl.value = c.lat.toFixed(6);
+                                    lngEl.value = c.lng.toFixed(6);
+                                    return;
+                                }
+                            }
+
+                            // Fallback: pick first layer's representative coord
+                            let found = false;
+                            window.drawnItems.eachLayer(function (l) {
+                                if (found) return;
+                                try {
+                                    if (l.getLatLng) {
+                                        const p = l.getLatLng();
+                                        if (p) {
+                                            latEl.value = p.lat.toFixed(6);
+                                            lngEl.value = p.lng.toFixed(6);
+                                            found = true;
+                                            return;
+                                        }
+                                    }
+                                    if (l.toGeoJSON) {
+                                        const g = l.toGeoJSON();
+                                        if (g && g.geometry && g.geometry.coordinates) {
+                                            const coords = g.geometry.coordinates;
+                                            let c = null;
+                                            if (g.geometry.type === 'Point') c = coords;
+                                            else if (g.geometry.type === 'LineString' && coords.length) c = coords[0];
+                                            else if (g.geometry.type === 'Polygon' && coords.length && coords[0].length) c = coords[0][0];
+                                            else if (Array.isArray(coords) && coords.length && Array.isArray(coords[0])) c = coords[0][0];
+                                            if (c && c.length >= 2) {
+                                                lngEl.value = parseFloat(c[0]).toFixed(6);
+                                                latEl.value = parseFloat(c[1]).toFixed(6);
+                                                found = true;
+                                                return;
+                                            }
+                                        }
+                                    }
+                                } catch (e) { /* ignore layer errors */ }
+                            });
+                        } catch (err) {
+                            console.warn('syncLatLngFromDrawnItems error', err);
+                        }
+                    }
+
                     map.on(L.Draw.Event.CREATED, function (e) {
                         const layerCreated = e.layer;
                         window.drawnItems.addLayer(layerCreated);
                         writeDrawnItemsToInput();
+                        syncLatLngFromDrawnItems();
                     });
 
                     map.on(L.Draw.Event.EDITED, function (e) {
                         writeDrawnItemsToInput();
+                        syncLatLngFromDrawnItems();
                     });
 
                     map.on(L.Draw.Event.DELETED, function (e) {
                         writeDrawnItemsToInput();
+                        syncLatLngFromDrawnItems();
                     });
+
+                    // Safety: ensure lat/lng synced before submit
+                    const editForm = document.getElementById('editForm');
+                    if (editForm) {
+                        editForm.addEventListener('submit', function () {
+                            try {
+                                writeDrawnItemsToInput();
+                                syncLatLngFromDrawnItems();
+                            } catch (err) {
+                                console.warn('pre-submit sync failed', err);
+                            }
+                        }, { passive: true });
+                    }
 
                     // Defensive cleanup: if multiple toolbars exist, keep the first
                     (function removeExtraDrawToolbars() {
