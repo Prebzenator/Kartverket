@@ -1,4 +1,6 @@
-﻿@model string
+﻿@model IEnumerable<WebApplication1.Models.ObstacleData>
+@using System.Text.Json
+
 @{
     ViewData["Title"] = "Obstacle";
 }
@@ -21,7 +23,7 @@
                     <img src="~/images/Kartverket-logoutentekst.png" alt="Kartverket logo" class="img-fluid" style="max-height:72px;" />
                     <div>
                         <h2 class="h5 mb-0 fw-semibold">Kartverket</h2>
-                        <p class="text-muted small mb-0">Nasjonalt register over luftfartshindre</p>
+                        <p class="text-muted small mb-0">National register of aviation obstacles</p>
                     </div>
                 </div>
 
@@ -59,8 +61,38 @@
             </div>
 
             <div class="col-12 col-md-6">
-                <div id="hero-map" style="height:240px; border-radius:.75rem; box-shadow:0 6px 18px rgba(16,24,40,0.06);"></div>
-                <small class="text-muted d-block mt-2">Map preview. Click "Report new obstacle" to open full map tools.</small>
+                <!-- Larger map preview -->
+                <div id="hero-map" style="height:480px; border-radius:.75rem; box-shadow:0 6px 18px rgba(16,24,40,0.06); position:relative;"></div>
+
+                <!-- Legend (subtle) -->
+                <div class="mt-2 d-flex flex-wrap align-items-center gap-3">
+                    <div class="legend-item d-flex align-items-center gap-2">
+                        <span class="legend-dot legend-1" aria-hidden="true"></span>
+                        <small class="text-muted mb-0">Mast or Tower</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center gap-2">
+                        <span class="legend-dot legend-2" aria-hidden="true"></span>
+                        <small class="text-muted mb-0">Power Line</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center gap-2">
+                        <span class="legend-dot legend-3" aria-hidden="true"></span>
+                        <small class="text-muted mb-0">Construction Crane</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center gap-2">
+                        <span class="legend-dot legend-4" aria-hidden="true"></span>
+                        <small class="text-muted mb-0">Cable</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center gap-2">
+                        <span class="legend-dot legend-5" aria-hidden="true"></span>
+                        <small class="text-muted mb-0">Other</small>
+                    </div>
+                    <div class="legend-item d-flex align-items-center gap-2">
+                        <span class="legend-dot legend-0" aria-hidden="true"></span>
+                        <small class="text-muted mb-0">Uncategorized</small>
+                    </div>
+                </div>
+
+                <small class="text-muted d-block mt-1">Colored dots indicate category; click a dot for details. Uncategorized are shown in neutral grey.</small>
             </div>
         </div>
     </div>
@@ -98,9 +130,10 @@
 
     <div class="row justify-content-center mt-4">
         <div class="col-12 col-lg-8 text-center">
-            @if (!string.IsNullOrWhiteSpace(Model))
+            @* Optional message passed via ViewData *@
+            @if (ViewData["Message"] is string msg && !string.IsNullOrWhiteSpace(msg))
             {
-                <p class="small text-muted mb-0">@Model</p>
+                <p class="small text-muted mb-0">@msg</p>
             }
         </div>
     </div>
@@ -108,7 +141,7 @@
 
 @section Styles {
     <style>
-        /* Hvit-aktig "missing" knapp — god kontrast, tydelig kant og subtile hover-effekter */
+        /* White-style "missing" button */
         .btn-missing {
             background: #ffffff;
             color: #0f1724;
@@ -119,7 +152,7 @@
 
             .btn-missing:hover, .btn-missing:focus {
                 background: #f8fafc;
-                color: #dc3545; /* Optional: Make text/icon turn Red on hover for extra feedback */
+                color: #dc3545;
                 border-color: #c7cbd1;
                 text-decoration: none;
             }
@@ -127,6 +160,109 @@
             .btn-missing:active {
                 box-shadow: 0 1px 3px rgba(2,6,23,0.08) inset;
             }
+
+        /* High-visibility "Use my position" button (icon-only) */
+        .btn-locate {
+            background: #ffb703; /* warm amber for contrast */
+            color: #072a6b;
+            border: 1px solid #f4a300;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 14px rgba(2,6,23,0.14);
+            cursor: pointer;
+        }
+
+            .btn-locate:hover, .btn-locate:focus {
+                background: #ffb03a;
+                color: #072a6b;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(255, 176, 3, 0.18); /* focus ring */
+            }
+
+        /* Legend dot base */
+        .legend-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(16,24,40,0.12);
+            border: 2px solid #fff;
+        }
+
+        /* Category color classes for legend and markers (includes 0 = Uncategorized) */
+        .legend-1, .marker-cat-1 {
+            background: linear-gradient(180deg,#8fb4ff 0%,#2d7bff 100%);
+        }
+
+        .legend-2, .marker-cat-2 {
+            background: linear-gradient(180deg,#ffd6a5 0%,#ff8c42 100%);
+        }
+
+        .legend-3, .marker-cat-3 {
+            background: linear-gradient(180deg,#c7f9cc 0%,#49c36b 100%);
+        }
+
+        .legend-4, .marker-cat-4 {
+            background: linear-gradient(180deg,#ffd6f0 0%,#ff7ab6 100%);
+        }
+
+        .legend-5, .marker-cat-5 {
+            background: linear-gradient(180deg,#e6e6e6 0%,#9ca3af 100%);
+        }
+
+        .legend-0, .marker-cat-0 {
+            background: linear-gradient(180deg,#f5f7f9 0%,#d1d5db 100%);
+        }
+
+        /* Styled DivIcon for map markers */
+        .obstacle-dot {
+            position: relative;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            box-shadow: 0 6px 14px rgba(16,24,40,0.18), 0 0 0 2px #ffffff;
+            transform: translate(-50%, -50%);
+            display: inline-block;
+        }
+
+            .obstacle-dot .inner {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255,255,255,0.95);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            }
+
+            .obstacle-dot:hover {
+                transform: translate(-50%, -50%) scale(1.12);
+                box-shadow: 0 8px 18px rgba(16,24,40,0.22), 0 0 0 3px rgba(255,255,255,0.85);
+            }
+
+        /* Ensure muted small text inside Leaflet popups remains readable */
+        .leaflet-popup-content small.text-muted {
+            color: #0f1724 !important;
+            opacity: 0.9 !important;
+        }
+
+        /* Map responsiveness */
+        #hero-map {
+            width: 100%;
+            max-height: 700px;
+        }
+
+        @@media (max-width: 768px) {
+            #hero-map {
+                height: 340px;
+            }
+        }
     </style>
 }
 
@@ -135,15 +271,114 @@
     <script>
         (function () {
             try {
-                const map = L.map('hero-map', { zoomControl: false, dragging: true }).setView([60.472, 8.4689], 5);
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '' }).addTo(map);
+                // Initialize map
+                const map = L.map('hero-map', { zoomControl: false, dragging: true })
+                    .setView([60.472, 8.4689], 5);
 
-                const sample = [
-                    [59.91, 10.75],
-                    [63.43, 10.4],
-                    [58.97, 5.73]
-                ];
-                sample.forEach(c => L.circleMarker(c, { radius: 6, color: '#0d6efd', fillColor: '#0d6efd', fillOpacity: 0.85 }).addTo(map));
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: ''
+                }).addTo(map);
+
+                // Convert C# model to JS
+                const obstacles = @Html.Raw(JsonSerializer.Serialize(Model));
+
+                // Helper: map category id to marker class (and legend color)
+                const categoryClass = {
+                    0: 'marker-cat-0', // Uncategorized (CategoryId == null)
+                    1: 'marker-cat-1', // Mast or Tower
+                    2: 'marker-cat-2', // Power Line
+                    3: 'marker-cat-3', // Construction Crane
+                    4: 'marker-cat-4', // Cable
+                    5: 'marker-cat-5'  // Other
+                };
+
+                // Create DivIcon factory that injects category class
+                function createDivIconForCategory(catId) {
+                    const key = (catId === null || catId === undefined) ? 0 : Number(catId);
+                    const cls = categoryClass[key] || 'marker-cat-0';
+                    const html = `<span class="obstacle-dot ${cls}" role="img" aria-label="Obstacle"><span class="inner"></span></span>`;
+                    return L.divIcon({
+                        className: '', // empty so only our html applies
+                        html: html,
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11]
+                    });
+                }
+
+                // Add approved obstacles using DivIcons
+                obstacles.forEach(o => {
+                    if (o.Latitude !== null && o.Longitude !== null) {
+                        // If you DO NOT want to show uncategorized markers, skip when CategoryId == null:
+                        // if (o.CategoryId == null) return;
+                        const icon = createDivIconForCategory(o.CategoryId);
+                        const marker = L.marker([o.Latitude, o.Longitude], { icon: icon, keyboard: true })
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="min-width:220px">
+                                    <strong>${o.ObstacleName}</strong><br/>
+                                    <small class="text-muted">Category: ${getCategoryLabel(o.CategoryId)}</small><br/>
+                                    Height: ${o.ObstacleHeight ?? 'unknown'} m<br/>
+                                    ${o.ObstacleDescription ?? ''}
+                                </div>
+                            `);
+
+                        // Hover opens popup for quick preview
+                        marker.on('mouseover', function () { this.openPopup(); });
+                        marker.on('mouseout', function () { this.closePopup(); });
+
+                        // Keyboard accessibility
+                        marker.on('keypress', (e) => {
+                            if (e.originalEvent.key === 'Enter') marker.openPopup();
+                        });
+                    }
+                });
+
+                // Utility to map category id to readable label (mirror seeded data)
+                function getCategoryLabel(id) {
+                    switch (Number(id)) {
+                        case 1: return 'Mast or Tower';
+                        case 2: return 'Power Line';
+                        case 3: return 'Construction Crane';
+                        case 4: return 'Cable';
+                        case 5: return 'Other';
+                        default: return 'Uncategorized';
+                    }
+                }
+
+                // --- Add "Use my position" control (high-visibility, icon-only) ---
+                const locateBtn = L.control({ position: 'topright' });
+                locateBtn.onAdd = function () {
+                    const container = L.DomUtil.create('div', '');
+                    const btn = L.DomUtil.create('button', 'btn-locate', container);
+                    btn.type = 'button';
+                    btn.setAttribute('title', 'Use my position');
+                    btn.setAttribute('aria-label', 'Use my position');
+                    btn.innerHTML = '<i class="bi bi-geo-alt-fill" aria-hidden="true"></i>';
+
+                    // Prevent map interactions when clicking the button
+                    L.DomEvent.disableClickPropagation(btn);
+                    L.DomEvent.disableScrollPropagation(btn);
+
+                    btn.onclick = function () {
+                        // Request geolocation and center/zoom without adding marker
+                        map.locate({ setView: true, maxZoom: 15, enableHighAccuracy: true });
+                    };
+
+                    return container;
+                };
+                locateBtn.addTo(map);
+
+                // Center and zoom to user location (no marker created)
+                map.on('locationfound', function (e) {
+                    map.setView(e.latlng, Math.max(map.getZoom(), 15));
+                });
+
+                map.on('locationerror', function () {
+                    alert('Unable to access your location. Please check browser permissions.');
+                });
+
             } catch (e) {
                 console.warn('Hero map init failed', e);
             }
