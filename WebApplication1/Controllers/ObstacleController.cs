@@ -9,9 +9,7 @@ using WebApplication1.Models;
 namespace WebApplication1.Controllers
 {
     /// <summary>
-    /// Controller for handling obstacle data input and admin review.
-    /// Supports both draft (NotApproved) and submitted (Pending) reports.
-    /// Requires user authentication.
+    /// Handles the creation and modification of obstacle reports by users.
     /// </summary>
     [Authorize]
     public class ObstacleController : Controller
@@ -29,9 +27,7 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// GET: /Obstacle/DataForm
-        /// Displays the form for entering obstacle data.
-        /// If 'missing' parameter is true, prefills ObstacleName with "MISSING - ".
+        /// Displays the obstacle reporting form.
         /// </summary>
         /// <param name="missing">If true, prefills the name for a missing obstacle report.</param>
         [HttpGet]
@@ -41,7 +37,6 @@ namespace WebApplication1.Controllers
 
             if (missing)
             {
-                // Prefill name for missing obstacle reports
                 model.ObstacleName = "MISSING - ";
                 ViewBag.Missing = true;
             }
@@ -58,22 +53,15 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// POST: /Obstacle/DataForm
-        /// Handles form submission for creating or updating obstacle reports.
-        /// Supports both creating new reports and editing existing ones.
-        /// Can save as draft (NotApproved) or submit for review (Pending).
+        /// Processes the submission of an obstacle report (create or edit).
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DataForm(Microsoft.AspNetCore.Http.IFormCollection form, string? IsDraft, int? id)
         {
-            // Parse draft flag
-            var isDraft = string.Equals(IsDraft, "true", System.StringComparison.OrdinalIgnoreCase);
-
-            // Get current authenticated user
+            var isDraft = string.Equals(IsDraft, "true", StringComparison.OrdinalIgnoreCase);
             var user = await _userManager.GetUserAsync(User);
 
-            // Helper: parse raw input into decimal? (culture‑safe)
             decimal? ParseDecimalRaw(string? raw)
             {
                 if (string.IsNullOrWhiteSpace(raw)) return null;
@@ -83,7 +71,6 @@ namespace WebApplication1.Controllers
                 return null;
             }
 
-            // Parse height input
             var heightRaw = form["HeightInputRaw"].FirstOrDefault();
             var parsedHeightInput = ParseDecimalRaw(heightRaw);
 
@@ -92,7 +79,6 @@ namespace WebApplication1.Controllers
             {
                 if (User.IsInRole("Pilot"))
                 {
-                    // Convert feet to meters for pilots
                     heightMetersFromInput = UnitConverter.ToMeters(parsedHeightInput);
                 }
                 else
@@ -105,10 +91,6 @@ namespace WebApplication1.Controllers
 
             if (id.HasValue && id.Value > 0)
             {
-                /// <summary>
-                /// ===== EDITING EXISTING REPORT =====
-                /// Finds the report by ID, checks ownership, and updates fields.
-                /// </summary>
                 obstacledata = await _context.Obstacles.FindAsync(id.Value);
                 if (obstacledata == null) return NotFound();
 
@@ -117,17 +99,11 @@ namespace WebApplication1.Controllers
                     return Forbid();
                 }
 
-                obstacledata.ObstacleName = form["ObstacleName"];
+                obstacledata.ObstacleName = form["ObstacleName"].ToString() ?? string.Empty;
                 obstacledata.ObstacleHeight = heightMetersFromInput ?? obstacledata.ObstacleHeight;
-                obstacledata.ObstacleDescription = form["ObstacleDescription"];
+                obstacledata.ObstacleDescription = form["ObstacleDescription"].FirstOrDefault();
                 obstacledata.Latitude = decimal.TryParse(form["Latitude"], out var lat) ? lat : obstacledata.Latitude;
                 obstacledata.Longitude = decimal.TryParse(form["Longitude"], out var lng) ? lng : obstacledata.Longitude;
-
-                /// <summary>
-                /// ✅ Save full geometry from hidden field
-                /// </summary>
-                obstacledata.GeometryJson = form["GeometryJson"];
-
                 obstacledata.ReportedAt = DateTime.UtcNow;
 
                 if (int.TryParse(form["CategoryId"], out var categoryId))
@@ -137,13 +113,9 @@ namespace WebApplication1.Controllers
             }
             else
             {
-                /// <summary>
-                /// ===== CREATING NEW REPORT =====
-                /// Creates a new ObstacleData entity and assigns all fields.
-                /// </summary>
                 obstacledata = new ObstacleData
                 {
-                    ObstacleName = form["ObstacleName"],
+                    ObstacleName = form["ObstacleName"].FirstOrDefault() ?? string.Empty,
                     ObstacleHeight = heightMetersFromInput,
                     ObstacleDescription = form["ObstacleDescription"],
                     Latitude = ParseDecimalRaw(form["Latitude"]),
@@ -168,11 +140,6 @@ namespace WebApplication1.Controllers
                 _context.Obstacles.Add(obstacledata);
             }
 
-            /// <summary>
-            /// Set status based on draft flag:
-            /// - Draft: NotApproved
-            /// - Submit: Pending
-            /// </summary>
             obstacledata.Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending;
 
             if (!isDraft && !TryValidateModel(obstacledata))
@@ -191,8 +158,7 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Legacy redirect: Admin review page moved to AdminObstacleController.
-        /// Redirects to the new unified admin dashboard.
+        /// Redirects to the Admin Dashboard.
         /// </summary>
         [Authorize(Roles = "Registry Administrator")]
         [HttpGet]
@@ -202,8 +168,7 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Legacy redirect: Review pending reports moved to AdminObstacleController.
-        /// Redirects to admin dashboard with Pending filter applied.
+        /// Redirects to the Admin Dashboard filtered by Pending status.
         /// </summary>
         [Authorize(Roles = "Registry Administrator")]
         [HttpGet]
@@ -213,8 +178,7 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// Legacy action: Status updates moved to AdminObstacleController.
-        /// Redirects to admin dashboard where proper approve/reject actions exist.
+        /// Redirects to the Admin Dashboard.
         /// </summary>
         [Authorize(Roles = "Registry Administrator")]
         [HttpPost]

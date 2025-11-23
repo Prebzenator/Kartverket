@@ -464,21 +464,6 @@
             map.on('click', e => setPoint(e.latlng));
             // Geolocation with IP fallback (with basic status handling)
             let lastLocation = null, myMarker = null, accCircle = null;
-
-            function showFsToast(text, isError) {
-                if (!fsToast) return;
-                fsToast.classList.remove('visually-hidden');
-                fsToast.textContent = text;
-                fsToast.style.background = isError ? 'rgba(220,53,69,0.95)' : 'rgba(0,0,0,0.6)';
-                fsToast.style.color = '#fff';
-                fsToast.style.padding = '8px 12px';
-                fsToast.style.borderRadius = '6px';
-                clearTimeout(fsToast._hideTimer);
-                fsToast._hideTimer = setTimeout(() => {
-                    if (fsToast) fsToast.classList.add('visually-hidden');
-                }, 2500);
-            }
-
             function onLocationFound(e) {
                 lastLocation = e.latlng;
                 if (!myMarker) myMarker = L.marker(e.latlng, { title: "Your position" }).addTo(map).bindPopup("You are here");
@@ -600,35 +585,6 @@
                                 edit: { featureGroup: fsDrawnItems, remove:true }
                             });
                             fsMap.addControl(fsDrawControl);
-
-                            // Keep GeometryJson updated in fullscreen too
-                            fsMap.on(L.Draw.Event.CREATED, e => {
-                                let layer = e.layer;
-                                if (layer instanceof L.Circle) {
-                                    const polyGeo = circleToPolygon(layer, 64);
-                                    const poly = L.geoJSON(polyGeo).getLayers()[0];
-                                    fsDrawnItems.addLayer(poly);
-                                } else {
-                                    fsDrawnItems.addLayer(layer);
-                                }
-                                // copy back into main drawnItems for consistent serialization and preview
-                                drawnItems.clearLayers();
-                                copyGroup(fsDrawnItems, drawnItems);
-                                updateGeoJson();
-                            });
-
-                            fsMap.on(L.Draw.Event.EDITED, e => {
-                                // After edits, sync fs -> main and reserialize
-                                drawnItems.clearLayers();
-                                copyGroup(fsDrawnItems, drawnItems);
-                                updateGeoJson();
-                            });
-
-                            fsMap.on(L.Draw.Event.DELETED, e => {
-                                drawnItems.clearLayers();
-                                copyGroup(fsDrawnItems, drawnItems);
-                                updateGeoJson();
-                            });
                             fsMap.on(L.Draw.Event.CREATED, e => { fsDrawnItems.addLayer(e.layer); });
                             fsMap.on(L.Draw.Event.EDITED, e => {});
                             fsMap.on(L.Draw.Event.DELETED, e => {});
