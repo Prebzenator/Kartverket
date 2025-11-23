@@ -17,6 +17,9 @@ namespace WebApplication1.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
+        /// <summary>
+        /// Constructor injecting database context and user manager.
+        /// </summary>
         public ObstacleController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
@@ -117,6 +120,7 @@ namespace WebApplication1.Controllers
                     ObstacleDescription = form["ObstacleDescription"],
                     Latitude = ParseDecimalRaw(form["Latitude"]),
                     Longitude = ParseDecimalRaw(form["Longitude"]),
+                    GeometryJson = form["GeometryJson"],   // ✅ Save full geometry
                     ReportedAt = DateTime.UtcNow,
                     DateData = DateTime.UtcNow
                 };

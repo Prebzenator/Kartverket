@@ -1,5 +1,6 @@
 ﻿@model WebApplication1.Models.ObstacleData
 @using WebApplication1.Helpers
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Register Obstacle";
@@ -281,6 +282,32 @@
                 map.addControl(drawControl);
             }
 
+            // Helper: convert Leaflet Circle to Polygon approximation (n points)
+            function circleToPolygon(circleLayer, steps = 64) {
+                const center = circleLayer.getLatLng();
+                const radius = circleLayer.getRadius(); // meters
+                const R = 6378137; // Earth radius in meters (WGS84)
+                const lat1 = center.lat * Math.PI / 180;
+                const lon1 = center.lng * Math.PI / 180;
+                const d = radius / R;
+                const coords = [];
+                for (let i = 0; i < steps; i++) {
+                    const bearing = (i / steps) * 2 * Math.PI;
+                    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(d) + Math.cos(lat1) * Math.sin(d) * Math.cos(bearing));
+                    const lon2 = lon1 + Math.atan2(Math.sin(bearing) * Math.sin(d) * Math.cos(lat1), Math.cos(d) - Math.sin(lat1) * Math.sin(lat2));
+                    coords.push([lon2 * 180 / Math.PI, lat2 * 180 / Math.PI]); // GeoJSON uses [lng, lat]
+                }
+                // close ring
+                if (coords.length && (coords[0][0] !== coords[coords.length-1][0] || coords[0][1] !== coords[coords.length-1][1])) {
+                    coords.push(coords[0]);
+                }
+                return {
+                    type: "Polygon",
+                    coordinates: [coords]
+                };
+            }
+
+            // Serialize geometry to hidden input
             function updateGeoJson() {
                 try {
                     geoInput.value = JSON.stringify(drawnItems.toGeoJSON());
@@ -290,10 +317,140 @@
                 }
             }
 
+            // Keep GeometryJson synced (main map)
             if (hasDraw) {
-                map.on(L.Draw.Event.CREATED, e => { drawnItems.addLayer(e.layer); updateGeoJson(); });
-                map.on(L.Draw.Event.EDITED, e => updateGeoJson());
-                map.on(L.Draw.Event.DELETED, e => updateGeoJson());
+                // ---- Drawing handlers: create / edit / delete ----
+                map.on(L.Draw.Event.CREATED, e => {
+                    let layer = e.layer;
+
+                    // compute a representative center point for different layer types
+                    function computeCenterForLayer(l) {
+                        try {
+                            if (l instanceof L.Marker) {
+                                return l.getLatLng();
+                            }
+                            if (l instanceof L.Circle) {
+                                // circle: center available directly
+                                return l.getLatLng();
+                            }
+                            // Polylines: choose midpoint of first segment (better than bounding box center for long lines)
+                            if (l instanceof L.Polyline && !(l instanceof L.Polygon)) {
+                                const pts = l.getLatLngs();
+                                if (Array.isArray(pts) && pts.length >= 2) {
+                                    const a = pts[0], b = pts[1];
+                                    return L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2);
+                                }
+                            }
+                            // Polygons / Rectangles: use bounds center
+                            if (l.getBounds && typeof l.getBounds === 'function') {
+                                const b = l.getBounds();
+                                if (b && typeof b.getCenter === 'function') return b.getCenter();
+                            }
+                        } catch (err) {
+                            console.warn('computeCenterForLayer failed', err);
+                        }
+                        return null;
+                    }
+
+                    // If a circle, capture center before converting it
+                    let center = null;
+                    if (layer instanceof L.Circle) {
+                        center = computeCenterForLayer(layer);
+                        // Convert circle to polygon for consistent storage
+                        const polyGeo = circleToPolygon(layer, 64);
+                        const poly = L.geoJSON(polyGeo).getLayers()[0];
+                        drawnItems.addLayer(poly);
+                    } else {
+                        drawnItems.addLayer(layer);
+                        // compute center from the added layer (works for marker, polygon, polyline)
+                        center = computeCenterForLayer(layer);
+                    }
+
+                    // Update the hidden GeometryJson (serialize current drawnItems)
+                    updateGeoJson();
+
+                    // If we could compute a center, set Latitude/Longitude fields
+                    if (center) {
+                        latInput.value = fmt.format(center.lat);
+                        lngInput.value = fmt.format(center.lng);
+                    }
+                });
+
+                map.on(L.Draw.Event.EDITED, e => {
+                    // After edits, reserialize drawnItems and update lat/lng to represent the edited geometry
+                    updateGeoJson();
+
+                    // Choose a sensible representative center from the edited features:
+                    // prefer the first edited layer's computed center, otherwise fall back to bounds/first layer
+                    try {
+                        let rep = null;
+                        if (e.layers && typeof e.layers.eachLayer === 'function') {
+                            e.layers.eachLayer(l => {
+                                if (!rep) {
+                                    if (l instanceof L.Circle) rep = l.getLatLng();
+                                    else if (l.getBounds && typeof l.getBounds === 'function') {
+                                        const b = l.getBounds();
+                                        if (b && typeof b.getCenter === 'function') rep = b.getCenter();
+                                    } else if (l instanceof L.Marker) rep = l.getLatLng();
+                                    else if (l instanceof L.Polyline) {
+                                        const pts = l.getLatLngs();
+                                        if (Array.isArray(pts) && pts.length >= 2) {
+                                            const a = pts[0], b = pts[1];
+                                            rep = L.latLng((a.lat + b.lat) / 2, (a.lng + b.lng) / 2);
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        // fallback: any layer in drawnItems
+                        if (!rep && drawnItems && typeof drawnItems.eachLayer === 'function') {
+                            drawnItems.eachLayer(l => {
+                                if (!rep) {
+                                    if (l.getBounds && typeof l.getBounds === 'function') {
+                                        const b = l.getBounds();
+                                        if (b && typeof b.getCenter === 'function') rep = b.getCenter();
+                                    } else if (l instanceof L.Marker) rep = l.getLatLng();
+                                }
+                            });
+                        }
+
+                        if (rep) {
+                            latInput.value = fmt.format(rep.lat);
+                            lngInput.value = fmt.format(rep.lng);
+                        }
+                    } catch (err) {
+                        console.warn('Error during EDITED handling', err);
+                    }
+                });
+
+                map.on(L.Draw.Event.DELETED, e => {
+                    updateGeoJson();
+
+                    // If nothing left, clear lat/lng; otherwise set to center of remaining geometry
+                    try {
+                        let rep = null;
+                        if (drawnItems.getLayers().length === 0) {
+                            latInput.value = '';
+                            lngInput.value = '';
+                        } else {
+                            // pick center of first remaining layer
+                            const first = drawnItems.getLayers()[0];
+                            if (first) {
+                                if (first.getBounds && typeof first.getBounds === 'function') {
+                                    const b = first.getBounds();
+                                    if (b && typeof b.getCenter === 'function') rep = b.getCenter();
+                                } else if (first instanceof L.Marker) rep = first.getLatLng();
+                            }
+                            if (rep) {
+                                latInput.value = fmt.format(rep.lat);
+                                lngInput.value = fmt.format(rep.lng);
+                            }
+                        }
+                    } catch (err) {
+                        console.warn('Error during DELETED handling', err);
+                    }
+                });
             }
 
             // Lat/Lng click handling
@@ -372,7 +529,10 @@
                     const existing = geoInput?.value;
                     if (existing) {
                         const geo = JSON.parse(existing);
-                        const tmp = L.geoJSON(geo);
+                        // Use pointToLayer so GeoJSON Points become markers
+                        const tmp = L.geoJSON(geo, {
+                            pointToLayer: (feature, latlng) => L.marker(latlng)
+                        });
                         tmp.eachLayer(l => drawnItems.addLayer(l));
                         updateGeoJson();
                     }
@@ -389,7 +549,7 @@
                 sourceGroup.eachLayer(l => {
                     try {
                         const gj = l.toGeoJSON();
-                        L.geoJSON(gj).eachLayer(ml => targetGroup.addLayer(ml));
+                        L.geoJSON(gj, { pointToLayer: (f, latlng) => L.marker(latlng) }).eachLayer(ml => targetGroup.addLayer(ml));
                     } catch (e) {
                         try { targetGroup.addLayer(l); } catch (_) { /* ignore */ }
                     }
@@ -540,32 +700,54 @@
             }
 
         })();
+        
     </script>
 
     @if ((ViewBag.Missing as bool?) ?? false)
     {
         <script>
-            const input = document.getElementById("ObstacleNameInput");
-            const prefix = "MISSING - ";
-            if (input) {
-                input.addEventListener("keydown", (e) => {
-                    const c = input.selectionStart;
-                    if ((e.key === "Backspace" && c <= prefix.length) ||
-                        (e.key === "Delete" && c < prefix.length)) e.preventDefault();
-                });
-                input.addEventListener("input", () => {
+            (function () {
+                // Run after DOM is ready to guarantee the input exists
+                function initMissingNameGuard() {
+                    const input = document.getElementById("ObstacleNameInput");
+                    if (!input) return;
+
+                    const prefix = "MISSING - ";
+
+                    input.addEventListener("keydown", (e) => {
+                        const c = input.selectionStart;
+                        if ((e.key === "Backspace" && c <= prefix.length) ||
+                            (e.key === "Delete" && c < prefix.length)) {
+                            e.preventDefault();
+                        }
+                    });
+
+                    input.addEventListener("input", () => {
+                        if (!input.value.startsWith(prefix)) {
+                            const suffix = input.value.replace(prefix, "");
+                            input.value = prefix + suffix;
+                            input.setSelectionRange(prefix.length, prefix.length);
+                        }
+                    });
+
+                    input.addEventListener("focus", () => {
+                        if (input.selectionStart < prefix.length) {
+                            input.setSelectionRange(prefix.length, prefix.length);
+                        }
+                    });
+
+                    // Ensure initial value has prefix
                     if (!input.value.startsWith(prefix)) {
-                        const suffix = input.value.replace(prefix, "");
-                        input.value = prefix + suffix;
-                        input.setSelectionRange(prefix.length, prefix.length);
+                        input.value = prefix + (input.value || "");
                     }
-                });
-                input.addEventListener("focus", () => {
-                    if (input.selectionStart < prefix.length) {
-                        input.setSelectionRange(prefix.length, prefix.length);
-                    }
-                });
-            }
+                }
+
+                if (document.readyState === "loading") {
+                    document.addEventListener("DOMContentLoaded", initMissingNameGuard);
+                } else {
+                    initMissingNameGuard();
+                }
+            })();
         </script>
     }
 }
@@ -639,4 +821,5 @@
         padding: 0;
         margin: -1px;
     }
+    
 </style>
