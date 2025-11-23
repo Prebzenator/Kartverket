@@ -284,39 +284,197 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
-    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    @if (!string.IsNullOrEmpty(Model?.GeometryJson) || (Model?.Latitude.HasValue == true && Model?.Longitude.HasValue == true))
     {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
         <script>
-            const lat = parseFloat("@lat");
-            const lng = parseFloat("@lng");
+            (function () {
+                const mapEl = document.getElementById('map');
+                if (!mapEl) { console.warn('No map container found'); return; }
 
-            // Initier kart
-            const map = L.map('map').setView([lat, lng], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+                // Safe parse of model coordinates
+                const latStr = "@(Model?.Latitude.HasValue == true ? Model.Latitude.Value.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture) : "")";
+                const lngStr = "@(Model?.Longitude.HasValue == true ? Model.Longitude.Value.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture) : "")";
+                const latModel = latStr ? parseFloat(latStr) : NaN;
+                const lngModel = lngStr ? parseFloat(lngStr) : NaN;
 
-            // Marker som kan flyttes
-            let marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                const map = L.map('map').setView([(!isNaN(latModel) ? latModel : 60.472), (!isNaN(lngModel) ? lngModel : 8.4689)], (!isNaN(latModel) && !isNaN(lngModel)) ? 14 : 5);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
 
-            // Oppdater inputfelter når markøren dras
-            marker.on('dragend', function () {
-                const pos = marker.getLatLng();
-                document.getElementById('Latitude').value = pos.lat.toFixed(6);
-                document.getElementById('Longitude').value = pos.lng.toFixed(6);
-            });
+                // Raw GeoJSON from model
+                const geometry = @Html.Raw(string.IsNullOrEmpty(Model?.GeometryJson) ? "null" : Model.GeometryJson);
 
-            // Oppdater inputfelter når kartet klikkes
-            map.on('click', function (e) {
-                const pos = e.latlng;
-                marker.setLatLng(pos);
-                document.getElementById('Latitude').value = pos.lat.toFixed(6);
-                document.getElementById('Longitude').value = pos.lng.toFixed(6);
-            });
+                // Helper: extract first usable coordinate [lng, lat] from GeoJSON
+                function findFirstCoord(obj) {
+                    if (!obj) return null;
+                    if (obj.type === 'FeatureCollection' && Array.isArray(obj.features)) {
+                        for (const f of obj.features) {
+                            const c = findFirstCoord(f);
+                            if (c) return c;
+                        }
+                        return null;
+                    }
+                    if (obj.type === 'Feature') return findFirstCoord(obj.geometry);
+                    if (obj.type === 'Point' && Array.isArray(obj.coordinates)) return obj.coordinates;
+                    if ((obj.type === 'LineString' || obj.type === 'MultiPoint') && Array.isArray(obj.coordinates)) return obj.coordinates[0] || null;
+                    if (obj.type === 'Polygon' && Array.isArray(obj.coordinates)) return (obj.coordinates[0] && obj.coordinates[0][0]) || null;
+                    if (obj.type === 'MultiPolygon' && Array.isArray(obj.coordinates)) return (obj.coordinates[0] && obj.coordinates[0][0] && obj.coordinates[0][0][0]) || null;
+                    if (obj.type === 'GeometryCollection' && Array.isArray(obj.geometries)) {
+                        for (const g of obj.geometries) {
+                            const c = findFirstCoord(g);
+                            if (c) return c;
+                        }
+                    }
+                    return null;
+                }
+
+                // Filter to polygons/lines only (used for area/line rendering)
+                function filterPolygonsAndLines(gj) {
+                    if (!gj) return null;
+                    if (gj.type === 'FeatureCollection' && Array.isArray(gj.features)) {
+                        const features = gj.features.filter(f => {
+                            const t = (f && f.geometry && f.geometry.type) || '';
+                            return t === 'Polygon' || t === 'MultiPolygon' || t === 'LineString' || t === 'MultiLineString';
+                        });
+                        if (!features.length) return null;
+                        return { type: 'FeatureCollection', features };
+                    }
+                    if (gj.type === 'Feature') {
+                        const t = (gj.geometry && gj.geometry.type) || '';
+                        if (t === 'Polygon' || t === 'MultiPolygon' || t === 'LineString' || t === 'MultiLineString') return gj;
+                        return null;
+                    }
+                    if (gj.type === 'Polygon' || gj.type === 'MultiPolygon' || gj.type === 'LineString' || gj.type === 'MultiLineString') return gj;
+                    return null;
+                }
+
+                // Utility: update input fields with lat/lng (6 decimals)
+                function setInputs(lat, lng) {
+                    const latEl = document.getElementById('Latitude');
+                    const lngEl = document.getElementById('Longitude');
+                    if (latEl) latEl.value = lat.toFixed(6);
+                    if (lngEl) lngEl.value = lng.toFixed(6);
+                }
+
+                // Add polygon/line layers first
+                try {
+                    if (geometry) {
+                        const filtered = filterPolygonsAndLines(geometry);
+                        if (filtered) {
+                            const layer = L.geoJSON(filtered, {
+                                style: function (feature) {
+                                    const t = feature && feature.geometry && feature.geometry.type;
+                                    if (t && t.indexOf('Line') === 0) return { color: '#1f77b4', weight: 3, opacity: 0.9 };
+                                    return { color: '#e6550d', weight: 2, fillOpacity: 0.25 };
+                                }
+                            }).addTo(map);
+
+                            const bounds = (typeof layer.getBounds === 'function') ? layer.getBounds() : null;
+                            if (bounds && typeof bounds.isValid === 'function' && bounds.isValid()) {
+                                map.fitBounds(bounds, { padding: [20, 20] });
+                            }
+                        }
+
+                        // Render GeoJSON Points as markers and keep a single draggable representative marker
+                        const pointLayer = L.geoJSON(geometry, {
+                            pointToLayer: (feature, latlng) => L.marker(latlng)
+                        }).addTo(map);
+
+                        // Determine marker position: prefer pointLayer bounds center, fallback to first coord, else model lat/lng
+                        let markerPos = null;
+                        const pBounds = (typeof pointLayer.getBounds === 'function') ? pointLayer.getBounds() : null;
+                        if (pBounds && typeof pBounds.isValid === 'function' && pBounds.isValid()) {
+                            markerPos = pBounds.getCenter();
+                        } else {
+                            const first = findFirstCoord(geometry);
+                            if (first && first.length >= 2) {
+                                const lng = parseFloat(first[0]);
+                                const lat = parseFloat(first[1]);
+                                if (!isNaN(lat) && !isNaN(lng)) markerPos = L.latLng(lat, lng);
+                            }
+                        }
+
+                        if (!markerPos && !isNaN(latModel) && !isNaN(lngModel)) {
+                            markerPos = L.latLng(latModel, lngModel);
+                        }
+
+                        // Create draggable marker if we have a position
+                        if (markerPos) {
+                            const repMarker = L.marker(markerPos, { draggable: true }).addTo(map);
+
+                            // Ensure inputs reflect initial marker pos
+                            setInputs(markerPos.lat, markerPos.lng);
+
+                            repMarker.on('dragend', function () {
+                                const pos = repMarker.getLatLng();
+                                setInputs(pos.lat, pos.lng);
+                            });
+
+                            map.on('click', function (e) {
+                                const pos = e.latlng;
+                                repMarker.setLatLng(pos);
+                                setInputs(pos.lat, pos.lng);
+                            });
+                        } else {
+                            // If we have no usable geometry and no model coords, let clicks create/update a marker
+                            let tempMarker = null;
+                            map.on('click', function (e) {
+                                const pos = e.latlng;
+                                if (!tempMarker) {
+                                    tempMarker = L.marker(pos, { draggable: true }).addTo(map);
+                                    tempMarker.on('dragend', () => {
+                                        const p = tempMarker.getLatLng();
+                                        setInputs(p.lat, p.lng);
+                                    });
+                                } else {
+                                    tempMarker.setLatLng(pos);
+                                }
+                                setInputs(pos.lat, pos.lng);
+                            });
+                        }
+                    } else {
+                        // No geometry: fallback to model lat/lng if present — create draggable marker
+                        if (!isNaN(latModel) && !isNaN(lngModel)) {
+                            const marker = L.marker([latModel, lngModel], { draggable: true }).addTo(map);
+                            setInputs(latModel, lngModel);
+                            marker.on('dragend', function () {
+                                const pos = marker.getLatLng();
+                                setInputs(pos.lat, pos.lng);
+                            });
+                            map.on('click', function (e) {
+                                const pos = e.latlng;
+                                marker.setLatLng(pos);
+                                setInputs(pos.lat, pos.lng);
+                            });
+                        } else {
+                            // No coords available: let clicks create a marker
+                            let tempMarker = null;
+                            map.on('click', function (e) {
+                                const pos = e.latlng;
+                                if (!tempMarker) {
+                                    tempMarker = L.marker(pos, { draggable: true }).addTo(map);
+                                    tempMarker.on('dragend', () => {
+                                        const p = tempMarker.getLatLng();
+                                        setInputs(p.lat, p.lng);
+                                    });
+                                } else {
+                                    tempMarker.setLatLng(pos);
+                                }
+                                setInputs(pos.lat, pos.lng);
+                            });
+                        }
+                    }
+                } catch (err) {
+                    console.warn('Error rendering admin report map', err);
+                } finally {
+                    setTimeout(() => { try { map.invalidateSize(); } catch (_) { } }, 120);
+                }
+            })();
         </script>
     }
 }
-

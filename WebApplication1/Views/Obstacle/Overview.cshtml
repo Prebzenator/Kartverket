@@ -22,7 +22,6 @@
                         <dt class="col-5 col-md-4">Name</dt>
                         <dd class="col-7 col-md-8">@Model.ObstacleName</dd>
 
-                     
                         <dt class="col-5 col-md-4">Category</dt>
                         <dd class="col-7 col-md-8">@Model.Category?.Name</dd>
 
@@ -80,7 +79,8 @@
                 </div>
             }
 
-            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            @* Render map when there is GeometryJson OR lat/lng *@
+            @if (!string.IsNullOrEmpty(Model?.GeometryJson) || (Model?.Latitude.HasValue == true && Model?.Longitude.HasValue == true))
             {
                 <div class="card shadow-sm rounded-4">
                     <div class="card-body p-0">
@@ -98,17 +98,134 @@
 </div>
 
 @section Scripts {
-    @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+    @* Only include and run map script when the container is rendered *@
+    @if (!string.IsNullOrEmpty(Model?.GeometryJson) || (Model?.Latitude.HasValue == true && Model?.Longitude.HasValue == true))
     {
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
         <script>
-            const lat = parseFloat("@lat");
-            const lng = parseFloat("@lng");
-            const map2 = L.map('map-overview').setView([lat, lng], 14);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map2);
-            L.marker([lat, lng]).addTo(map2);
+            (function () {
+                const mapEl = document.getElementById('map-overview');
+                if (!mapEl) { console.warn('No map container found'); return; }
+
+                const map = L.map('map-overview').setView([60.472, 8.4689], 5);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Raw GeometryJson from model (use Html.Raw to avoid HTML-encoding)
+                const geometry = @Html.Raw(string.IsNullOrEmpty(Model?.GeometryJson) ? "null" : Model.GeometryJson);
+
+                // Extract a first coordinate [lng, lat] from arbitrary GeoJSON
+                function findFirstCoord(obj) {
+                    if (!obj) return null;
+                    if (obj.type === 'FeatureCollection' && Array.isArray(obj.features)) {
+                        for (const f of obj.features) {
+                            const c = findFirstCoord(f);
+                            if (c) return c;
+                        }
+                        return null;
+                    }
+                    if (obj.type === 'Feature') return findFirstCoord(obj.geometry);
+                    if (obj.type === 'Point' && Array.isArray(obj.coordinates)) return obj.coordinates;
+                    if ((obj.type === 'LineString' || obj.type === 'MultiPoint') && Array.isArray(obj.coordinates)) return obj.coordinates[0] || null;
+                    if (obj.type === 'Polygon' && Array.isArray(obj.coordinates)) return (obj.coordinates[0] && obj.coordinates[0][0]) || null;
+                    if (obj.type === 'MultiPolygon' && Array.isArray(obj.coordinates)) return (obj.coordinates[0] && obj.coordinates[0][0] && obj.coordinates[0][0][0]) || null;
+                    if (obj.type === 'GeometryCollection' && Array.isArray(obj.geometries)) {
+                        for (const g of obj.geometries) {
+                            const c = findFirstCoord(g);
+                            if (c) return c;
+                        }
+                    }
+                    return null;
+                }
+
+                // Filter to polygon/lines (used to render area/line features)
+                function filterPolygonsAndLines(gj) {
+                    if (!gj) return null;
+                    if (gj.type === 'FeatureCollection' && Array.isArray(gj.features)) {
+                        const features = gj.features.filter(f => {
+                            const t = (f && f.geometry && f.geometry.type) || '';
+                            return t === 'Polygon' || t === 'MultiPolygon' || t === 'LineString' || t === 'MultiLineString';
+                        });
+                        if (!features.length) return null;
+                        return { type: 'FeatureCollection', features };
+                    }
+                    if (gj.type === 'Feature') {
+                        const t = (gj.geometry && gj.geometry.type) || '';
+                        if (t === 'Polygon' || t === 'MultiPolygon' || t === 'LineString' || t === 'MultiLineString') return gj;
+                        return null;
+                    }
+                    if (gj.type === 'Polygon' || gj.type === 'MultiPolygon' || gj.type === 'LineString' || gj.type === 'MultiLineString') return gj;
+                    return null;
+                }
+
+                try {
+                    // Render polygons/lines first
+                    if (geometry) {
+                        const filtered = filterPolygonsAndLines(geometry);
+                        if (filtered) {
+                            const layer = L.geoJSON(filtered, {
+                                style: function (feature) {
+                                    const t = feature && feature.geometry && feature.geometry.type;
+                                    if (t && t.indexOf('Line') === 0) return { color: '#1f77b4', weight: 3, opacity: 0.9 };
+                                    return { color: '#e6550d', weight: 2, fillOpacity: 0.25 };
+                                }
+                            }).addTo(map);
+
+                            const bounds = (typeof layer.getBounds === 'function') ? layer.getBounds() : null;
+                            if (bounds && typeof bounds.isValid === 'function' && bounds.isValid()) {
+                                map.fitBounds(bounds, { padding: [20, 20] });
+                                setTimeout(()=> map.invalidateSize(), 120);
+                                return;
+                            }
+                        }
+
+                        // Render any Points from the GeoJSON (pointToLayer creates markers)
+                        const pointLayer = L.geoJSON(geometry, {
+                            pointToLayer: (feature, latlng) => L.marker(latlng)
+                        }).addTo(map);
+
+                        const pBounds = (typeof pointLayer.getBounds === 'function') ? pointLayer.getBounds() : null;
+                        if (pBounds && typeof pBounds.isValid === 'function' && pBounds.isValid()) {
+                            map.fitBounds(pBounds, { padding: [20, 20] });
+                            setTimeout(()=> map.invalidateSize(), 120);
+                            return;
+                        }
+
+                        // Fallback: center on the first coordinate found in the GeoJSON
+                        const first = findFirstCoord(geometry);
+                        if (first && first.length >= 2) {
+                            const lng = parseFloat(first[0]);
+                            const lat = parseFloat(first[1]);
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                L.marker([lat, lng]).addTo(map);
+                                map.setView([lat, lng], 14);
+                                setTimeout(()=> map.invalidateSize(), 120);
+                                return;
+                            }
+                        }
+                    }
+
+                    // Last fallback: use model lat/lng if present
+                    if (@(Model?.Latitude.HasValue == true ? "true" : "false") && @(Model?.Longitude.HasValue == true ? "true" : "false")) {
+                        const latVal = parseFloat("@lat");
+                        const lngVal = parseFloat("@lng");
+                        if (!isNaN(latVal) && !isNaN(lngVal)) {
+                            L.marker([latVal, lngVal]).addTo(map);
+                            map.setView([latVal, lngVal], 14);
+                            setTimeout(()=> map.invalidateSize(), 120);
+                            return;
+                        }
+                    }
+
+                    console.warn('No usable geometry or coordinates found for rendering.');
+                } catch (err) {
+                    console.warn('Error rendering overview map', err);
+                }
+
+            })();
         </script>
     }
 }
