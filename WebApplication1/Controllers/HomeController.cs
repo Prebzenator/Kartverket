@@ -1,37 +1,54 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApplication1.Models;
+using WebApplication1.Data;
 
 namespace WebApplication1.Controllers
 {
     public class HomeController : Controller
     {
-        // This action displays the home page
-        // If user is Registry Administrator, redirect to admin dashboard
-        public IActionResult Index()
+        private readonly ApplicationDbContext _context;
+
+        public HomeController(ApplicationDbContext context)
         {
-            // Check if user is a Registry Administrator
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            // If the user is authenticated and has the "Registry Administrator" role,
+            // redirect them to the Admin Dashboard
             if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
             {
                 return RedirectToAction("Dashboard", "AdminObstacle");
             }
 
-            return View();
+            // Fetch all obstacles that are approved and have valid coordinates
+            var obstacles = await _context.Obstacles
+                .Where(o => o.Status == ReportStatus.Approved &&
+                            o.Latitude.HasValue &&
+                            o.Longitude.HasValue)
+                .ToListAsync();
+
+            // Pass the obstacles list to the view
+            return View(obstacles);
         }
 
-        // This action displays the Privacy page
+        // Display the Privacy page
         public IActionResult Privacy()
         {
             return View();
         }
 
-        // Response cache attribute to prevent caching of error responses
+        // Display the Error page with diagnostic information
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-
-        // This action handles errors and displays the Error view
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }
