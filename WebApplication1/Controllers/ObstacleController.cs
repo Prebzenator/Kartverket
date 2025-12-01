@@ -120,7 +120,7 @@ namespace WebApplication1.Controllers
                     ObstacleDescription = form["ObstacleDescription"],
                     Latitude = ParseDecimalRaw(form["Latitude"]),
                     Longitude = ParseDecimalRaw(form["Longitude"]),
-                    GeometryJson = form["GeometryJson"],   // ✅ Save full geometry
+                    GeometryJson = form["GeometryJson"],
                     ReportedAt = DateTime.UtcNow,
                     DateData = DateTime.UtcNow
                 };
@@ -142,9 +142,38 @@ namespace WebApplication1.Controllers
 
             obstacledata.Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending;
 
-            if (!isDraft && !TryValidateModel(obstacledata))
+            if (!isDraft)
             {
-                return View(obstacledata);
+                // Validate required fields manually
+                // submition requires all fields to be filled, however some are not nullable in the model
+                // Therefore, submitting will show validation errors in 2 rounds
+                if (string.IsNullOrWhiteSpace(obstacledata.ObstacleName))
+                    ModelState.AddModelError(nameof(obstacledata.ObstacleName), "Name is required.");
+
+                if (string.IsNullOrWhiteSpace(obstacledata.ObstacleDescription))
+                    ModelState.AddModelError(nameof(obstacledata.ObstacleDescription), "Description is required.");
+
+                if (!obstacledata.Latitude.HasValue || !obstacledata.Longitude.HasValue)
+                    ModelState.AddModelError("Coordinates", "Coordinates are required when submitting.");
+
+                if (!obstacledata.CategoryId.HasValue || obstacledata.CategoryId <= 0)
+                    ModelState.AddModelError(nameof(obstacledata.CategoryId), "Category is required when submitting.");
+
+                if (!obstacledata.ObstacleHeight.HasValue)
+                    ModelState.AddModelError(nameof(obstacledata.ObstacleHeight), "Height is required when submitting.");
+
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.CategoryOptions = _context.ObstacleCategories
+                        .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
+                        {
+                            Value = c.Id.ToString(),
+                            Text = c.Name
+                        })
+                        .ToList();
+
+                    return View(obstacledata);
+                }
             }
 
             await _context.SaveChangesAsync();

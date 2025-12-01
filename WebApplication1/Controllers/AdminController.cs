@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApplication1.Data;
 using WebApplication1.Models;
 using WebApplication1.ViewModels;
 
@@ -8,18 +10,23 @@ namespace WebApplication1.Controllers
 {
     /// <summary>
     /// System Administrator controller for user management.
+    /// Also exposes AdminMap so Registry Administrators can open the map view.
     /// </summary>
-    [Authorize(Roles = "System Administrator")]
+    [Authorize(Roles = "System Administrator,Registry Administrator")]
     public class AdminController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext _db;
 
-        public AdminController(UserManager<ApplicationUser> userManager,
-                             RoleManager<IdentityRole> roleManager)
+        public AdminController(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _db = db;
         }
 
         public IActionResult CreateUser()
@@ -39,11 +46,10 @@ namespace WebApplication1.Controllers
                 Email = vm.Email,
                 FullName = vm.FullName,
                 Organization = vm.Organization,
-                EmailConfirmed = true, // Skip confirmation for this implementation
-                MustChangePassword = true // Force password change on first login
+                EmailConfirmed = true,
+                MustChangePassword = true
             };
 
-            // Generate a temporary password
             var tempPassword = "Temp!" + Guid.NewGuid().ToString("N").Substring(0, 8);
 
             var createResult = await _userManager.CreateAsync(user, tempPassword);
@@ -68,7 +74,6 @@ namespace WebApplication1.Controllers
                 await _userManager.AddToRoleAsync(user, "Pilot");
             }
 
-            // Display the temporary password to the admin
             var successVm = new CreateUserSuccessViewModel
             {
                 FullName = vm.FullName,
@@ -79,6 +84,20 @@ namespace WebApplication1.Controllers
             };
 
             return View("CreateUserSuccess", successVm);
+        }
+
+
+        /// Returns the AdminMap view with approved obstacles for Registry Administrators.
+
+        [HttpGet]
+        public async Task<IActionResult> AdminMap()
+        {
+            var approved = await _db.Obstacles
+                .Where(o => o.Status == ReportStatus.Approved)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(approved);
         }
     }
 }

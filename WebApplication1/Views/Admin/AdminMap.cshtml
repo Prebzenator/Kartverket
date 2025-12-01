@@ -1,0 +1,256 @@
+﻿@model IEnumerable<WebApplication1.Models.ObstacleData>
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Admin Map";
+    var mapHeight = "520px";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h4 mb-3">Map</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body p-0">
+                    <div id="admin-map" style="height:@mapHeight; width:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-2">
+                <div class="legend-item d-flex align-items-center gap-2">
+                    <span class="legend-dot legend-1" aria-hidden="true"></span>
+                    <small class="text-muted mb-0">Mast or Tower</small>
+                </div>
+                <div class="legend-item d-flex align-items-center gap-2">
+                    <span class="legend-dot legend-2" aria-hidden="true"></span>
+                    <small class="text-muted mb-0">Power Line</small>
+                </div>
+                <div class="legend-item d-flex align-items-center gap-2">
+                    <span class="legend-dot legend-3" aria-hidden="true"></span>
+                    <small class="text-muted mb-0">Construction Crane</small>
+                </div>
+                <div class="legend-item d-flex align-items-center gap-2">
+                    <span class="legend-dot legend-4" aria-hidden="true"></span>
+                    <small class="text-muted mb-0">Cable</small>
+                </div>
+                <div class="legend-item d-flex align-items-center gap-2">
+                    <span class="legend-dot legend-5" aria-hidden="true"></span>
+                    <small class="text-muted mb-0">Other</small>
+                </div>
+                <div class="legend-item d-flex align-items-center gap-2">
+                    <span class="legend-dot legend-0" aria-hidden="true"></span>
+                    <small class="text-muted mb-0">Uncategorized</small>
+                </div>
+            </div>
+            <small class="text-muted d-block mb-4">Colored dots indicate category; click a dot for details. Uncategorized are shown in neutral grey.</small>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .legend-dot {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(16,24,40,0.12);
+            border: 2px solid #fff;
+        }
+
+        .legend-1, .marker-cat-1 {
+            background: linear-gradient(180deg,#8fb4ff 0%,#2d7bff 100%);
+        }
+
+        .legend-2, .marker-cat-2 {
+            background: linear-gradient(180deg,#ffd6a5 0%,#ff8c42 100%);
+        }
+
+        .legend-3, .marker-cat-3 {
+            background: linear-gradient(180deg,#c7f9cc 0%,#49c36b 100%);
+        }
+
+        .legend-4, .marker-cat-4 {
+            background: linear-gradient(180deg,#ffd6f0 0%,#ff7ab6 100%);
+        }
+
+        .legend-5, .marker-cat-5 {
+            background: linear-gradient(180deg,#e6e6e6 0%,#9ca3af 100%);
+        }
+
+        .legend-0, .marker-cat-0 {
+            background: linear-gradient(180deg,#f5f7f9 0%,#d1d5db 100%);
+        }
+
+        .obstacle-dot {
+            position: relative;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            box-shadow: 0 6px 14px rgba(16,24,40,0.18), 0 0 0 2px #ffffff;
+            transform: translate(-50%, -50%);
+            display: inline-block;
+        }
+
+            .obstacle-dot .inner {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255,255,255,0.95);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+            }
+
+            .obstacle-dot:hover {
+                transform: translate(-50%, -50%) scale(1.12);
+                box-shadow: 0 8px 18px rgba(16,24,40,0.22), 0 0 0 3px rgba(255,255,255,0.85);
+            }
+
+        .btn-locate {
+            background: #ffb703;
+            color: #072a6b;
+            border: 1px solid #f4a300;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 14px rgba(2,6,23,0.14);
+            cursor: pointer;
+        }
+
+            .btn-locate:hover, .btn-locate:focus {
+                background: #ffb03a;
+                color: #072a6b;
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(255, 176, 3, 0.18);
+            }
+
+        .leaflet-popup-content small.text-muted {
+            color: #0f1724 !important;
+            opacity: 0.9 !important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+    <script>
+        (function () {
+            try {
+                const map = L.map('admin-map', { zoomControl: true }).setView([60.472, 8.4689], 5);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: ''
+                }).addTo(map);
+
+                const obstacles = @Html.Raw(JsonSerializer.Serialize(Model ?? Enumerable.Empty<WebApplication1.Models.ObstacleData>()));
+
+                const categoryClass = {
+                    0: 'marker-cat-0',
+                    1: 'marker-cat-1',
+                    2: 'marker-cat-2',
+                    3: 'marker-cat-3',
+                    4: 'marker-cat-4',
+                    5: 'marker-cat-5'
+                };
+
+                function createDivIconForCategory(catId) {
+                    const key = (catId === null || catId === undefined) ? 0 : Number(catId);
+                    const cls = categoryClass[key] || 'marker-cat-0';
+                    const html = `<span class="obstacle-dot ${cls}" role="img" aria-label="Obstacle"><span class="inner"></span></span>`;
+                    return L.divIcon({
+                        className: '',
+                        html: html,
+                        iconSize: [22, 22],
+                        iconAnchor: [11, 11]
+                    });
+                }
+
+                const latlngs = [];
+                obstacles.forEach(o => {
+                    if (o.Latitude !== null && o.Longitude !== null) {
+                        const icon = createDivIconForCategory(o.CategoryId);
+                        const marker = L.marker([o.Latitude, o.Longitude], { icon: icon, keyboard: true })
+                            .addTo(map)
+                            .bindPopup(`
+                                <div style="min-width:220px">
+                                    <strong>${o.ObstacleName}</strong><br/>
+                                    <small class="text-muted">Category: ${getCategoryLabel(o.CategoryId)}</small><br/>
+                                    Height: ${o.ObstacleHeight ?? 'unknown'} m<br/>
+                                    ${o.ObstacleDescription ?? ''}
+                                </div>
+                            `);
+
+                        marker.on('mouseover', function () { this.openPopup(); });
+                        marker.on('mouseout', function () { this.closePopup(); });
+                        marker.on('keypress', (e) => {
+                            if (e.originalEvent.key === 'Enter') marker.openPopup();
+                        });
+
+                        latlngs.push([o.Latitude, o.Longitude]);
+                    }
+                });
+
+                if (latlngs.length > 0) {
+                    map.fitBounds(latlngs, { padding: [40, 40], maxZoom: 14 });
+                } else {
+                    map.setView([60.472, 8.4689], 5);
+                }
+
+                const locateBtn = L.control({ position: 'topright' });
+                locateBtn.onAdd = function () {
+                    const container = L.DomUtil.create('div', '');
+                    const btn = L.DomUtil.create('button', 'btn-locate', container);
+                    btn.type = 'button';
+                    btn.setAttribute('title', 'Use my position');
+                    btn.setAttribute('aria-label', 'Use my position');
+                    btn.innerHTML = '<i class="bi bi-geo-alt-fill" aria-hidden="true"></i>';
+                    L.DomEvent.disableClickPropagation(btn);
+                    L.DomEvent.disableScrollPropagation(btn);
+                    btn.onclick = function () {
+                        map.locate({ setView: true, maxZoom: 15, enableHighAccuracy: true });
+                    };
+                    return container;
+                };
+                locateBtn.addTo(map);
+
+                map.on('locationfound', function (e) {
+                    map.setView(e.latlng, Math.max(map.getZoom(), 15));
+                });
+
+                map.on('locationerror', function () {
+                    console.warn('Unable to access your location. Please check browser permissions.');
+                });
+
+                function getCategoryLabel(id) {
+                    switch (Number(id)) {
+                        case 1: return 'Mast or Tower';
+                        case 2: return 'Power Line';
+                        case 3: return 'Construction Crane';
+                        case 4: return 'Cable';
+                        case 5: return 'Other';
+                        default: return 'Uncategorized';
+                    }
+                }
+
+            } catch (e) {
+                console.warn('Admin map init failed', e);
+            }
+        })();
+    </script>
+}

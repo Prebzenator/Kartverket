@@ -45,7 +45,7 @@
         <!-- Left Column: Obstacle Details -->
         <div class="col-lg-8">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div class="card-header bg-body-secondary d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Obstacle Information</h5>
                     @* Show edit button for all own reports (not just drafts) *@
                     @if (ViewBag.CanEdit == true)
@@ -79,7 +79,7 @@
             @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
             {
                 <div class="card shadow-sm">
-                    <div class="card-header bg-light">
+                    <div class="card-header bg-body-secondary">
                         <h5 class="mb-0">Location</h5>
                     </div>
                     <div class="card-body p-0">
@@ -93,7 +93,7 @@
         <div class="col-lg-4">
             <!-- Current Status -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
+                <div class="card-header bg-body-secondary">
                     <h5 class="mb-0">Current Status</h5>
                 </div>
                 <div class="card-body">
@@ -151,7 +151,7 @@
 
             <!-- Reporter Info -->
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
+                <div class="card-header bg-body-secondary">
                     <h5 class="mb-0">Reporter Information</h5>
                 </div>
                 <div class="card-body">
@@ -160,6 +160,7 @@
                     <p class="mb-0"><strong>User ID:</strong> <small class="text-muted">@Model.ReportedByUserId</small></p>
                 </div>
             </div>
+
 
             <!-- Admin Comments Display (only for rejected reports, not drafts) -->
             @if (!isDraft && Model.Status == ReportStatus.NotApproved && !string.IsNullOrEmpty(Model.AdminComments))
