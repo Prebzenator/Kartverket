@@ -38,11 +38,24 @@
     <header class="border-bottom bg-body">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
             <div class="container-fluid">
-                <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
-                   asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
-                    <i class="bi bi-compass"></i>
-                    Obstacle App
-                </a>
+                @* Logo: route based on role (Pilot -> Home, otherwise AdminObstacle Dashboard) *@
+                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
+                {
+                    <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
+                       asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-compass"></i>
+                        Obstacle App
+                    </a>
+                }
+                else
+                {
+                    <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
+                       asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
+                        <i class="bi bi-compass"></i>
+                        Obstacle App
+                    </a>
+                }
+
                 <button class="navbar-toggler" type="button"
                         data-bs-toggle="collapse" data-bs-target="#mainNav"
                         aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
