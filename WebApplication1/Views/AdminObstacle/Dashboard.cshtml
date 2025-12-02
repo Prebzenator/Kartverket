@@ -56,62 +56,62 @@
                     <i class="bi bi-person-plus me-1" aria-hidden="true"></i> Create user
                 </a>
             }
-            <a asp-controller="AdminObstacle" asp-action="ExportCsv" class="btn btn-outline-secondary" title="Export current view">
-                <i class="bi bi-download me-1" aria-hidden="true"></i> Export
-            </a>
+            
         </div>
     </div>
 
     <!-- Stats -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card h-100">
+            <div class="card h-100 bg-secondary text-white">
                 <div class="card-body">
-                    <small class="text-muted">Total</small>
+                    <small>Total</small>
                     <div class="d-flex align-items-center justify-content-between">
                         <h3 class="mb-0">@Model.TotalReports</h3>
-                        <i class="bi bi-archive-fill fs-3 text-secondary"></i>
+                        <i class="bi bi-archive-fill fs-3"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card h-100 border-warning">
+            <div class="card h-100 bg-warning text-white">
                 <div class="card-body">
-                    <small class="text-muted">Pending</small>
+                    <small>Pending</small>
                     <div class="d-flex align-items-center justify-content-between">
-                        <h3 class="mb-0 text-warning">@Model.PendingCount</h3>
-                        <i class="bi bi-clock-history fs-3 text-warning"></i>
+                        <h3 class="mb-0">@Model.PendingCount</h3>
+                        <i class="bi bi-clock-history fs-3"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card h-100 border-success">
+            <div class="card h-100 bg-success text-white">
                 <div class="card-body">
-                    <small class="text-muted">Approved</small>
+                    <small>Approved</small>
                     <div class="d-flex align-items-center justify-content-between">
-                        <h3 class="mb-0 text-success">@Model.ApprovedCount</h3>
-                        <i class="bi bi-check-circle-fill fs-3 text-success"></i>
+                        <h3 class="mb-0">@Model.ApprovedCount</h3>
+                        <i class="bi bi-check-circle-fill fs-3"></i>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="col-md-3">
-            <div class="card h-100 border-danger">
+            <div class="card h-100 bg-danger text-white">
                 <div class="card-body">
-                    <small class="text-muted">Rejected</small>
+                    <small>Rejected</small>
                     <div class="d-flex align-items-center justify-content-between">
-                        <h3 class="mb-0 text-danger">@Model.RejectedCount</h3>
-                        <i class="bi bi-x-circle-fill fs-3 text-danger"></i>
+                        <h3 class="mb-0">@Model.RejectedCount</h3>
+                        <i class="bi bi-x-circle-fill fs-3"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+
 
     <!-- Flash messages -->
     @if (TempData["SuccessMessage"] != null)

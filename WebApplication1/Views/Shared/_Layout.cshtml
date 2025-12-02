@@ -15,17 +15,14 @@
           href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
           crossorigin="anonymous" />
 
-    <!-- Leaflet + Draw (CSS) -->
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin="anonymous" />
     <link rel="stylesheet"
           href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"
           crossorigin="anonymous" />
 
     <style>
-        /* Standard høyde for kartet */
         #map, #app-map {
             height: 70vh;
             min-height: 420px;
@@ -35,7 +32,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
 
-    @* Render optional page-specific Styles section to avoid InvalidOperationException *@
     @RenderSection("Styles", required: false)
 </head>
 <body class="bg-body">
@@ -43,7 +39,7 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
             <div class="container-fluid">
                 <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
-                   asp-area="" asp-controller="Home" asp-action="Index">
+                   asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
                     <i class="bi bi-compass"></i>
                     Obstacle App
                 </a>
@@ -55,14 +51,25 @@
 
                 <div id="mainNav" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link d-flex align-items-center gap-1"
-                               asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-house-door"></i><span>Home</span>
-                            </a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house-door"></i><span>Home</span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-1"
+                                   asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
+                                    <i class="bi bi-house-door"></i><span>Dashboard</span>
+                                </a>
+                            </li>
+                        }
 
-                        @* My Reports (Pilots only) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
                         {
                             <li class="nav-item">
@@ -73,18 +80,16 @@
                             </li>
                         }
 
-                        @* Review Reports (Registry Administrators only) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Registry Administrator"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-controller="AdminObstacle" asp-action="Dashboard">
-                                    <i class="bi bi-clipboard-check"></i><span>Review Reports</span>
+                                   asp-controller="Admin" asp-action="AdminMap">
+                                    <i class="bi bi-map-fill"></i><span>Map</span>
                                 </a>
                             </li>
                         }
 
-                        @* Manage Users (System Administrators ONLY) *@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("System Administrator"))
                         {
                             <li class="nav-item">
@@ -109,7 +114,6 @@
                             </a>
                         }
 
-                        @* Bruker-dropdown: viser e-post/brukernavn, Change password og Log out *@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             var currentUser = await UserManager.GetUserAsync(User);
@@ -188,11 +192,9 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <!-- Leaflet + Draw (JS må lastes FØR side-spesifikke scripts) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js" crossorigin="anonymous"></script>
-    
-    <!-- Theme script -->
+
     <script>
         (function () {
             const STORAGE_KEY = 'theme';
@@ -201,16 +203,20 @@
             const initial = saved || (prefersDark ? 'dark' : 'light');
             setTheme(initial);
 
-            document.getElementById('theme-toggle')?.addEventListener('click', () => {
-                const html = document.documentElement;
-                const current = html.getAttribute('data-bs-theme') || 'light';
-                const next = current === 'light' ? 'dark' : 'light';
-                setTheme(next);
-                localStorage.setItem(STORAGE_KEY, next);
-            });
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    const html = document.documentElement;
+                    const current = html.getAttribute('data-bs-theme') || 'light';
+                    const next = current === 'light' ? 'dark' : 'light';
+                    setTheme(next);
+                    localStorage.setItem(STORAGE_KEY, next);
+                });
+            }
 
             function setTheme(theme) {
-                document.documentElement.setAttribute('data-bs-theme', theme);
+                const html = document.documentElement;
+                html.setAttribute('data-bs-theme', theme);
                 const icon = document.getElementById('theme-icon');
                 if (icon) {
                     icon.classList.remove('bi-moon', 'bi-sun');
@@ -220,7 +226,6 @@
         })();
     </script>
 
-    @* Render optional per-page scripts *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
