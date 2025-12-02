@@ -5,7 +5,7 @@ The test suite is divided into three projects: **Unit**, **Integration**, and **
 
 ---
 
-## 📁 Test project overview
+## Test project overview
 
 ```
 tests/
@@ -14,7 +14,7 @@ tests/
   WebApplication1.Tests.Security/
 ```
 
-### ✔ 1. Unit tests
+### 1. Unit tests
 Small, isolated tests such as:
 - ModelState behavior in `ObstacleController`
 - Helper methods (`UnitConverter`)
@@ -42,7 +42,7 @@ Does **not** use database or authentication.
 
 ---
 
-### ✔ 2. Integration tests
+### 2. Integration tests
 These tests use:
 - A real ObstacleController
 - Fake authenticated Pilot user
@@ -64,7 +64,7 @@ These tests use:
 
 ---
 
-### ✔ 3. Security tests
+### 3. Security tests
 Security tests check **attributes** using reflection.
 
 **`Review_Action_ShouldRequire_RegistryAdministrator_Role`**
@@ -80,7 +80,7 @@ These tests do not run logic — they verify security configuration.
 
 ---
 
-## ▶️ How to run tests
+## How to run tests
 
 ### In Visual Studio
 1. Open **Test Explorer**
@@ -108,7 +108,7 @@ dotnet test tests/WebApplication1.Tests.Security/WebApplication1.Tests.Security.
 
 ---
 
-## ✔ Summary
+## Summary
 
 This test suite covers:
 - Form submission and database flow (integration)
