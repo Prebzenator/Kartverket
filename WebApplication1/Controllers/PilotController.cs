@@ -55,7 +55,6 @@ namespace WebApplication1.Controllers
         /// <summary>
         /// Provides the form to edit a report owned by the current user.
         /// </summary>
-        /// <param name="id">The ID of the report to edit.</param>
         [HttpGet]
         public async Task<IActionResult> EditReport(int id)
         {
@@ -71,6 +70,13 @@ namespace WebApplication1.Controllers
                 return Forbid();
             }
 
+            // NEW: Prevent editing if report is already approved/rejected
+            if (report.Status == ReportStatus.Approved || report.Status == ReportStatus.NotApproved)
+            {
+                TempData["ErrorMessage"] = "Denne rapporten er allerede behandlet av admin og kan ikke endres.";
+                return RedirectToAction("ViewReport", new { id = report.Id });
+            }
+
             ViewBag.CategoryOptions = _context.ObstacleCategories
                 .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
@@ -83,9 +89,44 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
+        /// Handles submission of edited report data.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditReport(int id, ObstacleData updatedReport)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            var report = await _context.Obstacles.FindAsync(id);
+            if (report == null) return NotFound();
+
+            if (report.ReportedByUserId != user.Id)
+                return Forbid();
+
+            // NEW: Prevent editing if report is already approved/rejected
+            if (report.Status == ReportStatus.Approved || report.Status == ReportStatus.NotApproved)
+            {
+                TempData["ErrorMessage"] = "Rapporten er allerede behandlet av admin og kan ikke endres.";
+                return RedirectToAction("ViewReport", new { id = report.Id });
+            }
+
+            // Update allowed fields
+            report.ObstacleName = updatedReport.ObstacleName;
+            report.ObstacleDescription = updatedReport.ObstacleDescription;
+            report.ObstacleHeight = updatedReport.ObstacleHeight;
+            report.Latitude = updatedReport.Latitude;
+            report.Longitude = updatedReport.Longitude;
+            report.CategoryId = updatedReport.CategoryId;
+            report.GeometryJson = updatedReport.GeometryJson;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("ViewReport", new { id = report.Id });
+        }
+
+        /// <summary>
         /// Displays detailed information for a specific report.
         /// </summary>
-        /// <param name="id">The ID of the report to view.</param>
         [HttpGet]
         public async Task<IActionResult> ViewReport(int id)
         {
@@ -101,7 +142,8 @@ namespace WebApplication1.Controllers
                 return Forbid();
             }
 
-            ViewBag.CanEdit = (report.ReportedByUserId == user.Id);
+            // Only allow edit if user owns AND report is still pending
+            ViewBag.CanEdit = (report.ReportedByUserId == user.Id && report.Status == ReportStatus.Pending);
 
             return View(report);
         }

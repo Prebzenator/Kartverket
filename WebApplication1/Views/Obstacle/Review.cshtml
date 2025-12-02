@@ -55,7 +55,7 @@
                             </a>
                         </td>
                         <td>@item.Category?.Name</td>
-                        <td>@string.Format(CultureInfo.CurrentCulture, "{0:0.##}", item.ObstacleHeight)</td>
+                        <td>@item.ObstacleHeight?.ToString("F2", CultureInfo.CurrentCulture)</td>
                         <td class="d-none d-md-table-cell text-truncate" style="max-width:320px;">@item.ObstacleDescription</td>
                         <td>
                             @switch (item.Status)

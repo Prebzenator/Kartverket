@@ -61,8 +61,13 @@
 
                         <div class="mb-3">
                             <label asp-for="ObstacleHeight" class="form-label"></label>
-                            <input asp-for="ObstacleHeight" type="number" step="0.01" class="form-control" />
+                            <input asp-for="ObstacleHeight"
+                             type="number"
+                             step="0.01"
+                             class="form-control"
+                        value="@(Model.ObstacleHeight?.ToString("F2", CultureInfo.InvariantCulture))" />
                         </div>
+
 
                         <div class="mb-3">
                             <label asp-for="ObstacleDescription" class="form-label"></label>
