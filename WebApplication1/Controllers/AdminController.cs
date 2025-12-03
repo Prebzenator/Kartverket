@@ -29,13 +29,24 @@ namespace WebApplication1.Controllers
             _db = db;
         }
 
+        /// <summary>
+        /// GET: /Admin/CreateUser
+        /// Show create user form (System Administrator only).
+        /// </summary>
+        [Authorize(Roles = "System Administrator")]
         public IActionResult CreateUser()
         {
             return View(new CreateUserViewModel());
         }
 
+        /// <summary>
+        /// POST: /Admin/CreateUser
+        /// Creates a user and returns the CreateUserSuccess view with the temporary password.
+        /// Only System Administrator can perform.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "System Administrator")]
         public async Task<IActionResult> CreateUser(CreateUserViewModel vm)
         {
             if (!ModelState.IsValid) return View(vm);
@@ -59,19 +70,44 @@ namespace WebApplication1.Controllers
                 return View(vm);
             }
 
-            if (!string.IsNullOrWhiteSpace(vm.Role))
+            // Determine roles to assign
+            var rolesToAdd = new List<string>();
+            if (string.IsNullOrWhiteSpace(vm.Role))
             {
-                if (!await _roleManager.RoleExistsAsync(vm.Role))
-                {
-                    ModelState.AddModelError("", $"Role '{vm.Role}' does not exist.");
-                    await _userManager.DeleteAsync(user);
-                    return View(vm);
-                }
-                await _userManager.AddToRoleAsync(user, vm.Role);
+                rolesToAdd.Add("Pilot");
+            }
+            else if (vm.Role == "System Administrator")
+            {
+                // Makes sure System Administrators also get Registry Administrator role
+                rolesToAdd.Add("System Administrator");
+                rolesToAdd.Add("Registry Administrator");
             }
             else
             {
-                await _userManager.AddToRoleAsync(user, "Pilot");
+                rolesToAdd.Add(vm.Role);
+            }
+
+            foreach (var role in rolesToAdd.Distinct())
+            {
+                if (!await _roleManager.RoleExistsAsync(role))
+                {
+                    await _userManager.DeleteAsync(user);
+                    ModelState.AddModelError("", $"Role '{role}' does not exist.");
+                    return View(vm);
+                }
+            }
+
+            // Add roles or rollback if any fail
+            foreach (var role in rolesToAdd.Distinct())
+            {
+                var addRoleResult = await _userManager.AddToRoleAsync(user, role);
+                if (!addRoleResult.Succeeded)
+                {
+                    // rollback: remove user if role assignment fails
+                    await _userManager.DeleteAsync(user);
+                    ModelState.AddModelError("", string.Join("; ", addRoleResult.Errors.Select(e => e.Description)));
+                    return View(vm);
+                }
             }
 
             var successVm = new CreateUserSuccessViewModel
@@ -86,9 +122,91 @@ namespace WebApplication1.Controllers
             return View("CreateUserSuccess", successVm);
         }
 
+        /// <summary>
+        /// Manage users page: list existing users and provide delete action.
+        /// Only System Administrator can access.
+        /// </summary>
+        [Authorize(Roles = "System Administrator")]
+        public async Task<IActionResult> ManageUsers()
+        {
+            var users = await _userManager.Users
+                .OrderBy(u => u.Email)
+                .ToListAsync();
 
+            var vm = new ManageUsersViewModel
+            {
+                Users = new List<AdminUserListItemViewModel>()
+            };
+
+            foreach (var u in users)
+            {
+                var roles = await _userManager.GetRolesAsync(u);
+                vm.Users.Add(new AdminUserListItemViewModel
+                {
+                    Id = u.Id,
+                    Email = u.Email,
+                    FullName = u.FullName,
+                    Organization = u.Organization,
+                    Roles = string.Join(", ", roles)
+                });
+            }
+
+            return View(vm);
+        }
+
+        /// <summary>
+        /// Delete user (POST). Safety checks: cannot delete yourself, cannot delete last System Administrator.
+        /// Only System Administrator can perform.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "System Administrator")]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                TempData["Error"] = "User not found.";
+                return RedirectToAction(nameof(ManageUsers));
+            }
+
+            // Prevent deleting yourself
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser != null && currentUser.Id == user.Id)
+            {
+                TempData["Error"] = "You cannot delete your own account.";
+                return RedirectToAction(nameof(ManageUsers));
+            }
+
+            // Prevent deleting the last System Administrator
+            if (await _userManager.IsInRoleAsync(user, "System Administrator"))
+            {
+                var admins = await _userManager.GetUsersInRoleAsync("System Administrator");
+                if (admins.Count <= 1)
+                {
+                    TempData["Error"] = "Cannot delete the last System Administrator account.";
+                    return RedirectToAction(nameof(ManageUsers));
+                }
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = string.Join("; ", result.Errors.Select(e => e.Description));
+            }
+            else
+            {
+                TempData["Success"] = $"User {user.Email} deleted.";
+            }
+
+            return RedirectToAction(nameof(ManageUsers));
+        }
+
+        /// <summary>
         /// Returns the AdminMap view with approved obstacles for Registry Administrators.
-
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> AdminMap()
         {

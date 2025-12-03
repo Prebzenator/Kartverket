@@ -38,11 +38,13 @@
     <header class="border-bottom bg-body">
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
             <div class="container-fluid">
-                @* Logo: route based on role (Pilot -> Home, otherwise AdminObstacle Dashboard) *@
-                @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
+                @* Logo: route based on role
+                   - Registry Administrator or System Administrator -> AdminObstacle/Dashboard
+                   - Otherwise (including unauthenticated and Pilot) -> Home/Index *@
+                @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Registry Administrator") || User.IsInRole("System Administrator")))
                 {
                     <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
-                       asp-area="" asp-controller="Home" asp-action="Index">
+                       asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
                         <i class="bi bi-compass"></i>
                         Obstacle App
                     </a>
@@ -50,7 +52,7 @@
                 else
                 {
                     <a class="navbar-brand fw-semibold d-flex align-items-center gap-2"
-                       asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
+                       asp-area="" asp-controller="Home" asp-action="Index">
                         <i class="bi bi-compass"></i>
                         Obstacle App
                     </a>
@@ -64,12 +66,13 @@
 
                 <div id="mainNav" class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto">
-                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pilot"))
+                        @* Home / Dashboard: Registry/System Admin -> Dashboard, otherwise -> Home *@
+                        @if (User.Identity?.IsAuthenticated == true && (User.IsInRole("Registry Administrator") || User.IsInRole("System Administrator")))
                         {
                             <li class="nav-item">
                                 <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-area="" asp-controller="Home" asp-action="Index">
-                                    <i class="bi bi-house-door"></i><span>Home</span>
+                                   asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
+                                    <i class="bi bi-house-door"></i><span>Dashboard</span>
                                 </a>
                             </li>
                         }
@@ -77,8 +80,8 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-area="" asp-controller="AdminObstacle" asp-action="Dashboard">
-                                    <i class="bi bi-house-door"></i><span>Dashboard</span>
+                                   asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house-door"></i><span>Home</span>
                                 </a>
                             </li>
                         }
@@ -107,8 +110,8 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link d-flex align-items-center gap-1"
-                                   asp-controller="Admin" asp-action="CreateUser">
-                                    <i class="bi bi-person-plus"></i><span>Create User</span>
+                                   asp-controller="Admin" asp-action="ManageUsers">
+                                    <i class="bi bi-people"></i><span>Manage Users</span>
                                 </a>
                             </li>
                         }
