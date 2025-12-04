@@ -1,7 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+/// <summary>
+/// ViewModel used for handling user login, including email, password,
+/// optional persistent login, and an optional return URL after authentication.
+/// </summary>
 namespace WebApplication1.ViewModels
 {
+// ViewModel for user login
     public class LoginViewModel
     {
         [Required]
@@ -16,9 +21,9 @@ namespace WebApplication1.ViewModels
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
 
-        /// <summary>
-        /// The URL to redirect to after a successful login.
-        /// </summary>
+        
+// The URL to redirect to after a successful login.
+       
         public string? ReturnUrl { get; set; }
     }
 }
