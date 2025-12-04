@@ -16,16 +16,18 @@ namespace WebApplication1.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
+        /// <summary>
+        /// Initializes the PilotController with database context and user manager.
+        /// </summary>
         public PilotController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        /// <summary>
-        /// Displays a dashboard of all reports associated with the user's organization.
-        /// Allows organization members to coordinate by viewing colleague reports.
-        /// </summary>
+        // GET: /Pilot/Log
+        // Displays a dashboard of all reports associated with the user's organization
+        // Allows organization members to coordinate by viewing colleague reports
         [HttpGet]
         public async Task<IActionResult> Log()
         {
@@ -36,25 +38,27 @@ namespace WebApplication1.Controllers
 
             if (string.IsNullOrEmpty(userOrg))
             {
+                // Safety check:
+                // User has no organization assigned, cannot fetch reports
                 TempData["ErrorMessage"] = "You don't have an organization assigned.";
                 return View(new List<ObstacleData>());
             }
 
-            // Retrieve all reports from the user's organization, ordered by recency
+            // Retrieve all reports from the user's organization, ordered by most recent first
             var reports = await _context.Obstacles
                 .Where(o => o.ReporterOrganization == userOrg)
                 .OrderByDescending(o => o.ReportedAt)
                 .ToListAsync();
 
+            // Pass current user and organization info to the view
             ViewBag.CurrentUserId = user.Id;
             ViewBag.OrganizationName = userOrg;
 
             return View(reports);
         }
 
-        /// <summary>
-        /// Provides the form to edit a report owned by the current user.
-        /// </summary>
+        // GET: /Pilot/EditReport/{id}
+        // Provides the form to edit a report owned by the current user
         [HttpGet]
         public async Task<IActionResult> EditReport(int id)
         {
@@ -70,13 +74,14 @@ namespace WebApplication1.Controllers
                 return Forbid();
             }
 
-            // NEW: Prevent editing if report is already approved/rejected
+            // Prevent editing if report is already approved or rejected
             if (report.Status == ReportStatus.Approved || report.Status == ReportStatus.NotApproved)
             {
-                TempData["ErrorMessage"] = "Denne rapporten er allerede behandlet av admin og kan ikke endres.";
+                TempData["ErrorMessage"] = "This report has already been processed by admin and cannot be edited.";
                 return RedirectToAction("ViewReport", new { id = report.Id });
             }
 
+            // Show category options in the view
             ViewBag.CategoryOptions = _context.ObstacleCategories
                 .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
@@ -85,12 +90,12 @@ namespace WebApplication1.Controllers
                 })
                 .ToList();
 
+            // Reuse the obstacle DataForm view for editing
             return View("~/Views/Obstacle/DataForm.cshtml", report);
         }
 
-        /// <summary>
-        /// Handles submission of edited report data.
-        /// </summary>
+        // POST: /Pilot/EditReport/{id}
+        // Handles submission of edited report data
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditReport(int id, ObstacleData updatedReport)
@@ -101,17 +106,18 @@ namespace WebApplication1.Controllers
             var report = await _context.Obstacles.FindAsync(id);
             if (report == null) return NotFound();
 
+            // Security check: Users can only edit their own reports
             if (report.ReportedByUserId != user.Id)
                 return Forbid();
 
-            // NEW: Prevent editing if report is already approved/rejected
+            // Prevent editing if report is already approved or rejected
             if (report.Status == ReportStatus.Approved || report.Status == ReportStatus.NotApproved)
             {
-                TempData["ErrorMessage"] = "Rapporten er allerede behandlet av admin og kan ikke endres.";
+                TempData["ErrorMessage"] = "This report has already been processed by admin and cannot be edited.";
                 return RedirectToAction("ViewReport", new { id = report.Id });
             }
 
-            // Update allowed fields
+            // Update allowed fields only (ownership and status already checked)
             report.ObstacleName = updatedReport.ObstacleName;
             report.ObstacleDescription = updatedReport.ObstacleDescription;
             report.ObstacleHeight = updatedReport.ObstacleHeight;
@@ -121,12 +127,13 @@ namespace WebApplication1.Controllers
             report.GeometryJson = updatedReport.GeometryJson;
 
             await _context.SaveChangesAsync();
+
+            // Redirect back to the detailed view of the updated report
             return RedirectToAction("ViewReport", new { id = report.Id });
         }
 
-        /// <summary>
-        /// Displays detailed information for a specific report.
-        /// </summary>
+        // GET: /Pilot/ViewReport/{id}
+        // Displays detailed information for a specific report
         [HttpGet]
         public async Task<IActionResult> ViewReport(int id)
         {
@@ -142,7 +149,7 @@ namespace WebApplication1.Controllers
                 return Forbid();
             }
 
-            // Only allow edit if user owns AND report is still pending
+            // Only allow edit if user owns the report AND it is still pending
             ViewBag.CanEdit = (report.ReportedByUserId == user.Id && report.Status == ReportStatus.Pending);
 
             return View(report);

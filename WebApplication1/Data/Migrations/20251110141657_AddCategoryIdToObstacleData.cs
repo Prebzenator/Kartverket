@@ -33,20 +33,11 @@ namespace WebApplication1.Data.Migrations
                 keyValue: 4,
                 column: "Name",
                 value: "Cable");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Obstacles_CategoryId",
-                table: "Obstacles",
-                column: "CategoryId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropIndex(
-                name: "IX_Obstacles_CategoryId",
-                table: "Obstacles");
-
             migrationBuilder.AlterColumn<int>(
                 name: "CategoryId",
                 table: "Obstacles",
