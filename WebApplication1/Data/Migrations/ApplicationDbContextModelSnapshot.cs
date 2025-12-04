@@ -413,7 +413,9 @@ namespace WebApplication1.Data.Migrations
                 {
                     b.HasOne("WebApplication1.Models.ObstacleCategory", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Category");
                 });

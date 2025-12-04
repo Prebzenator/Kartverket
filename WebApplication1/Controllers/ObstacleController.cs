@@ -18,7 +18,7 @@ namespace WebApplication1.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         /// <summary>
-        /// Constructor injecting database context and user manager.
+        /// Initializes the controller with database context and user manager.
         /// </summary>
         public ObstacleController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -26,10 +26,9 @@ namespace WebApplication1.Controllers
             _userManager = userManager;
         }
 
-        /// <summary>
-        /// Displays the obstacle reporting form.
-        /// </summary>
-        /// <param name="missing">If true, prefills the name for a missing obstacle report.</param>
+        // GET: /Obstacle/DataForm
+        // Displays the obstacle reporting form
+        // If "missing" is true, pre-fills the name for a missing obstacle report
         [HttpGet]
         public IActionResult DataForm(bool missing = false)
         {
@@ -37,10 +36,12 @@ namespace WebApplication1.Controllers
 
             if (missing)
             {
+                // Pre-fill the obstacle name to indicate a missing report
                 model.ObstacleName = "MISSING - ";
                 ViewBag.Missing = true;
             }
 
+            // Shows category options
             ViewBag.CategoryOptions = _context.ObstacleCategories
                 .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                 {
@@ -52,16 +53,20 @@ namespace WebApplication1.Controllers
             return View(model);
         }
 
-        /// <summary>
-        /// Processes the submission of an obstacle report (create or edit).
-        /// </summary>
+        // POST: /Obstacle/DataForm
+        // Processes the submission of an obstacle report (create or edit)
+        // Supports draft saving via IsDraft=true
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DataForm(Microsoft.AspNetCore.Http.IFormCollection form, string? IsDraft, int? id)
         {
+            // Determine if the submission should be treated as a draft
+            // Drafts skip full validation and are marked NotApproved
             var isDraft = string.Equals(IsDraft, "true", StringComparison.OrdinalIgnoreCase);
+
             var user = await _userManager.GetUserAsync(User);
 
+            // Helper function to parse decimal values (height, latitude, longitude) from string
             decimal? ParseDecimalRaw(string? raw)
             {
                 if (string.IsNullOrWhiteSpace(raw)) return null;
@@ -71,12 +76,15 @@ namespace WebApplication1.Controllers
                 return null;
             }
 
+            // Parse height input from form
             var heightRaw = form["HeightInputRaw"].FirstOrDefault();
             var parsedHeightInput = ParseDecimalRaw(heightRaw);
 
             decimal? heightMetersFromInput = null;
             if (parsedHeightInput.HasValue)
             {
+                // Pilots enter height in feet, convert to meters
+                // Other roles enter directly in meters
                 if (User.IsInRole("Pilot"))
                 {
                     heightMetersFromInput = UnitConverter.ToMeters(parsedHeightInput);
@@ -91,14 +99,17 @@ namespace WebApplication1.Controllers
 
             if (id.HasValue && id.Value > 0)
             {
+                // Editing an existing obstacle report
                 obstacledata = await _context.Obstacles.FindAsync(id.Value);
                 if (obstacledata == null) return NotFound();
 
+                // Only the original reporter can edit their own report
                 if (user != null && obstacledata.ReportedByUserId != user.Id)
                 {
                     return Forbid();
                 }
 
+                // Update fields from form input
                 obstacledata.ObstacleName = form["ObstacleName"].ToString() ?? string.Empty;
                 obstacledata.ObstacleHeight = heightMetersFromInput ?? obstacledata.ObstacleHeight;
                 obstacledata.ObstacleDescription = form["ObstacleDescription"].FirstOrDefault();
@@ -113,6 +124,7 @@ namespace WebApplication1.Controllers
             }
             else
             {
+                // Creating a new obstacle report
                 obstacledata = new ObstacleData
                 {
                     ObstacleName = form["ObstacleName"].FirstOrDefault() ?? string.Empty,
@@ -125,6 +137,7 @@ namespace WebApplication1.Controllers
                     DateData = DateTime.UtcNow
                 };
 
+                // Attach reporter details if available
                 if (user != null)
                 {
                     obstacledata.ReportedByUserId = user.Id;
@@ -140,13 +153,13 @@ namespace WebApplication1.Controllers
                 _context.Obstacles.Add(obstacledata);
             }
 
+            // Set report status depending on draft flag
             obstacledata.Status = isDraft ? ReportStatus.NotApproved : ReportStatus.Pending;
 
             if (!isDraft)
             {
-                // Validate required fields manually
-                // submition requires all fields to be filled, however some are not nullable in the model
-                // Therefore, submitting will show validation errors in 2 rounds
+                // Manual validation of required fields when submitting (not draft)
+                // Drafts bypass this strict validation
                 if (string.IsNullOrWhiteSpace(obstacledata.ObstacleName))
                     ModelState.AddModelError(nameof(obstacledata.ObstacleName), "Name is required.");
 
@@ -164,6 +177,7 @@ namespace WebApplication1.Controllers
 
                 if (!ModelState.IsValid)
                 {
+                    // If validation fails, categorize options and return to form view
                     ViewBag.CategoryOptions = _context.ObstacleCategories
                         .Select(c => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
                         {
@@ -186,9 +200,8 @@ namespace WebApplication1.Controllers
             return View("Overview", obstacledata);
         }
 
-        /// <summary>
-        /// Redirects to the Admin Dashboard.
-        /// </summary>
+        // GET: /Obstacle/Review
+        // Redirects to the Admin Dashboard
         [Authorize(Roles = "Registry Administrator")]
         [HttpGet]
         public IActionResult Review()
@@ -196,9 +209,8 @@ namespace WebApplication1.Controllers
             return RedirectToAction("Dashboard", "AdminObstacle");
         }
 
-        /// <summary>
-        /// Redirects to the Admin Dashboard filtered by Pending status.
-        /// </summary>
+        // GET: /Obstacle/ReviewPending
+        // Redirects to the Admin Dashboard filtered by Pending status
         [Authorize(Roles = "Registry Administrator")]
         [HttpGet]
         public IActionResult ReviewPending()
@@ -206,15 +218,16 @@ namespace WebApplication1.Controllers
             return RedirectToAction("Dashboard", "AdminObstacle", new { filterStatus = "Pending" });
         }
 
-        /// <summary>
-        /// Redirects to the Admin Dashboard.
-        /// </summary>
+        // POST: /Obstacle/UpdateStatus
+        // Updates status and redirects to the Admin Dashboard
         [Authorize(Roles = "Registry Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult UpdateStatus(int id, ReportStatus status)
         {
+            // Redirect to AdminObstacle Dashboard. Actual status update is handled there.
             return RedirectToAction("Dashboard", "AdminObstacle");
         }
     }
 }
+

@@ -16,7 +16,7 @@ namespace WebApplication1.Models
         public string ObstacleName { get; set; } = string.Empty;
 
         [DisplayName("Category")]
-        public int? CategoryId { get; set; }
+        public int? CategoryId { get; set; } // Made CategoryId nullable
 
         [ForeignKey("CategoryId")]
         public ObstacleCategory? Category { get; set; }
