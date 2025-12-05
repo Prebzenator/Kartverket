@@ -3,7 +3,8 @@
 namespace WebApplication1.ViewModels
 {
     /// <summary>
-    /// Data required to create a new user.
+    /// ViewModel containing the data required to create a new user.
+    /// Used in the admin create user form.
     /// </summary>
     public class CreateUserViewModel
     {
@@ -21,11 +22,13 @@ namespace WebApplication1.ViewModels
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        // Role assigned to the new user (e.g. Pilot, Registry Administrator, System Administrator)
         public string Role { get; set; } = string.Empty;
     }
 
     /// <summary>
-    /// Data displayed upon successful user creation, including the temporary password.
+    /// ViewModel used after successful user creation.
+    /// Contains the temporary password and basic user details for display.
     /// </summary>
     public class CreateUserSuccessViewModel
     {
@@ -33,6 +36,8 @@ namespace WebApplication1.ViewModels
         public string Organization { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
+
+        // Temporary password generated for the new user
         public string TempPassword { get; set; } = string.Empty;
     }
 }
