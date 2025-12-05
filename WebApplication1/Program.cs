@@ -5,14 +5,23 @@ using System.Globalization;
 using WebApplication1.Data;
 using WebApplication1.Models;
 
+/// <summary>
+/// Main entry point for the WebApplication1 ASP.NET Core application.
+/// Configures services, middleware, and database connections.
+/// </summary>
+
+
 // Set default culture to en-US for consistent formatting
 var defaultCulture = new CultureInfo("en-US");
 CultureInfo.DefaultThreadCurrentCulture = defaultCulture;
 CultureInfo.DefaultThreadCurrentUICulture = defaultCulture;
 
+// Application builder initialization
+// Create the WebApplication builder
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+// Supports both MySQL/MariaDB and SQLite(LocalDev) based on connection string
 // Configure ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -55,6 +64,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 // Configure Identity
+// Sets password rules, unique email requirement, and token providers
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequireDigit = true;
@@ -64,9 +74,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequireNonAlphanumeric = false;
     options.User.RequireUniqueEmail = true;
 })
+// Use Entity Framework stores for Identity
+// Give support to email confirmation and password reset tokens
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// Add MVC controllers with views
 builder.Services.AddControllersWithViews();
 
 // Data Protection configuration
@@ -74,9 +87,11 @@ builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("/root/.aspnet/DataProtection-Keys"))
     .SetApplicationName("kartverket");
 
+// Build the WebApplication and migrate database
 var app = builder.Build();
 
 // Apply migrations and seed data
+// Includes retry logic if DB is not yet available
 try
 {
     using var scope = app.Services.CreateScope();
@@ -98,9 +113,10 @@ try
         {
             try
             {
+                // Apply pending migrations
                 db.Database.Migrate();
                 logger.LogInformation("Migrations applied successfully.");
-
+                // Seed roles(Admin, pilot and registry administrator)
                 try
                 {
                     await RoleSeeder.SeedAsync(services);
@@ -143,6 +159,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Static files, routing, authentication and authorization
 app.UseStaticFiles();
 app.UseRouting();
 
