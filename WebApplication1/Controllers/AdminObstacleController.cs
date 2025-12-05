@@ -10,22 +10,26 @@ namespace WebApplication1.Controllers
 {
     /// <summary>
     /// Controller for Registry Administrators to review, approve, or reject obstacle reports.
+    /// Manage obstacle reports submitted by users.
+    /// Only registry administrators have access.
     /// </summary>
     [Authorize(Roles = "Registry Administrator")]
     public class AdminObstacleController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ApplicationDbContext _context; // Database context
+        private readonly UserManager<ApplicationUser> _userManager; // User manager for identity operations
 
+// inject required services for database access and user management
         public AdminObstacleController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        /// <summary>
-        /// Displays the main dashboard with filtering and sorting options for all reports.
-        /// </summary>
+// GET: /AdminObstacle/Dashboard
+// Displays the main dashboard with filtering and sorting options for all reports
+// Administrators can filter by status, organization, category, and search text
+    
         [HttpGet]
         public async Task<IActionResult> Dashboard(
             string sortBy = "date",
@@ -34,27 +38,29 @@ namespace WebApplication1.Controllers
             string filterCategory = "all",
             string? q = null)
         {
+// Base query for obstacles 
             var query = _context.Obstacles
                 .AsNoTracking()
                 .Include(o => o.Category)
                 .AsQueryable();
 
+//Search by name or reporter name
             if (!string.IsNullOrWhiteSpace(q))
             {
                 var qTrim = q.Trim();
                 query = query.Where(o => o.ObstacleName.Contains(qTrim) || (o.ReporterName != null && o.ReporterName.Contains(qTrim)));
             }
-
+//
             if (filterStatus != "all" && Enum.TryParse<ReportStatus>(filterStatus, out var status))
             {
                 query = query.Where(o => o.Status == status);
             }
-
+// Filter by reporting organization
             if (filterOrg != "all")
             {
                 query = query.Where(o => o.ReporterOrganization != null && o.ReporterOrganization == filterOrg);
             }
-
+// Filter by category
             if (!string.IsNullOrEmpty(filterCategory) && filterCategory != "all")
             {
                 if (filterCategory == "uncategorized")
@@ -66,7 +72,7 @@ namespace WebApplication1.Controllers
                     query = query.Where(o => o.CategoryId == catId);
                 }
             }
-
+// Sorting option
             query = sortBy switch
             {
                 "date" => query.OrderByDescending(o => o.ReportedAt),
@@ -80,18 +86,21 @@ namespace WebApplication1.Controllers
             };
 
             var reports = await query.ToListAsync();
+// Debug info for admin
 
             ViewBag.Debug_ReturnedCount = reports.Count;
             ViewBag.Debug_ReturnedUncategorized = reports.Count(r => r.CategoryId == null);
 
+// Load administrators for assignment
             var admins = await _userManager.GetUsersInRoleAsync("Registry Administrator");
 
+// Distinct list of orgnaizations for filtering
             var organizations = await _context.Obstacles
                 .Where(o => o.ReporterOrganization != null)
                 .Select(o => o.ReporterOrganization)
                 .Distinct()
                 .ToListAsync();
-
+// Category list for dropdowns
             var categoriesFromDb = await _context.ObstacleCategories
                 .AsNoTracking()
                 .OrderBy(c => c.Name)
@@ -101,6 +110,7 @@ namespace WebApplication1.Controllers
             ViewBag.Debug_TotalInDb = await _context.Obstacles.CountAsync();
             ViewBag.Debug_UncategorizedInDb = await _context.Obstacles.CountAsync(o => o.CategoryId == null);
 
+// Build view model
             var viewModel = new AdminDashboardViewModel
             {
                 Reports = reports,
@@ -119,6 +129,10 @@ namespace WebApplication1.Controllers
             return View(viewModel);
         }
 
+// GET: /AdminObstacle/ViewReport/{id}
+// Loads a single report by id
+// Load all registry administrators for assignment
+// Display the report details view
         [HttpGet]
         public async Task<IActionResult> ViewReport(int id)
         {
@@ -131,6 +145,8 @@ namespace WebApplication1.Controllers
             return View(report);
         }
 
+// POST: /AdminObstacle/UpdateReport/{id}
+// Updates report details such as name, height, description, and location
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateReport(int id, ObstacleData model)
@@ -150,6 +166,8 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(ViewReport), new { id });
         }
 
+// POST: /AdminObstacle/AssignReport
+// Assign or unassign a report to a registry administrator
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignReport(int id, string assignToUserId)
@@ -178,9 +196,11 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(ViewReport), new { id });
         }
 
-        /// <summary>
-        /// Marks a report as Approved, indicating it is ready for integration into the national register.
-        /// </summary>
+        
+
+// POST: /AdminObstacle/ApproveReport
+ // Marks a report as Approved, indicating it is ready for integration into the national register.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveReport(int id)
@@ -207,9 +227,10 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
-        /// <summary>
-        /// Rejects a report and requires administrative comments explaining the reason.
-        /// </summary>
+
+// POST: /AdminObstacle/RejectReport
+// Rejects a report and requires administrative comments explaining the reason.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectReport(int id, string adminComments)
@@ -237,9 +258,10 @@ namespace WebApplication1.Controllers
             return RedirectToAction(nameof(Dashboard));
         }
 
-        /// <summary>
-        /// Reverts a report status to Pending.
-        /// </summary>
+// POST: /AdminObstacle/SetPending
+// <summary>
+// Reverts a report status to Pending.
+// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetPending(int id)

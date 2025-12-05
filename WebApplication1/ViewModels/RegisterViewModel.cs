@@ -2,9 +2,10 @@
 
 namespace WebApplication1.ViewModels
 {
-    /// <summary>
-    /// ViewModel for the user registration form.
-    /// </summary>
+/// <summary>
+/// ViewModel used for collecting user information during registration,
+/// including name, organization, email, and password confirmation.
+/// </summary>
     public class RegisterViewModel
     {
         [Required]

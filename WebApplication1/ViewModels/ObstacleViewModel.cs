@@ -1,5 +1,10 @@
 using WebApplication1.Helpers;
 
+/// <summary>
+/// ViewModel used for creating and editing obstacle data in forms.
+/// Stores height in meters, accepts raw height input for parsing,
+/// and provides a calculated height in feet for display purposes.
+/// </summary>
 namespace WebApplication1.ViewModels
 {
     public class ObstacleViewModel
